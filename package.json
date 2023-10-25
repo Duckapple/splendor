@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "build:function": "(cd function-src && bun ./build.ts)"
+  },
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^3.3.0",
+    "bun-types": "latest"
+  },
+  "name": "splendor",
+  "module": "index.js",
+  "type": "module",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
