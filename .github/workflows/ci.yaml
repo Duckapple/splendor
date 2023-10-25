@@ -17,12 +17,9 @@ jobs:
 
       - id: "auth"
         uses: "google-github-actions/auth@v1"
-        env:
-          WORKLOAD_IDENTITY_TOKEN: ${{ secrets.WORKLOAD_IDENTITY_TOKEN }}
-          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
         with:
-          workload_identity_provider: "$WORKLOAD_IDENTITY_TOKEN"
-          service_account: "$SERVICE_ACCOUNT"
+          workload_identity_provider: "projects/477772360728/locations/global/workloadIdentityPools/pool/providers/github-actions-oidc"
+          service_account: "conint@organic-folder-403021.iam.gserviceaccount.com"
 
       - id: "deploy"
         uses: "google-github-actions/deploy-cloud-functions@v1"
