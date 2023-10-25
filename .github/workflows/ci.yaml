@@ -1,0 +1,30 @@
+on:
+  push:
+    branches: "main"
+
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "oven-sh/setup-bun@v1"
+
+      - run: "bun run build:function"
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_TOKEN }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
+      - id: "deploy"
+        uses: "google-github-actions/deploy-cloud-functions@v1"
+        with:
+          name: "splendor"
+          runtime: "nodejs20"
+          source_dir: "./function"
+          entry_point: "index.js"
