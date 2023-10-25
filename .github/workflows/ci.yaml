@@ -26,5 +26,6 @@ jobs:
         with:
           name: "splendor"
           runtime: "nodejs20"
+          region: "europe-west3"
           source_dir: "./function"
           entry_point: "index.js"
