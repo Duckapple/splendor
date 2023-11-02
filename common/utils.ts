@@ -9,8 +9,13 @@ export function shuffled<T>(sourceArr: T[]): T[] {
   return arr;
 }
 
-export function range<T extends number>(
-  length: T
-): number[] & { length: typeof length } {
-  return Array(length).map((_, i) => i) as any;
+export function range(i: number, j?: number) {
+  let x = 0;
+  if (j !== undefined) {
+    x = i;
+    i = j;
+  }
+  return Array(i - x)
+    .fill(0)
+    .map(() => x++);
 }
