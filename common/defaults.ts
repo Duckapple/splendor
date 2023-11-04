@@ -136,5 +136,13 @@ export function newGameState(playerCount: 2 | 3 | 4): GameState {
     );
   }
 
-  return { shown, tokens, piles };
+  const players = range(playerCount).map(() => ({
+    id: "lmao",
+    cards: { high: [], middle: [], low: [], persons: [] },
+    tokens: [0, 0, 0, 0, 0, 0] as const,
+  }));
+
+  const id = "xddd";
+
+  return { id, shown, tokens, piles, players, turn: 0 };
 }

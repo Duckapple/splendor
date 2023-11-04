@@ -3,3 +3,4 @@ function
 !function/package.json
 node_modules
 function.zip
+.env.yaml

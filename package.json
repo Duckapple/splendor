@@ -1,18 +1,25 @@
 {
   "scripts": {
     "build:function": "(cd function-src && bun ./build.ts)",
-    "deploy:function": "gcloud functions deploy splendor-test --region=europe-west3 --trigger-http --runtime=nodejs20 --source=function --allow-unauthenticated --gen2",
-    "build:frontend": "cd frontend && bun run build"
+    "deploy:function": "gcloud functions deploy splendor-test --region=europe-west3 --trigger-http --runtime=nodejs20 --source=function --allow-unauthenticated --gen2 --env-vars-file .env.yaml",
+    "frontend": "cd frontend && bun run",
+    "preview": "bun run frontend build && bun run frontend preview"
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "^3.3.0",
     "@google-cloud/datastore": "^8.2.2",
-    "bun-types": "latest"
+    "@types/web-push": "^3.6.2",
+    "bun-types": "latest",
+    "web-push": "^3.6.6"
   },
   "name": "splendor",
   "module": "index.js",
   "type": "module",
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "neverthrow": "^6.1.0",
+    "valibot": "^0.20.1"
   }
 }
