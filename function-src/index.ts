@@ -5,14 +5,14 @@ import { err, fromThrowable, ok } from "neverthrow";
 import { object, safeParse as _safeParse, string, BaseSchema } from "valibot";
 import { randomUUID } from "crypto";
 
+import { newGameState } from "../common/defaults";
+
 function safeParse<TSchema extends BaseSchema>(schema: TSchema) {
   return function (data: unknown) {
     const val = _safeParse(schema, data);
     return val.success ? ok(val.output) : err(val.issues);
   };
 }
-
-import { newGameState } from "../common/defaults";
 
 const requiredEnv = ["MAIL", "PUBLIC_KEY", "PRIVATE_KEY"] as const;
 

@@ -34,8 +34,8 @@ export type ShownGameState = Omit<GameState, "piles" | "players"> & {
 };
 
 export type Actions = (BuyCard | TakePerson | TakeTokens | Reserve) & {
-  id: ID;
-  playerID: ID;
+  gameId: ID;
+  playerId: ID;
 };
 
 export type BuyCard = {
