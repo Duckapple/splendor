@@ -1,4 +1,5 @@
 import { http, type HttpFunction } from "@google-cloud/functions-framework";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/planetscale-serverless";
 import { connect } from "@planetscale/database";
 import webPush from "web-push";
@@ -7,6 +8,7 @@ import { object, safeParse as _safeParse, string, BaseSchema } from "valibot";
 import { randomUUID } from "crypto";
 
 import { newGameState } from "../common/defaults";
+import { Push, User } from "../db/schema";
 
 function safeParse<TSchema extends BaseSchema>(schema: TSchema) {
   return function (data: unknown) {
@@ -51,6 +53,16 @@ http("splendor-test", async (req, res) => {
   if (req.method === "POST" && req.body) {
     return sub(req, res);
   }
+
+  const y = await db
+    .select()
+    .from(User)
+    .where(eq(User.userName, "Duckapple"))
+    .leftJoin(Push, eq(User.id, Push.userId));
+
+  res.send(y.map((d) => ({ ...d.Push, userName: d.User.userName })));
+
+  return;
 
   // const data = await db.select().from(testTable);
 
