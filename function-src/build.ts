@@ -6,6 +6,7 @@ await Bun.build({
     "@google-cloud/datastore",
     "web-push",
     "crypto",
+    "bcrypt",
   ],
   minify: true,
 });

@@ -7,7 +7,6 @@ import { object, safeParse as _safeParse, string, BaseSchema } from "valibot";
 import { randomUUID } from "crypto";
 
 import { newGameState } from "../common/defaults";
-import { Test, testTable } from "../db/schema";
 
 function safeParse<TSchema extends BaseSchema>(schema: TSchema) {
   return function (data: unknown) {
@@ -53,11 +52,11 @@ http("splendor-test", async (req, res) => {
     return sub(req, res);
   }
 
-  const data = await db.select().from(testTable);
+  // const data = await db.select().from(testTable);
 
   const kind = "Splendor Game State";
 
-  const name = data[0].firstName || req.query.name?.toString() || "default";
+  const name = req.query.name?.toString() || "default";
 
   // The Cloud Datastore key for the new entity
   const key = ds.key([kind, name]);
