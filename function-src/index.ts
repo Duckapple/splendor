@@ -1,11 +1,13 @@
 import { http, type HttpFunction } from "@google-cloud/functions-framework";
-import { Datastore } from "@google-cloud/datastore";
+import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { connect } from "@planetscale/database";
 import webPush from "web-push";
 import { err, fromThrowable, ok } from "neverthrow";
 import { object, safeParse as _safeParse, string, BaseSchema } from "valibot";
 import { randomUUID } from "crypto";
 
 import { newGameState } from "../common/defaults";
+import { Test, testTable } from "../db/schema";
 
 function safeParse<TSchema extends BaseSchema>(schema: TSchema) {
   return function (data: unknown) {
@@ -26,16 +28,36 @@ const env: Record<(typeof requiredEnv)[number], string> = Object.fromEntries(
 
 webPush.setVapidDetails(env["MAIL"], env["PUBLIC_KEY"], env["PRIVATE_KEY"]);
 
-const ds = new Datastore();
+const connection = connect({
+  host: process.env.DATABASE_HOST,
+  username: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+});
+
+const db = drizzle(connection);
+
+const ds = {
+  key(arr: [string, string]) {
+    return arr.join("--");
+  },
+  save(x) {
+    return x;
+  },
+  get(key: string) {
+    return new Promise<any>((res) => res([{ pushSubscription: {} }]));
+  },
+};
 
 http("splendor-test", async (req, res) => {
   if (req.method === "POST" && req.body) {
     return sub(req, res);
   }
 
+  const data = await db.select().from(testTable);
+
   const kind = "Splendor Game State";
 
-  const name = req.query.name?.toString() || "default";
+  const name = data[0].firstName || req.query.name?.toString() || "default";
 
   // The Cloud Datastore key for the new entity
   const key = ds.key([kind, name]);

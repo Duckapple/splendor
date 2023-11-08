@@ -6,10 +6,11 @@
     "preview": "bun run frontend build && bun run frontend preview"
   },
   "devDependencies": {
-    "@google-cloud/functions-framework": "^3.3.0",
     "@google-cloud/datastore": "^8.2.2",
+    "@google-cloud/functions-framework": "^3.3.0",
     "@types/web-push": "^3.6.2",
     "bun-types": "latest",
+    "drizzle-kit": "^0.19.13",
     "web-push": "^3.6.6"
   },
   "name": "splendor",
@@ -19,6 +20,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@planetscale/database": "^1.11.0",
+    "drizzle-orm": "^0.28.6",
     "neverthrow": "^6.1.0",
     "valibot": "^0.20.1"
   }
