@@ -26,6 +26,7 @@
     "@planetscale/database": "^1.11.0",
     "bcrypt": "^5.1.1",
     "drizzle-orm": "^0.28.6",
+    "drizzle-valibot": "^0.1.1",
     "neverthrow": "^6.1.0",
     "valibot": "^0.20.1"
   }

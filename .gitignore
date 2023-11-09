@@ -4,3 +4,4 @@ function
 node_modules
 function.zip
 .env.yaml
+out

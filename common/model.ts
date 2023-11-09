@@ -2,6 +2,7 @@
 export enum Color { W, U, G, R, B, Y }
 
 export interface Card {
+  id: number;
   /** Point value */
   p?: number;
   /** Color */
