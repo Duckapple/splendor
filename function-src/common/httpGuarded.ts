@@ -6,6 +6,9 @@ const drizzleError = object({
   body: object({ message: string() }),
 });
 
+export type Request = Parameters<HttpFunction>[0];
+export type Response = Parameters<HttpFunction>[1];
+
 export const httpGuarded: typeof http = (functionName, handler) => {
   const guardedHandler: HttpFunction = async (req, res) => {
     try {

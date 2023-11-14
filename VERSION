@@ -1,14 +1,14 @@
 {
   "register": {
-    "hash": "6aae7e82a3a5fdd8",
-    "version": 1
+    "hash": "14f10623c835c7e0",
+    "version": 2
   },
   "log-in": {
-    "hash": "4d817199f0287fec",
-    "version": 1
+    "hash": "387d4bfc2c87a280",
+    "version": 2
   },
   "game": {
-    "hash": "ad592575ad98670f",
-    "version": 1
+    "hash": "c24b23ff60d7216c",
+    "version": 5
   }
 }

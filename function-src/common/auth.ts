@@ -25,13 +25,13 @@ if (process.env.JWT_SECRET == null) throw new Error("JWT_SECRET undefined");
 
 const secret = process.env.JWT_SECRET;
 
-type Result = {
+export type AuthUser = {
   id: string;
   userName: string;
   iat: number;
 };
 
-export function ensureAuth(req: Request): Result {
+export function ensureAuth(req: Request): AuthUser {
   const authHeader = req.headers.authorization;
   if (authHeader == null) throw new AuthError();
 
@@ -42,7 +42,7 @@ export function ensureAuth(req: Request): Result {
     const payload = JWT.verify(jwt, secret, {
       algorithms: ["HS512"],
     });
-    return payload as Result;
+    return payload as AuthUser;
   } catch (e) {
     throw new AuthError("Invalid JWT Token");
   }

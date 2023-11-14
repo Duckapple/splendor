@@ -50,8 +50,6 @@ const newVersions = Object.fromEntries(outputs) as {
   [T in (typeof functions)[number]]: { hash: string; version: any };
 };
 
-await Bun.write(Bun.file("./VERSION"), JSON.stringify(newVersions, null, 2));
-
 console.log("Built successfully!");
 
 if (!Bun.argv.includes("deploy")) process.exit(0);
@@ -78,7 +76,10 @@ function deploy(functionName: string) {
 for (const fun of ["register", "log-in", "game"] as const) {
   if (newVersions[fun].version === versions[fun].version) continue;
   console.log("Deploying", fun);
-  deploy(fun);
+  const proc = deploy(fun);
 }
+
+// Only update version files if deployment happened
+await Bun.write(Bun.file("./VERSION"), JSON.stringify(newVersions, null, 2));
 
 console.log("All deployed!");

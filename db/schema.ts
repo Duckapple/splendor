@@ -24,15 +24,16 @@ function indicesOn<T extends string>(
 }
 
 function uuid<T extends string>(name: T) {
-  return char(name, { length: 36 })
-    .notNull()
-    .default(sql`(UUID())`);
+  return char(name, { length: 36 }).notNull();
+}
+function uuidDefaulted<T extends string>(name: T) {
+  return uuid(name).default(sql`(UUID())`);
 }
 
 export const User = mysqlTable(
   "User",
   {
-    id: uuid("id").primaryKey(),
+    id: uuidDefaulted("id").primaryKey(),
     bcrypt: char("bcrypt", { length: 60 }).notNull(),
     userName: varchar("userName", { length: 64 }).notNull().unique(),
   },
@@ -72,7 +73,7 @@ export const SplendorGamePlayer = mysqlTable("SplendorGamePlayer", {
 
 // prettier-ignore
 export const SplendorGame = mysqlTable("SplendorGame", {
-  id: uuid("id").primaryKey(),
+  id: uuidDefaulted("id").primaryKey(),
   shown: json("shown").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`),
   piles: json("piles").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`),
   tokens: json("tokens").default(sql`('[0,0,0,0,0,0]')`),
