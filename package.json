@@ -11,6 +11,7 @@
     "@google-cloud/datastore": "^8.2.2",
     "@google-cloud/functions-framework": "^3.3.0",
     "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/web-push": "^3.6.2",
     "bun-types": "latest",
     "drizzle-kit": "^0.19.13",
@@ -27,6 +28,7 @@
     "bcrypt": "^5.1.1",
     "drizzle-orm": "^0.28.6",
     "drizzle-valibot": "^0.1.1",
+    "jsonwebtoken": "^9.0.2",
     "neverthrow": "^6.1.0",
     "valibot": "^0.20.1"
   }

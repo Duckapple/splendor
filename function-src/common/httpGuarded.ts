@@ -1,5 +1,6 @@
 import { HttpFunction, http } from "@google-cloud/functions-framework";
 import { ValiError, object, safeParse, string } from "valibot";
+import { AuthError } from "./auth";
 
 const drizzleError = object({
   body: object({ message: string() }),
@@ -10,8 +11,11 @@ export const httpGuarded: typeof http = (functionName, handler) => {
     try {
       await handler(req, res);
     } catch (e: unknown) {
+      if (e instanceof AuthError) {
+        return res.status(401).json({ message: "Unauthorized", data: e.data });
+      }
       if (e instanceof ValiError) {
-        // ! DO NOT LOG `e``, CAN CONTAIN PASSWORD
+        // ! DO NOT LOG `e`, CAN CONTAIN PASSWORD
         const saneError = {
           message: "Invalid input",
           issues: e.issues.map((issue) => ({

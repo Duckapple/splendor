@@ -21,4 +21,6 @@ function deploy(functionName: string) {
 // prettier-ignore
 await Promise.all([
     deploy("register"),
+    deploy("log-in"),
+    deploy("game"),
 ]);

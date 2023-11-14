@@ -6,7 +6,9 @@ const external = [
   "@google-cloud/functions-framework",
   "@google-cloud/datastore",
   "web-push",
+  "@planetscale/database",
   "crypto",
+  "jsonwebtoken",
   "bcrypt",
 ];
 const pkgJson = Bun.file("./package.json");
@@ -18,6 +20,7 @@ async function buildFunction(functionName: string) {
     naming,
     external,
     minify,
+    target: "node",
   });
   await Bun.write(`../out/${functionName}/package.json`, pkgJson);
 }
@@ -32,6 +35,8 @@ await Bun.build({
 // prettier-ignore
 await Promise.all([
   buildFunction("register"),
+  buildFunction("log-in"),
+  buildFunction("game"),
 ]);
 
 console.log("Built successfully!");
