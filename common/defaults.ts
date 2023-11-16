@@ -119,7 +119,7 @@ function cardFromId(id: number): Card {
   return cards.persons[id - 0xc0];
 }
 
-export function newGameState(playerCount: 2 | 3 | 4): GameState {
+export function newGameState(id: string, playerCount: 2 | 3 | 4): GameState {
   const defaultTokenCounts = [0, 0, 4, 5, 7];
   const t = defaultTokenCounts[playerCount];
   const tokens = [t, t, t, t, t, 5] as const;
@@ -148,8 +148,6 @@ export function newGameState(playerCount: 2 | 3 | 4): GameState {
     cards: { high: [], middle: [], low: [], persons: [] },
     tokens: [0, 0, 0, 0, 0, 0] as const,
   }));
-
-  const id = "xddd";
 
   return { id, shown, tokens, piles, players, turn: 0 };
 }

@@ -27,7 +27,6 @@ export const httpGuarded: typeof http = (functionName, handler) => {
             path: issue.path?.map((path) => path.key),
           })),
         };
-        console.error(JSON.stringify(e));
         return res
           .status(400) // Bad Request
           .json(saneError);

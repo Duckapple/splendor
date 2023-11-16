@@ -1,17 +1,19 @@
 import {
   IndexBuilder,
   MySqlColumn,
+  boolean,
   char,
+  datetime,
   index,
-  int,
   json,
+  mysqlEnum,
   mysqlTable,
   text,
   tinyint,
   varchar,
 } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
-import { never, object, string } from "valibot";
+import { object, string } from "valibot";
 import { createInsertSchema } from "drizzle-valibot";
 
 function indicesOn<T extends string>(
@@ -42,10 +44,6 @@ export const User = mysqlTable(
 
 export type User = typeof User.$inferSelect;
 
-export const newUserSchema = createInsertSchema(User, {
-  bcrypt: never(),
-});
-
 export const Push = mysqlTable(
   "Push",
   {
@@ -63,19 +61,51 @@ export const pushSchema = createInsertSchema(Push, {
   }),
 });
 
+export const SplendorRoom = mysqlTable("SplendorRoom", {
+  id: uuidDefaulted("id").primaryKey(),
+  ownerId: uuid("ownerId"),
+  started: boolean("started").default(false),
+  createdAt: datetime("createdAt", { fsp: 0 })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+});
+
 // prettier-ignore
 export const SplendorGamePlayer = mysqlTable("SplendorGamePlayer", {
   userId: uuid("userId"),
   gameId: uuid("gameId"),
   position: tinyint("position").notNull(),
-  cards: json("cards").notNull().default(sql`('[]')`),
+  cards: json("cards").notNull().default(sql`('[]')`).$type<number[]>(),
 });
+export type SplendorGamePlayer = typeof SplendorGamePlayer.$inferSelect;
 
 // prettier-ignore
 export const SplendorGame = mysqlTable("SplendorGame", {
-  id: uuidDefaulted("id").primaryKey(),
+  id: uuid("id").primaryKey(),
   shown: json("shown").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`),
   piles: json("piles").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`),
   tokens: json("tokens").default(sql`('[0,0,0,0,0,0]')`),
   turn: tinyint("turn").default(0),
+});
+
+const splendorActions = [
+  "BUY_CARD",
+  "TAKE_PERSON",
+  "TAKE_TOKENS",
+  "RESERVE",
+] as const;
+export const SplendorActionType = mysqlEnum(
+  "SplendorActionType",
+  splendorActions
+);
+export type SplendorActionType = (typeof splendorActions)[number];
+
+export const SplendorAction = mysqlTable("SplendorAction", {
+  gameId: uuid("gameId"),
+  userId: uuid("userId"),
+  timestamp: datetime("timestamp", { fsp: 0 })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  type: SplendorActionType.notNull(),
+  data: json("data").notNull(),
 });

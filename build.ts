@@ -41,10 +41,9 @@ await Bun.build({
   minify,
 });
 
-const functions = ["register", "log-in", "game"] as const;
+const functions = ["register", "log-in", "game", "room"] as const;
 
-// prettier-ignore
-const outputs = await Promise.all(functions.map(f => buildFunction(f)));
+const outputs = await Promise.all(functions.map(buildFunction));
 
 const newVersions = Object.fromEntries(outputs) as {
   [T in (typeof functions)[number]]: { hash: string; version: any };
@@ -73,7 +72,7 @@ function deploy(functionName: string) {
   });
 }
 
-for (const fun of ["register", "log-in", "game"] as const) {
+for (const fun of functions) {
   if (newVersions[fun].version === versions[fun].version) continue;
   console.log("Deploying", fun);
   const proc = deploy(fun);
