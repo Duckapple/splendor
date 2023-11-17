@@ -2,29 +2,24 @@ import { eq } from "drizzle-orm";
 import { SplendorGamePlayer, SplendorRoom, User } from "../db/schema";
 import { ensureAuth } from "./common/auth";
 import { db } from "./common/db";
-import { Request, Response, httpGuarded } from "./common/httpGuarded";
+import {
+  FunctionError,
+  Request,
+  Response,
+  authedHandler,
+  httpGuarded,
+} from "./common/httpGuarded";
 import { randomUUID } from "crypto";
 import { object, parse, string, uuid } from "valibot";
 import { AuthUser } from "../common/communication";
 
-httpGuarded("room", async (req, res) => {
-  const user = ensureAuth(req);
-  switch (req.method) {
-    case "POST":
-      return post(user, res);
-    case "PUT":
-      return put(user, req, res);
-    case "GET":
-      return get(user, req, res);
-    default:
-      return res
-        .status(404)
-        .header("Allow", "POST, PUT, GET")
-        .json({ message: "Not found" });
-  }
+httpGuarded("room", {
+  POST: authedHandler(post),
+  PUT: authedHandler(put),
+  GET: authedHandler(get),
 });
 
-export async function post(user: AuthUser, res: Response) {
+export async function post(user: AuthUser) {
   const id = randomUUID();
   const inserts = [
     db.insert(SplendorRoom).values({ id, ownerId: user.id }),
@@ -33,17 +28,17 @@ export async function post(user: AuthUser, res: Response) {
       .values({ gameId: id, userId: user.id, position: 0 }),
   ];
   await Promise.all(inserts);
-  res.status(200).json({ message: "Room created!", data: { id } });
+  return { message: "Room created!", data: { id } };
 }
 
 const getInput = object({ id: string([uuid()]) });
-export async function put(user: AuthUser, req: Request, res: Response) {
+export async function put(user: AuthUser, req: Request) {
   const { id } = parse(getInput, req.query);
 
   const roomAndPlayers = await getGame(id);
 
   if (roomAndPlayers == null) {
-    return res.status(404).json({ message: "Not Found" });
+    throw new FunctionError(404, { message: "Not Found" });
   }
 
   const players = roomAndPlayers.players;
@@ -69,23 +64,23 @@ export async function put(user: AuthUser, req: Request, res: Response) {
     message = "Joined the room!";
   }
 
-  res.status(200).json({ message, data: roomAndPlayers });
+  return { message, data: roomAndPlayers };
 }
 
-async function get(user: AuthUser, req: Request, res: Response) {
+async function get(user: AuthUser, req: Request) {
   const { id } = parse(getInput, req.query);
 
   const data = await getGame(id);
 
   if (data == null) {
-    return res.status(404).json({ message: "Not Found" });
+    throw new FunctionError(404, { message: "Not Found" });
   }
 
   if (data.players.every((player) => player.userId !== user.id)) {
-    return res.status(404).json({ message: "Not Found" });
+    throw new FunctionError(404, { message: "Not Found" });
   }
 
-  res.status(200).json({ message: "Found room", data });
+  return { message: "Found room", data };
 }
 
 export async function getGame(id: string) {

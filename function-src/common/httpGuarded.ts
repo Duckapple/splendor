@@ -1,6 +1,7 @@
 import { HttpFunction, http } from "@google-cloud/functions-framework";
 import { ValiError, object, safeParse, string } from "valibot";
-import { AuthError } from "./auth";
+import { AuthError, ensureAuth } from "./auth";
+import { AuthUser } from "../../common/communication";
 
 const drizzleError = object({
   body: object({ message: string() }),
@@ -88,4 +89,15 @@ export function httpGuarded(functionName: string, handlers: Handlers) {
     }
   };
   http(functionName, guardedHandler);
+}
+
+export function authedHandler(
+  fn: (user: AuthUser, ...params: Parameters<Handler>) => ReturnType<Handler>
+): Handler {
+  return function (
+    ...[req, ...params]: Parameters<Handler>
+  ): ReturnType<Handler> {
+    const user = ensureAuth(req);
+    return fn(user, req, ...params);
+  };
 }

@@ -2,35 +2,34 @@ import { and, eq } from "drizzle-orm";
 import { SplendorGame, SplendorGamePlayer } from "../db/schema";
 import { ensureAuth } from "./common/auth";
 import { db } from "./common/db";
-import { Request, Response, httpGuarded } from "./common/httpGuarded";
+import {
+  FunctionError,
+  Request,
+  Response,
+  authedHandler,
+  httpGuarded,
+} from "./common/httpGuarded";
 import { randomUUID } from "crypto";
 import { AuthUser } from "../common/communication";
 
-httpGuarded("game", async (req, res) => {
-  const user = ensureAuth(req);
-  switch (req.method) {
-    case "POST":
-      return post(user, res);
-    case "GET":
-      return get(user, req, res);
-    default:
-      return res.status(404).json({ message: "Not found" });
-  }
+httpGuarded("game", {
+  POST: authedHandler(post),
+  GET: authedHandler(get),
 });
 
-async function post(user: AuthUser, res: Response) {
+async function post(user: AuthUser) {
   const id = randomUUID();
   await db.insert(SplendorGame).values({ id });
   await db
     .insert(SplendorGamePlayer)
     .values({ gameId: id, userId: user.id, position: 0 });
-  res.status(200).json({ message: "Game created!", data: { id } });
+  return { message: "Game created!", data: { id } };
 }
 
-async function get(user: AuthUser, req: Request, res: Response) {
+async function get(user: AuthUser, req: Request) {
   const id = req.query.id;
   if (typeof id !== "string")
-    return res.status(400).json({ message: "Bad game ID" });
+    throw new FunctionError(400, { message: "Bad game ID" });
   const [result] = await db
     .select()
     .from(SplendorGame)
@@ -42,6 +41,6 @@ async function get(user: AuthUser, req: Request, res: Response) {
       and(eq(SplendorGame.id, id), eq(SplendorGamePlayer.userId, user.id))
     );
   if (result == null)
-    return res.status(404).json({ message: "Game not found" });
-  res.status(200).json({ message: "Gotten!", data: result });
+    throw new FunctionError(404, { message: "Game not found" });
+  return { message: "Gotten!", data: result };
 }
