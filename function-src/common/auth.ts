@@ -1,6 +1,8 @@
 import type { Request } from "@google-cloud/functions-framework";
 import JWT from "jsonwebtoken";
 import { maxLength, minLength, object, string } from "valibot";
+import { AuthUser } from "../../common/communication";
+import { Response } from "./httpGuarded";
 
 export class AuthError extends Error {
   data: string | undefined;
@@ -8,6 +10,20 @@ export class AuthError extends Error {
     super("Unauthorized");
     this.data = data;
   }
+}
+
+export function withHeaders(
+  res: Response,
+  methods: ("POST" | "GET" | "OPTIONS" | "PUT" | "DELETE" | "PATCH")[]
+) {
+  const headers: [string, string][] = [
+    ["Allow", methods.join(", ")],
+    ["Accept", "application/json"],
+    ["Access-Control-Allow-Origin", "*"],
+    ["Access-Control-Allow-Headers", "Content-Type, Accept, Authorization"],
+    ["Access-Control-Max-Age", "86400"],
+  ];
+  return headers.reduce((res, hdr) => res.header(...hdr), res);
 }
 
 export const login = object({
@@ -24,12 +40,6 @@ export const login = object({
 if (process.env.JWT_SECRET == null) throw new Error("JWT_SECRET undefined");
 
 const secret = process.env.JWT_SECRET;
-
-export type AuthUser = {
-  id: string;
-  userName: string;
-  iat: number;
-};
 
 export function ensureAuth(req: Request): AuthUser {
   const authHeader = req.headers.authorization;

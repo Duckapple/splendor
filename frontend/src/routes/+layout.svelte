@@ -3,13 +3,25 @@
 	import './styles.css';
 	import '../app.css';
 	import '$lib/main';
+	import { browser } from '$app/environment';
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				enabled: browser,
+			},
+		},
+	});
 </script>
 
 <div class="app">
 	<Header />
 
 	<main>
-		<slot />
+		<QueryClientProvider client={queryClient}>
+			<slot />
+		</QueryClientProvider>
 	</main>
 
 	<footer>

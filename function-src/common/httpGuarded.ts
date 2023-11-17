@@ -6,16 +6,57 @@ const drizzleError = object({
   body: object({ message: string() }),
 });
 
+export class FunctionError extends Error {
+  constructor(public status: number, public json: any) {
+    super();
+  }
+}
+
+function withHeaders(
+  res: Response,
+  methods: ("POST" | "GET" | "OPTIONS" | "PUT" | "DELETE" | "PATCH")[]
+) {
+  const headers: [string, string][] = [
+    ["Allow", methods.join(", ")],
+    ["Accept", "application/json"],
+    ["Access-Control-Allow-Origin", "*"],
+    ["Access-Control-Allow-Headers", "Content-Type, Accept, Authorization"],
+    ["Access-Control-Max-Age", "86400"],
+  ];
+  return headers.reduce((res, hdr) => res.header(...hdr), res);
+}
+
 export type Request = Parameters<HttpFunction>[0];
 export type Response = Parameters<HttpFunction>[1];
 
-export const httpGuarded: typeof http = (functionName, handler) => {
+const methods = ["POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"] as const;
+type Method = (typeof methods)[number];
+type Handler = (req: Request) => Promise<Record<string, any>>;
+type Handlers = Partial<Record<Method, Handler>>;
+
+export function httpGuarded(functionName: string, handlers: Handlers) {
+  const acceptedMethods = Object.keys(handlers) as Method[];
+
   const guardedHandler: HttpFunction = async (req, res) => {
     try {
-      await handler(req, res);
+      if (req.method === "OPTIONS") {
+        return withHeaders(res, acceptedMethods).sendStatus(200);
+      }
+      if (!(acceptedMethods as string[]).includes(req.method)) {
+        return withHeaders(res, acceptedMethods).sendStatus(404);
+      }
+      const handler = handlers[req.method] as Handler;
+
+      const data = await handler(req);
+      return withHeaders(res, acceptedMethods).status(200).json(data);
     } catch (e: unknown) {
+      if (e instanceof FunctionError) {
+        return withHeaders(res, acceptedMethods).status(e.status).json(e.json);
+      }
       if (e instanceof AuthError) {
-        return res.status(401).json({ message: "Unauthorized", data: e.data });
+        return withHeaders(res, acceptedMethods)
+          .status(401)
+          .json({ message: "Unauthorized", data: e.data });
       }
       if (e instanceof ValiError) {
         // ! DO NOT LOG `e`, CAN CONTAIN PASSWORD
@@ -27,7 +68,7 @@ export const httpGuarded: typeof http = (functionName, handler) => {
             path: issue.path?.map((path) => path.key),
           })),
         };
-        return res
+        return withHeaders(res, acceptedMethods)
           .status(400) // Bad Request
           .json(saneError);
       }
@@ -37,7 +78,7 @@ export const httpGuarded: typeof http = (functionName, handler) => {
           "code = AlreadyExists"
         );
         if (isUniqueViolation) {
-          return res.status(400).json({
+          return withHeaders(res, acceptedMethods).status(400).json({
             message: "Already exists",
           });
         }
@@ -47,4 +88,4 @@ export const httpGuarded: typeof http = (functionName, handler) => {
     }
   };
   http(functionName, guardedHandler);
-};
+}

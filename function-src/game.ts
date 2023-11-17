@@ -1,9 +1,10 @@
 import { and, eq } from "drizzle-orm";
 import { SplendorGame, SplendorGamePlayer } from "../db/schema";
-import { AuthUser, ensureAuth } from "./common/auth";
+import { ensureAuth } from "./common/auth";
 import { db } from "./common/db";
 import { Request, Response, httpGuarded } from "./common/httpGuarded";
 import { randomUUID } from "crypto";
+import { AuthUser } from "../common/communication";
 
 httpGuarded("game", async (req, res) => {
   const user = ensureAuth(req);
