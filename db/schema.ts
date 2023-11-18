@@ -70,6 +70,8 @@ export const SplendorRoom = mysqlTable("SplendorRoom", {
     .default(sql`CURRENT_TIMESTAMP`),
 });
 
+export type SplendorRoom = typeof SplendorRoom.$inferSelect;
+
 // prettier-ignore
 export const SplendorGamePlayer = mysqlTable("SplendorGamePlayer", {
   userId: uuid("userId"),

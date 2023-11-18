@@ -1,16 +1,17 @@
 <script>
 	import Counter from './Counter.svelte';
-	import { isLoggedIn, login, logout } from '$lib/main';
+	import { isLoggedIn, loginRegister, logout } from '$lib/main';
 	import { createMutation } from '@tanstack/svelte-query';
 	import ArbitraryData from '$lib/ArbitraryData.svelte';
 	$: userName = '';
 	$: password = '';
+	$: register = false;
 	const pw = 'password';
 
 	const loginMutation = createMutation({
 		mutationKey: ['login'],
 		mutationFn: () => {
-			return login(userName, password);
+			return loginRegister({ userName, password }, register);
 		},
 	});
 </script>
@@ -31,9 +32,25 @@
 			<input class="p-1 rounded" type="text" name="userName" id="userName" bind:value={userName} />
 			<label for="password">Password</label>
 			<input class="p-1 rounded" type="password" name={pw} id={pw} bind:value={password} />
-			{#if $loginMutation.error}<span class="text-red-500">{$loginMutation.error?.message}</span
-				>{/if}
-			<button class="p-1 mt-2 border border-black rounded" type="submit">Log in</button>
+			{#if $loginMutation.error}
+				<span class="text-red-500">{$loginMutation.error?.message}</span>
+			{/if}
+			<div class="flex gap-2">
+				<button
+					class="flex-grow p-1 mt-2 border border-black rounded"
+					on:click={() => (register = true)}
+					type="submit"
+				>
+					Register
+				</button>
+				<button
+					class="flex-grow p-1 mt-2 border border-black rounded"
+					on:click={() => (register = false)}
+					type="submit"
+				>
+					Log in
+				</button>
+			</div>
 		</form>
 	{:else}
 		<button class="p-1 border border-black rounded" on:click={() => logout()}>Log out</button>

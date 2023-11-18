@@ -1,16 +1,14 @@
 import { eq } from "drizzle-orm";
 import { SplendorGamePlayer, SplendorRoom, User } from "../db/schema";
-import { ensureAuth } from "./common/auth";
 import { db } from "./common/db";
 import {
   FunctionError,
   Request,
-  Response,
   authedHandler,
   httpGuarded,
 } from "./common/httpGuarded";
 import { randomUUID } from "crypto";
-import { object, parse, string, uuid } from "valibot";
+import { object, parse, safeParse, string, uuid } from "valibot";
 import { AuthUser } from "../common/communication";
 
 httpGuarded("room", {
@@ -35,13 +33,15 @@ const getInput = object({ id: string([uuid()]) });
 export async function put(user: AuthUser, req: Request) {
   const { id } = parse(getInput, req.query);
 
-  const roomAndPlayers = await getGame(id);
+  const roomAndPlayers = await getGame(eq(SplendorRoom.id, id));
 
-  if (roomAndPlayers == null) {
+  if (roomAndPlayers == null || roomAndPlayers.length === 0) {
     throw new FunctionError(404, { message: "Not Found" });
   }
 
-  const players = roomAndPlayers.players;
+  const [data] = roomAndPlayers;
+
+  const players = data.players;
 
   let message = "You're already in the room!";
 
@@ -64,17 +64,27 @@ export async function put(user: AuthUser, req: Request) {
     message = "Joined the room!";
   }
 
-  return { message, data: roomAndPlayers };
+  return { message, data };
 }
 
 async function get(user: AuthUser, req: Request) {
-  const { id } = parse(getInput, req.query);
+  const input = safeParse(getInput, req.query);
 
-  const data = await getGame(id);
+  if (!input.success) {
+    let manyResult = await getGame(eq(User.id, user.id));
+    if (manyResult == null) {
+      manyResult = [];
+    }
+    return { message: "Found rooms for user", data: manyResult };
+  }
 
-  if (data == null) {
+  const result = await getGame(eq(SplendorRoom.id, input.output.id));
+
+  if (result == null) {
     throw new FunctionError(404, { message: "Not Found" });
   }
+
+  const [data] = result;
 
   if (data.players.every((player) => player.userId !== user.id)) {
     throw new FunctionError(404, { message: "Not Found" });
@@ -83,10 +93,10 @@ async function get(user: AuthUser, req: Request) {
   return { message: "Found room", data };
 }
 
-export async function getGame(id: string) {
+export async function getGame(where: ReturnType<typeof eq>) {
   const roomAndPlayers = await db
     .select({
-      SplendorRoom,
+      room: SplendorRoom,
       player: {
         userId: SplendorGamePlayer.userId,
         position: SplendorGamePlayer.position,
@@ -99,13 +109,21 @@ export async function getGame(id: string) {
       eq(SplendorGamePlayer.gameId, SplendorRoom.id)
     )
     .leftJoin(User, eq(User.id, SplendorGamePlayer.userId))
-    .where(eq(SplendorRoom.id, id));
+    .where(where);
 
   if (roomAndPlayers.length === 0) return null;
 
-  const players = roomAndPlayers
-    .map(({ player }) => player)
-    .filter((player) => player.userId != null);
+  const res = new Map<
+    string,
+    SplendorRoom & { players: (typeof roomAndPlayers)[number]["player"][] }
+  >();
 
-  return { ...roomAndPlayers[0].SplendorRoom, players };
+  for (const { room, player } of roomAndPlayers) {
+    if (!res.has(room.id)) {
+      res.set(room.id, { ...room, players: [] });
+    }
+    res.get(room.id)?.players.push(player);
+  }
+
+  return [...res.values()];
 }

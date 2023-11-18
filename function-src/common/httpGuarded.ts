@@ -17,11 +17,13 @@ function withHeaders(
   res: Response,
   methods: ("POST" | "GET" | "OPTIONS" | "PUT" | "DELETE" | "PATCH")[]
 ) {
+  const allows = ["OPTIONS", ...methods].join(", ");
   const headers: [string, string][] = [
-    ["Allow", methods.join(", ")],
+    ["Allow", allows],
     ["Accept", "application/json"],
     ["Access-Control-Allow-Origin", "*"],
     ["Access-Control-Allow-Headers", "Content-Type, Accept, Authorization"],
+    ["Access-Control-Allow-Methods", allows],
     ["Access-Control-Max-Age", "86400"],
   ];
   return headers.reduce((res, hdr) => res.header(...hdr), res);

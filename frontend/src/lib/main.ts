@@ -19,10 +19,12 @@ jwt.subscribe((jwt) => {
 	globalThis.localStorage?.setItem(TOKEN, JSON.stringify(jwt));
 });
 
-export async function login(userName: string, password: string) {
-	const data = await fetch(BASE_URL + '/log-in', {
+type LoginInput = Record<'userName' | 'password', string>;
+export async function loginRegister(input: LoginInput, isRegister = false) {
+	const endpoint = isRegister ? '/register' : '/log-in';
+	const data = await fetch(BASE_URL + endpoint, {
 		headers: BASE_HEADERS,
-		body: JSON.stringify({ userName, password }),
+		body: JSON.stringify(input),
 		method: 'POST',
 	});
 
