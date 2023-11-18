@@ -1,5 +1,5 @@
 import type { AuthUser } from '../../../common/communication';
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 const BASE_URL = 'https://europe-west3-organic-folder-403021.cloudfunctions.net';
 // const BASE_URL = 'https://splendor-functions.simon-green.dev';
 const BASE_HEADERS = {
@@ -10,13 +10,13 @@ const BASE_HEADERS = {
 if (!('localStorage' in globalThis)) {
 	// prettier-ignore
 	globalThis.localStorage = {
-    clear() {},
-    getItem(key) { return null; },
-    setItem(key, value) {},
-    key(index) { return null; },
-    removeItem(key) {},
-    length: 0,
-  }
+	  clear() {},
+	  getItem() { return null; },
+	  setItem() {},
+	  key() { return null; },
+	  removeItem() {},
+	  length: 0,
+	};
 }
 
 const TOKEN = 'token' as const;
@@ -46,4 +46,28 @@ export async function login(userName: string, password: string) {
 
 export function logout() {
 	jwt.set(null);
+}
+
+type AuthInput = {
+	route: string;
+	method: string;
+	params?: Record<string, string>;
+	body?: Record<string, unknown>;
+};
+
+export async function authed({ route, method = 'POST', params, body }: AuthInput) {
+	const endpoint = BASE_URL + route + '?' + new URLSearchParams(params);
+	const data = await fetch(endpoint, {
+		headers: { ...BASE_HEADERS, Authorization: `Bearer ${get(jwt)}` },
+		body: body ? JSON.stringify(body) : undefined,
+		method,
+	});
+
+	if (data.status !== 200) {
+		const error = await data.json();
+		console.error(error);
+		throw error;
+	}
+
+	return await data.json();
 }

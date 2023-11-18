@@ -2,6 +2,7 @@
 	import Counter from './Counter.svelte';
 	import { isLoggedIn, login, logout } from '$lib/main';
 	import { createMutation } from '@tanstack/svelte-query';
+	import ArbitraryData from '$lib/ArbitraryData.svelte';
 	$: userName = '';
 	$: password = '';
 	const pw = 'password';
@@ -40,3 +41,5 @@
 
 	<Counter />
 </section>
+
+<ArbitraryData />
