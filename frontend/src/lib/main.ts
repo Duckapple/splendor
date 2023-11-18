@@ -7,26 +7,16 @@ const BASE_HEADERS = {
 	'Content-Type': 'application/json',
 };
 
-if (!('localStorage' in globalThis)) {
-	// prettier-ignore
-	globalThis.localStorage = {
-	  clear() {},
-	  getItem() { return null; },
-	  setItem() {},
-	  key() { return null; },
-	  removeItem() {},
-	  length: 0,
-	};
-}
-
 const TOKEN = 'token' as const;
 
-const jwt = writable<AuthUser | null>(JSON.parse(localStorage.getItem(TOKEN) ?? 'null'));
+const jwt = writable<AuthUser | null>(
+	JSON.parse(globalThis.localStorage?.getItem(TOKEN) ?? 'null')
+);
 
 export const isLoggedIn = derived(jwt, Boolean);
 
 jwt.subscribe((jwt) => {
-	localStorage.setItem(TOKEN, JSON.stringify(jwt));
+	globalThis.localStorage?.setItem(TOKEN, JSON.stringify(jwt));
 });
 
 export async function login(userName: string, password: string) {
@@ -48,7 +38,7 @@ export function logout() {
 	jwt.set(null);
 }
 
-type AuthInput = {
+export type AuthInput = {
 	route: string;
 	method: string;
 	params?: Record<string, string>;
