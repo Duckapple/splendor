@@ -15,9 +15,9 @@
 	const otherMutation = createMutation({
 		mutationKey: ['all'],
 		mutationFn: () => {
-			const data: AuthInput = {
-				method,
-				route,
+			const data: AuthInput<'/room', 'GET', 'id'> = {
+				method: method as any,
+				route: route as any,
 			};
 			if (params) {
 				data.params = JSON.parse(params);

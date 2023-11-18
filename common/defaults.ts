@@ -119,7 +119,7 @@ function cardFromId(id: number): Card {
   return cards.persons[id - 0xc0];
 }
 
-export function newGameState(id: string, playerCount: 2 | 3 | 4): GameState {
+export function newGameState(id: string, playerCount: number): GameState {
   const defaultTokenCounts = [0, 0, 4, 5, 7];
   const t = defaultTokenCounts[playerCount];
   const tokens = [t, t, t, t, t, 5] as const;
@@ -143,11 +143,5 @@ export function newGameState(id: string, playerCount: 2 | 3 | 4): GameState {
     shown.high.push(piles.high.pop()!);
   }
 
-  const players = range(playerCount).map(() => ({
-    id: "lmao",
-    cards: { high: [], middle: [], low: [], persons: [] },
-    tokens: [0, 0, 0, 0, 0, 0] as const,
-  }));
-
-  return { id, shown, tokens, piles, players, turn: 0 };
+  return { id, shown, tokens, piles, turn: 0 };
 }

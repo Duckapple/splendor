@@ -19,14 +19,16 @@ httpGuarded("room", {
 
 export async function post(user: AuthUser) {
   const id = randomUUID();
+  const room = { id, ownerId: user.id, started: false, createdAt: new Date() };
   const inserts = [
-    db.insert(SplendorRoom).values({ id, ownerId: user.id }),
+    db.insert(SplendorRoom).values(room),
     db
       .insert(SplendorGamePlayer)
       .values({ gameId: id, userId: user.id, position: 0 }),
   ];
+  const players = [{ userId: user.id, position: 0, userName: user.userName }];
   await Promise.all(inserts);
-  return { message: "Room created!", data: { id } };
+  return { message: "Room created!", data: { ...room, players } };
 }
 
 const getInput = object({ id: string([uuid()]) });
@@ -72,19 +74,14 @@ async function get(user: AuthUser, req: Request) {
 
   if (!input.success) {
     let manyResult = await getGame(eq(User.id, user.id));
-    if (manyResult == null) {
-      manyResult = [];
-    }
     return { message: "Found rooms for user", data: manyResult };
   }
 
-  const result = await getGame(eq(SplendorRoom.id, input.output.id));
+  const [data] = await getGame(eq(SplendorRoom.id, input.output.id));
 
-  if (result == null) {
+  if (data == null) {
     throw new FunctionError(404, { message: "Not Found" });
   }
-
-  const [data] = result;
 
   if (data.players.every((player) => player.userId !== user.id)) {
     throw new FunctionError(404, { message: "Not Found" });
@@ -111,7 +108,7 @@ export async function getGame(where: ReturnType<typeof eq>) {
     .leftJoin(User, eq(User.id, SplendorGamePlayer.userId))
     .where(where);
 
-  if (roomAndPlayers.length === 0) return null;
+  if (roomAndPlayers.length === 0) return [];
 
   const res = new Map<
     string,

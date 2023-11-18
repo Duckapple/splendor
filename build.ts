@@ -1,5 +1,7 @@
 import Bun from "bun";
 
+console.log(new Date());
+
 const versions = await Bun.file("./VERSION").json();
 
 const minify = true;

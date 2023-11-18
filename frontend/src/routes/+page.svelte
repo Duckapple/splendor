@@ -1,8 +1,9 @@
 <script>
 	import Counter from './Counter.svelte';
-	import { isLoggedIn, loginRegister, logout } from '$lib/main';
-	import { createMutation } from '@tanstack/svelte-query';
+	import { authed, isLoggedIn, loginRegister, logout } from '$lib/main';
+	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import ArbitraryData from '$lib/ArbitraryData.svelte';
+	import { timeAgo } from '$lib/timeAgo';
 	$: userName = '';
 	$: password = '';
 	$: register = false;
@@ -14,6 +15,18 @@
 			return loginRegister({ userName, password }, register);
 		},
 	});
+
+	const rooms = createQuery({
+		queryKey: ['rooms'],
+		queryFn: async () => {
+			const result = await authed({
+				method: 'GET',
+				route: '/room',
+			});
+			console.log(result);
+			return result;
+		},
+	});
 </script>
 
 <svelte:head>
@@ -22,9 +35,28 @@
 </svelte:head>
 
 <section class="flex flex-col justify-center items-center flex-[0.6]">
-	<h2>
-		try editing the <strong>src/routes/+page.svelte</strong> file
-	</h2>
+	{#if isLoggedIn && $rooms.isSuccess}
+		<div class="flex flex-col gap-4">
+			{#each $rooms.data.data as room}
+				<a class="block p-2 border border-gray-700" href={`/game?id=${room.id}`}>
+					<p>
+						{room.id}
+						{#if room.started} - started{/if}
+					</p>
+					<p>
+						Created by {room.players.find(({ userId }) => room.ownerId === userId)?.userName}
+						{timeAgo(room.createdAt)}
+					</p>
+					Players:
+					<ul class="pl-6 list-disc">
+						{#each room.players as player}
+							<li>{player.userName}</li>
+						{/each}
+					</ul>
+				</a>
+			{/each}
+		</div>
+	{/if}
 
 	{#if !$isLoggedIn}
 		<form on:submit|preventDefault={() => $loginMutation.mutate()} class="flex flex-col">

@@ -26,7 +26,6 @@ export type GameState = {
   piles: IdDecks;
   shown: IdDecks;
   tokens: Record<Color, number>;
-  players: (Player & { id: ID })[];
   turn: 0 | 1 | 2 | 3;
 };
 

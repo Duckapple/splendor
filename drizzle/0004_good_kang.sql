@@ -1,0 +1,1 @@
+ALTER TABLE `SplendorGamePlayer` ADD `tokens` json DEFAULT ('[0,0,0,0,0,0]') NOT NULL;
