@@ -94,7 +94,7 @@ export const SplendorGame = mysqlTable("SplendorGame", {
   piles: json("piles").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`).notNull().$type<IdDecks>(),
   tokens: json("tokens").default(sql`('[0,0,0,0,0,0]')`).notNull().$type<TokenHold>(),
   turn: tinyint("turn").notNull().default(0).$type<0 | 1 | 2 | 3>(),
-  playerCount: tinyint("playerCount").notNull().default(1).$type<1 | 2 | 3 | 4>(),
+  playerCount: tinyint("playerCount").notNull().$type<1 | 2 | 3 | 4>(),
 });
 export type SplendorGame = typeof SplendorGame.$inferSelect;
 

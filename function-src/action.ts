@@ -6,6 +6,7 @@ import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
 import { db } from './common/db';
 import { actionSchema } from '../common/actions';
 import { performAction } from '../common/logic';
+import { omit } from '../common/utils';
 
 httpGuarded('action', {
 	GET: authedHandler(get),
@@ -18,7 +19,7 @@ const getInput = v.object({
 });
 
 async function get(user: AuthUser, req: Request) {
-	const { gameId, since } = v.parse(getInput, req.params);
+	const { gameId, since } = v.parse(getInput, req.query);
 
 	const [game] = await db
 		.select({ id: SplendorGame.id })
@@ -44,14 +45,20 @@ async function get(user: AuthUser, req: Request) {
 }
 
 async function post(user: AuthUser, req: Request) {
-	const { gameId } = v.parse(v.object({ gameId: v.string([v.uuid()]) }), req.params);
+	const { gameId } = v.parse(v.object({ gameId: v.string([v.uuid()]) }), req.query);
 	const action = v.parse(actionSchema, req.body);
 
 	const [dbRes] = await db
 		.select({ game: SplendorGame, player: SplendorGamePlayer })
 		.from(SplendorGame)
 		.innerJoin(SplendorGamePlayer, eq(SplendorGamePlayer.gameId, SplendorGame.id))
-		.where(and(eq(SplendorGame.id, gameId), eq(SplendorGamePlayer.userId, user.id)));
+		.where(
+			and(
+				eq(SplendorGame.id, gameId),
+				eq(SplendorGamePlayer.userId, user.id),
+				eq(SplendorGame.turn, SplendorGamePlayer.position)
+			)
+		);
 
 	if (dbRes == null) {
 		throw new FunctionError(403, { message: 'Forbidden' });
@@ -61,17 +68,21 @@ async function post(user: AuthUser, req: Request) {
 
 	if (res.isErr()) throw new FunctionError(res.error.status ?? 400, res.error);
 
+	const dbAction: SplendorAction = { ...action, gameId, userId: user.id, timestamp: new Date() };
+
 	await Promise.all([
 		db.update(SplendorGame).set(res.value.game).where(eq(SplendorGame.id, gameId)),
 		db
 			.update(SplendorGamePlayer)
 			.set(res.value.player)
 			.where(eq(SplendorGamePlayer.userId, user.id)),
+		db.insert(SplendorAction).values(dbAction),
 	]);
 
 	const data = {
-		game: { ...dbRes.game, ...res.value.game },
+		game: omit({ ...dbRes.game, ...res.value.game }, 'piles'),
 		player: { ...dbRes.player, ...res.value.player },
+		action: dbAction,
 	};
 
 	return { message: 'Action performed', data };

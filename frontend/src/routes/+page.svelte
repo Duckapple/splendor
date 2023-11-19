@@ -18,13 +18,11 @@
 
 	const rooms = createQuery({
 		queryKey: ['rooms'],
-		queryFn: async () => {
-			const result = await authed({
+		queryFn: () => {
+			return authed({
 				method: 'GET',
 				route: '/room',
 			});
-			console.log(result);
-			return result;
 		},
 	});
 </script>

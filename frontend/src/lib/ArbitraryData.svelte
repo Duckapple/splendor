@@ -13,12 +13,9 @@
 	scratch.subscribe((text) => globalThis.sessionStorage?.setItem('scratch', text));
 
 	const otherMutation = createMutation({
-		mutationKey: ['all'],
+		mutationKey: [route, method, params, body],
 		mutationFn: () => {
-			const data: AuthInput<'/room', 'GET', 'id'> = {
-				method: method as any,
-				route: route as any,
-			};
+			const data: any = { method, route };
 			if (params) {
 				data.params = JSON.parse(params);
 			}

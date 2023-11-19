@@ -36,4 +36,11 @@ export function pick<T extends object, K extends keyof T>(obj: T, ...keys: K[]):
 	return res;
 }
 
+export function omit<T extends object, K extends keyof T>(obj: T, ...keys: K[]): Omit<T, K> {
+	for (const key of keys) {
+		delete obj[key];
+	}
+	return obj;
+}
+
 export type Extends<T1, T2> = T1 extends T2 ? true : false;
