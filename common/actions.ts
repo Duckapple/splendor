@@ -26,10 +26,16 @@ const takePerson = v.object({
 const takeTokens = v.object({
 	type: v.literal('TAKE_TOKENS'),
 	data: v.object({
-		tokens: v.array(v.number(), [v.minLength(2), v.maxLength(3)]) as v.ArraySchema<
+		tokens: v.array(v.number(), [v.minLength(1), v.maxLength(3)]) as v.ArraySchema<
 			ReturnType<typeof v.number>,
 			TakeTokens['data']['tokens']
 		>,
+		returned: v.optional(
+			v.array(v.number(), [v.minLength(1), v.maxLength(3)]) as v.ArraySchema<
+				ReturnType<typeof v.number>,
+				TakeTokens['data']['returned']
+			>
+		),
 	}),
 });
 

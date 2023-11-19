@@ -43,6 +43,13 @@
       "when": 1700359619801,
       "tag": "0005_mean_jetstream",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1700415417016,
+      "tag": "0006_old_skaar",
+      "breakpoints": true
     }
   ]
 }

@@ -15,7 +15,7 @@ import {
 import { sql } from "drizzle-orm";
 import { object, string } from "valibot";
 import { createInsertSchema } from "drizzle-valibot";
-import type { Color, IdDecks } from "../common/model";
+import type { Color, IdDecks, TokenHold } from "../common/model";
 
 function indicesOn<T extends string>(
   ...keys: T[]
@@ -83,7 +83,7 @@ export const SplendorGamePlayer = mysqlTable("SplendorGamePlayer", {
   position: tinyint("position").notNull(),
 	reserved: json("reserved").notNull().default(sql`('[]')`).$type<number[]>(),
   cards: json("cards").notNull().default(sql`('[]')`).$type<number[]>(),
-  tokens: json("tokens").notNull().default(sql`('[0,0,0,0,0,0]')`).$type<Record<Color, number>>(),
+  tokens: json("tokens").notNull().default(sql`('[0,0,0,0,0,0]')`).$type<TokenHold>(),
 });
 export type SplendorGamePlayer = typeof SplendorGamePlayer.$inferSelect;
 
@@ -92,8 +92,9 @@ export const SplendorGame = mysqlTable("SplendorGame", {
   id: uuid("id").primaryKey(),
   shown: json("shown").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`).notNull().$type<IdDecks>(),
   piles: json("piles").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`).notNull().$type<IdDecks>(),
-  tokens: json("tokens").default(sql`('[0,0,0,0,0,0]')`).notNull().$type<Record<Color, number>>(),
+  tokens: json("tokens").default(sql`('[0,0,0,0,0,0]')`).notNull().$type<TokenHold>(),
   turn: tinyint("turn").notNull().default(0).$type<0 | 1 | 2 | 3>(),
+  playerCount: tinyint("playerCount").notNull().default(1).$type<1 | 2 | 3 | 4>(),
 });
 export type SplendorGame = typeof SplendorGame.$inferSelect;
 

@@ -4,15 +4,26 @@ import { Color } from './model';
 import { cardFromId } from './defaults';
 import { pick, sum } from './utils';
 
-type BuyCardData = { type: 'BUY_CARD' } & (
+type BuyCardError = { type: 'BUY_CARD' } & (
 	| { cost: Card['cost'] }
 	| { playerTokens: [number, ...Card['cost']] }
 );
 
+type TakeTokensError = {
+	type: 'TAKE_TOKENS';
+	code:
+		| 'DUPLICATE_TOO_FEW'
+		| 'DUPLICATE_TOO_MANY'
+		| 'YELLOW'
+		| 'NOT_ENOUGH'
+		| 'TOO_MANY'
+		| 'TOO_FEW_FOR_RETURN';
+};
+
 type ActionError = {
 	message: string;
 	status?: number;
-	data?: BuyCardData;
+	data?: BuyCardError | TakeTokensError;
 };
 
 export function performAction(
@@ -20,6 +31,9 @@ export function performAction(
 	player: Player,
 	action: InnerAction
 ): Result<{ game: Partial<GameState>; player: Partial<Player> }, ActionError> {
+	game = structuredClone(game);
+	game.turn = ((game.turn + 1) % game.playerCount) as GameState['turn'];
+	player = structuredClone(player);
 	switch (action.type) {
 		case 'BUY_CARD':
 			if (action.data.row === 'reserve' && player.reserved[action.data.i] !== action.data.card) {
@@ -57,10 +71,65 @@ export function performAction(
 				player.tokens[i2] -= action.data.tokens[i2];
 			}
 
-			return ok({ game: pick(game, 'piles', 'shown'), player });
-		case 'TAKE_PERSON':
-			return err({ message: 'Not implemented', status: 500 });
+			return ok({
+				game: pick(game, 'piles', 'shown', 'turn'),
+				player: pick(player, 'cards', 'reserved', 'tokens'),
+			});
 		case 'TAKE_TOKENS':
+			const tokens = action.data.tokens;
+
+			const counts = [0, 0, 0, 0, 0, 0];
+			for (const color of tokens) {
+				counts[color] += 1;
+			}
+
+			if (sum(counts) + sum(player.tokens) <= 10 && action.data.returned != null)
+				return err({
+					message: 'Cannot return when not at token limit',
+					data: { type: 'TAKE_TOKENS', code: 'TOO_FEW_FOR_RETURN' },
+				});
+
+			const returnCounts = [0, 0, 0, 0, 0, 0];
+			for (const color of action.data.returned ?? []) {
+				returnCounts[color] += 1;
+			}
+
+			if (sum(counts) + sum(player.tokens) - sum(returnCounts) > 10)
+				return err({
+					message: 'Cannot end up with more tokens than 10',
+					data: { type: 'TAKE_TOKENS', code: 'TOO_MANY' },
+				});
+
+			if (counts[Color.Y] > 0)
+				return err({
+					message: 'Cannot take yellow tokens',
+					data: { type: 'TAKE_TOKENS', code: 'YELLOW' },
+				});
+
+			if (tokens.length === 3 && counts.some((count) => count >= 2))
+				return err({
+					message: 'Cannot take like tokens when taking three tokens',
+					data: { type: 'TAKE_TOKENS', code: 'DUPLICATE_TOO_MANY' },
+				});
+
+			for (let i = 0; i < game.tokens.length; i++) {
+				if (counts[i] > 1 && game.tokens[i] < 4)
+					return err({
+						message: 'Cannot take like tokens when less than 4 left',
+						data: { type: 'TAKE_TOKENS', code: 'DUPLICATE_TOO_FEW' },
+					});
+				game.tokens[i] -= counts[i] - returnCounts[i];
+				player.tokens[i] += counts[i] - returnCounts[i];
+			}
+
+			if (game.tokens.some((value) => value < 0))
+				return err({
+					message: 'Cannot take more tokens than what is left',
+					data: { type: 'TAKE_TOKENS', code: 'NOT_ENOUGH' },
+				});
+
+			return ok({ game: pick(game, 'tokens', 'turn'), player: pick(player, 'tokens') });
+		case 'TAKE_PERSON':
 			return err({ message: 'Not implemented', status: 500 });
 		case 'RESERVE':
 			return err({ message: 'Not implemented', status: 500 });

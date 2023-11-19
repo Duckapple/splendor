@@ -1,4 +1,4 @@
-import type { Card, CardDecks, GameState, IdDecks } from "./model";
+import type { Card, CardDecks, GameState, IdDecks, TokenHold } from "./model";
 import { Color as c } from "./model";
 import { shuffled } from "./utils";
 
@@ -120,10 +120,10 @@ export function cardFromId(id: number): Card {
   return cards.persons[id - 0xc0];
 }
 
-export function newGameState(id: string, playerCount: number): GameState {
+export function newGameState(id: string, playerCount: 1 | 2 | 3 | 4): GameState {
   const defaultTokenCounts = [0, 0, 4, 5, 7];
   const t = defaultTokenCounts[playerCount];
-  const tokens = [t, t, t, t, t, 5] as const;
+  const tokens: TokenHold = [t, t, t, t, t, 5];
 
   const piles = {
     persons: shuffled(cards.persons.map(({ id }) => id)),
@@ -144,5 +144,5 @@ export function newGameState(id: string, playerCount: number): GameState {
     shown.high.push(piles.high.pop()!);
   }
 
-  return { id, shown, tokens, piles, turn: 0 };
+  return { id, shown, tokens, piles, turn: 0, playerCount };
 }

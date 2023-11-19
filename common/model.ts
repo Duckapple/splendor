@@ -14,10 +14,12 @@ export interface Card {
 export type CardDecks = Record<'high' | 'middle' | 'low' | 'persons', Card[]>;
 export type IdDecks = Record<'high' | 'middle' | 'low' | 'persons', number[]>;
 
+export type TokenHold = [number, ...Card['cost']];
+
 export type Player = {
 	reserved: number[];
 	cards: number[];
-	tokens: Record<Color, number>;
+	tokens: TokenHold;
 };
 
 export type ID = string;
@@ -26,8 +28,9 @@ export type GameState = {
 	id: ID;
 	piles: IdDecks;
 	shown: IdDecks;
-	tokens: Record<Color, number>;
+	tokens: TokenHold;
 	turn: 0 | 1 | 2 | 3;
+	playerCount: 1 | 2 | 3 | 4;
 };
 
 export type ShownGameState = Omit<GameState, 'piles' | 'players'> & {
@@ -48,7 +51,7 @@ export type BuyCard = {
 		row: 'high' | 'middle' | 'low' | 'reserve';
 		i: number;
 		card: number;
-		tokens: [number, ...Card['cost']];
+		tokens: TokenHold;
 	};
 };
 
@@ -59,7 +62,10 @@ export type TakePerson = {
 
 export type TakeTokens = {
 	type: 'TAKE_TOKENS';
-	data: { tokens: [Color, Color, Color] | [Color, Color] };
+	data: {
+		tokens: [Color, Color, Color] | [Color, Color] | [Color];
+		returned?: [Color, Color, Color] | [Color, Color] | [Color];
+	};
 };
 
 export type Reserve = {

@@ -11,6 +11,8 @@ describe('performAction.buyCard', () => {
 	const game: any = {
 		shown: { low: [99, 99, 0, 99] },
 		piles: { low: [1] },
+		turn: 0,
+		playerCount: 4,
 	};
 	const player: Player = {
 		tokens: [...cardFromId(0).cost, 0],
@@ -31,6 +33,7 @@ describe('performAction.buyCard', () => {
 		game: {
 			piles: { low: [] },
 			shown: { low: [99, 99, 1, 99] },
+			turn: 1,
 		} as any,
 		player: {
 			tokens: [0, 0, 0, 0, 0, 0],
@@ -87,10 +90,10 @@ describe('performAction.buyCard', () => {
 
 		if (res.isErr()) expect(res.error).toBeUndefined();
 
-		expect(res.isOk()).toBe(true);
-
-		if (res.isOk())
-			expect(res.value).toEqual({ ...result, player: { ...result.player, cards: [...cards, 0] } });
+		expect(res.unwrapOr({})).toEqual({
+			...result,
+			player: { ...result.player, cards: [...cards, 0] },
+		});
 	});
 
 	it('can buy a card from both, with yellow', () => {
