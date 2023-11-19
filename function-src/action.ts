@@ -7,7 +7,7 @@ import { db } from './common/db';
 import { actionSchema } from '../common/actions';
 import { performAction } from '../common/logic';
 
-httpGuarded('/action', {
+httpGuarded('action', {
 	GET: authedHandler(get),
 	POST: authedHandler(post),
 });
