@@ -8,7 +8,7 @@ const drizzleError = object({
 });
 
 export class FunctionError extends Error {
-  constructor(public status: number, public json: any) {
+  constructor(public status: number, public json: { message: string; data?: any }) {
     super();
   }
 }

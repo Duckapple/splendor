@@ -90,10 +90,10 @@ export type SplendorGamePlayer = typeof SplendorGamePlayer.$inferSelect;
 // prettier-ignore
 export const SplendorGame = mysqlTable("SplendorGame", {
   id: uuid("id").primaryKey(),
-  shown: json("shown").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`).$type<IdDecks>(),
-  piles: json("piles").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`).$type<IdDecks>(),
-  tokens: json("tokens").default(sql`('[0,0,0,0,0,0]')`).$type<Record<Color, number>>(),
-  turn: tinyint("turn").default(0),
+  shown: json("shown").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`).notNull().$type<IdDecks>(),
+  piles: json("piles").default(sql`('{"high":[],"middle":[],"low":[],"persons":[]}')`).notNull().$type<IdDecks>(),
+  tokens: json("tokens").default(sql`('[0,0,0,0,0,0]')`).notNull().$type<Record<Color, number>>(),
+  turn: tinyint("turn").notNull().default(0).$type<0 | 1 | 2 | 3>(),
 });
 export type SplendorGame = typeof SplendorGame.$inferSelect;
 

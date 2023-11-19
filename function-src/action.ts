@@ -4,7 +4,8 @@ import { FunctionError, Request, authedHandler, httpGuarded } from './common/htt
 import { and, eq, gte } from 'drizzle-orm';
 import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
 import { db } from './common/db';
-import { actionSchema } from './common/actions';
+import { actionSchema } from '../common/actions';
+import { performAction } from '../common/logic';
 
 httpGuarded('/action', {
 	GET: authedHandler(get),
@@ -46,15 +47,32 @@ async function post(user: AuthUser, req: Request) {
 	const { gameId } = v.parse(v.object({ gameId: v.string([v.uuid()]) }), req.params);
 	const action = v.parse(actionSchema, req.body);
 
-	const [gameAndPlayer] = await db
-		.select()
+	const [dbRes] = await db
+		.select({ game: SplendorGame, player: SplendorGamePlayer })
 		.from(SplendorGame)
 		.innerJoin(SplendorGamePlayer, eq(SplendorGamePlayer.gameId, SplendorGame.id))
 		.where(and(eq(SplendorGame.id, gameId), eq(SplendorGamePlayer.userId, user.id)));
 
-	if (gameAndPlayer == null) {
+	if (dbRes == null) {
 		throw new FunctionError(403, { message: 'Forbidden' });
 	}
 
-	return { message: 'lol', data: {} };
+	const res = performAction(dbRes.game, dbRes.player, action);
+
+	if (res.isErr()) throw new FunctionError(res.error.status ?? 400, res.error);
+
+	await Promise.all([
+		db.update(SplendorGame).set(res.value.game).where(eq(SplendorGame.id, gameId)),
+		db
+			.update(SplendorGamePlayer)
+			.set(res.value.player)
+			.where(eq(SplendorGamePlayer.userId, user.id)),
+	]);
+
+	const data = {
+		game: { ...dbRes.game, ...res.value.game },
+		player: { ...dbRes.player, ...res.value.player },
+	};
+
+	return { message: 'Action performed', data };
 }

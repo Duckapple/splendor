@@ -42,5 +42,8 @@ export type Routes = {
     GET: {
       gameId: SplendorAction[];
     };
+    POST: {
+      gameId: { game: Omit<SplendorGame, "piles">; player: SplendorGamePlayer };
+    }
   };
 };

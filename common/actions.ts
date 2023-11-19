@@ -1,6 +1,6 @@
 import * as v from 'valibot';
-import { BuyCard, Reserve, TakePerson, TakeTokens } from '../../common/model';
-import type { Extends } from '../../common/utils';
+import { BuyCard, Reserve, TakePerson, TakeTokens } from './model';
+import type { Extends } from './utils';
 
 const buyCard = v.object({
 	type: v.literal('BUY_CARD'),

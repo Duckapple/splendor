@@ -11,6 +11,7 @@ type BuyCardData = { type: 'BUY_CARD' } & (
 
 type ActionError = {
 	message: string;
+	status?: number;
 	data?: BuyCardData;
 };
 
@@ -58,11 +59,11 @@ export function performAction(
 
 			return ok({ game: pick(game, 'piles', 'shown'), player });
 		case 'TAKE_PERSON':
-			return ok({ game: {}, player: {} });
+			return err({ message: 'Not implemented', status: 500 });
 		case 'TAKE_TOKENS':
-			return ok({ game: {}, player: {} });
+			return err({ message: 'Not implemented', status: 500 });
 		case 'RESERVE':
-			return ok({ game: {}, player: {} });
+			return err({ message: 'Not implemented', status: 500 });
 	}
 }
 
