@@ -1,18 +1,18 @@
 {
   "register": {
-    "hash": "dc87b4ed21c1d295",
-    "version": 5
+    "hash": "8469204ad60b7dfe",
+    "version": 6
   },
   "log-in": {
     "hash": "a1c15f1dc1582fc4",
     "version": 13
   },
   "game": {
-    "hash": "cf1417d8ea58b4c2",
-    "version": 6
+    "hash": "f6b8c263b17415c6",
+    "version": 7
   },
   "room": {
-    "hash": "ee660cb6744712a8",
-    "version": 6
+    "hash": "5a484c2711e8c844",
+    "version": 7
   }
 }

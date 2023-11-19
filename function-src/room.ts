@@ -10,6 +10,9 @@ import {
 import { randomUUID } from "crypto";
 import { object, parse, safeParse, string, uuid } from "valibot";
 import { AuthUser } from "../common/communication";
+import { alias } from "drizzle-orm/mysql-core";
+
+const playerAgain = alias(SplendorGamePlayer, "player2");
 
 httpGuarded("room", {
   POST: authedHandler(post),
@@ -73,7 +76,7 @@ async function get(user: AuthUser, req: Request) {
   const input = safeParse(getInput, req.query);
 
   if (!input.success) {
-    let manyResult = await getGame(eq(User.id, user.id));
+    let manyResult = await getGame(eq(playerAgain.userId, user.id));
     return { message: "Found rooms for user", data: manyResult };
   }
 
@@ -106,6 +109,7 @@ export async function getGame(where: ReturnType<typeof eq>) {
       eq(SplendorGamePlayer.gameId, SplendorRoom.id)
     )
     .leftJoin(User, eq(User.id, SplendorGamePlayer.userId))
+    .leftJoin(playerAgain, eq(playerAgain.gameId, SplendorRoom.id))
     .where(where);
 
   if (roomAndPlayers.length === 0) return [];

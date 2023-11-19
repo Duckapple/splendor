@@ -11,9 +11,12 @@ httpGuarded("register", {
     const id = randomUUID();
     const { userName, password } = parse(login, req.body);
     const bcryptPassword = hashSync(password, 12);
-    await db.insert(User).values({ userName, bcrypt: bcryptPassword });
+    const insert = db
+      .insert(User)
+      .values({ id, userName, bcrypt: bcryptPassword });
 
     const jwt = makeJwt({ id, userName });
+    await insert;
     return { jwt, message: "Registered successfully!", status: "success" };
   },
 });

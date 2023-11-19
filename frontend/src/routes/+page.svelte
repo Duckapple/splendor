@@ -1,6 +1,6 @@
 <script>
 	import Counter from './Counter.svelte';
-	import { authed, isLoggedIn, loginRegister, logout } from '$lib/main';
+	import { authed, isLoggedIn, loginRegister, logout, user } from '$lib/main';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import ArbitraryData from '$lib/ArbitraryData.svelte';
 	import { timeAgo } from '$lib/timeAgo';
@@ -85,7 +85,9 @@
 			</div>
 		</form>
 	{:else}
-		<button class="p-1 border border-black rounded" on:click={() => logout()}>Log out</button>
+		<button class="p-1 border border-black rounded" on:click={() => logout()}
+			>Log out of {$user?.userName}</button
+		>
 	{/if}
 
 	<Counter />
