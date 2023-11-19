@@ -1,4 +1,5 @@
 import type {
+  SplendorAction,
   SplendorGamePlayer,
   SplendorGame,
   SplendorRoom,
@@ -35,6 +36,11 @@ export type Routes = {
     POST: { id: GameState };
     GET: {
       id: { game: Omit<SplendorGame, "piles">; player: SplendorGamePlayer }[];
+    };
+  };
+  "/action": {
+    GET: {
+      gameId: SplendorAction[];
     };
   };
 };

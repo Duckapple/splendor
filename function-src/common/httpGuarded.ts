@@ -34,7 +34,11 @@ export type Response = Parameters<HttpFunction>[1];
 
 const methods = ["POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"] as const;
 type Method = (typeof methods)[number];
-type Handler = (req: Request) => Promise<Record<string, any>>;
+type HandlerResult = {
+  message: string;
+  data: Record<string, unknown> | Record<string, unknown>[];
+};
+type Handler = (req: Request) => Promise<HandlerResult>;
 type Handlers = Partial<Record<Method, Handler>>;
 
 export function httpGuarded(functionName: string, handlers: Handlers) {

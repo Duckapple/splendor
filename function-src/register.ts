@@ -17,6 +17,6 @@ httpGuarded("register", {
 
     const jwt = makeJwt({ id, userName });
     await insert;
-    return { jwt, message: "Registered successfully!", status: "success" };
+    return { data: { jwt }, message: "Registered successfully!" };
   },
 });

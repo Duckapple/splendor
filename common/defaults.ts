@@ -1,5 +1,6 @@
-import { Card, CardDecks, GameState, IdDecks, Color as c } from "./model";
-import { range, shuffled } from "./utils";
+import type { Card, CardDecks, GameState, IdDecks } from "./model";
+import { Color as c } from "./model";
+import { shuffled } from "./utils";
 
 export const cards = {
   high: [
@@ -112,7 +113,7 @@ export const cards = {
   ],
 } satisfies CardDecks;
 
-function cardFromId(id: number): Card {
+export function cardFromId(id: number): Card {
   if (id < 0x40) return cards.low[id];
   if (id < 0x80) return cards.middle[id - 0x40];
   if (id < 0xc0) return cards.high[id - 0x80];

@@ -21,6 +21,6 @@ httpGuarded("log-in", {
       throw new FunctionError(401, { message: "Wrong password" });
     }
     const jwt = makeJwt({ id: user.id, userName: user.userName });
-    return { jwt, message: "Logged in!", status: "success" };
+    return { data: { jwt }, message: "Logged in!", status: "success" };
   },
 });

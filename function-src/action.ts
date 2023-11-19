@@ -1,0 +1,60 @@
+import * as v from 'valibot';
+import { AuthUser } from '../common/communication';
+import { FunctionError, Request, authedHandler, httpGuarded } from './common/httpGuarded';
+import { and, eq, gte } from 'drizzle-orm';
+import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
+import { db } from './common/db';
+import { actionSchema } from './common/actions';
+
+httpGuarded('/action', {
+	GET: authedHandler(get),
+	POST: authedHandler(post),
+});
+
+const getInput = v.object({
+	gameId: v.string([v.uuid()]),
+	since: v.optional(v.transform(v.string(), (v) => new Date(v), v.date())),
+});
+
+async function get(user: AuthUser, req: Request) {
+	const { gameId, since } = v.parse(getInput, req.params);
+
+	const [game] = await db
+		.select({ id: SplendorGame.id })
+		.from(SplendorGame)
+		.innerJoin(SplendorGamePlayer, eq(SplendorGamePlayer.gameId, SplendorGame.id))
+		.where(and(eq(SplendorGame.id, gameId), eq(SplendorGamePlayer.userId, user.id)));
+
+	if (game == null) {
+		throw new FunctionError(404, { message: 'Not Found' });
+	}
+
+	const conditions = [eq(SplendorAction.gameId, gameId)];
+	if (since != null) {
+		conditions.push(gte(SplendorAction.timestamp, since));
+	}
+
+	const actions = await db
+		.select()
+		.from(SplendorAction)
+		.where(and(...conditions));
+
+	return { message: 'Got actions', data: actions };
+}
+
+async function post(user: AuthUser, req: Request) {
+	const { gameId } = v.parse(v.object({ gameId: v.string([v.uuid()]) }), req.params);
+	const action = v.parse(actionSchema, req.body);
+
+	const [gameAndPlayer] = await db
+		.select()
+		.from(SplendorGame)
+		.innerJoin(SplendorGamePlayer, eq(SplendorGamePlayer.gameId, SplendorGame.id))
+		.where(and(eq(SplendorGame.id, gameId), eq(SplendorGamePlayer.userId, user.id)));
+
+	if (gameAndPlayer == null) {
+		throw new FunctionError(403, { message: 'Forbidden' });
+	}
+
+	return { message: 'lol', data: {} };
+}

@@ -69,6 +69,9 @@ export const SplendorRoom = mysqlTable("SplendorRoom", {
   createdAt: datetime("createdAt", { fsp: 0 })
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: datetime("updatedAt", { fsp: 0 })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
 });
 
 export type SplendorRoom = typeof SplendorRoom.$inferSelect;
@@ -78,6 +81,7 @@ export const SplendorGamePlayer = mysqlTable("SplendorGamePlayer", {
   userId: uuid("userId"),
   gameId: uuid("gameId"),
   position: tinyint("position").notNull(),
+	reserved: json("reserved").notNull().default(sql`('[]')`).$type<number[]>(),
   cards: json("cards").notNull().default(sql`('[]')`).$type<number[]>(),
   tokens: json("tokens").notNull().default(sql`('[0,0,0,0,0,0]')`).$type<Record<Color, number>>(),
 });
@@ -122,3 +126,5 @@ export const SplendorAction = mysqlTable("SplendorAction", {
   type: SplendorActionType.notNull(),
   data: json("data").notNull(),
 });
+
+export type SplendorAction = typeof SplendorAction.$inferSelect;

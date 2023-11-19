@@ -43,7 +43,7 @@ export async function loginRegister(input: LoginInput, isRegister = false) {
 		throw error;
 	}
 
-	jwt.set((await data.json()).jwt);
+	jwt.set((await data.json()).data.jwt);
 }
 
 export function logout() {
@@ -58,7 +58,7 @@ export type AuthInput<
 > = {
 	route: Route;
 	method: Method;
-	params?: Params extends NONE ? undefined : Record<Params, string>;
+	params?: Params extends NONE ? undefined : Record<Params | (string & {}), string>;
 	body?: Record<string, unknown>;
 };
 

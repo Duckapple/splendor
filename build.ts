@@ -43,7 +43,7 @@ await Bun.build({
   minify,
 });
 
-const functions = ["register", "log-in", "game", "room"] as const;
+const functions = ["register", "log-in", "game", "room", "action"] as const;
 
 const outputs = await Promise.all(functions.map(buildFunction));
 
