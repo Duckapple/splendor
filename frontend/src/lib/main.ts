@@ -1,15 +1,25 @@
 import type { NONE, Routes } from '../../../common/communication';
-import { writable, derived, get } from 'svelte/store';
+import { writable, derived, get, type Writable } from 'svelte/store';
+
 const BASE_URL = 'https://europe-west3-organic-folder-403021.cloudfunctions.net';
-// const BASE_URL = 'https://splendor-functions.simon-green.dev';
+
 const BASE_HEADERS = {
 	Accept: 'application/json',
 	'Content-Type': 'application/json',
 };
 
+export function cachedWritable<T>(key: string): Writable<T | null>;
+export function cachedWritable<T>(key: string, defaultValue: T): Writable<T>;
+export function cachedWritable<T>(key: string, defaultValue?: T) {
+	const def = defaultValue ?? null;
+	const w = writable(JSON.parse(globalThis.localStorage?.getItem(key) ?? 'null') ?? def);
+	w.subscribe((data) => globalThis.localStorage?.setItem(key, JSON.stringify(data ?? def)));
+	return w;
+}
+
 const TOKEN = 'token' as const;
 
-const jwt = writable<string | null>(JSON.parse(globalThis.localStorage?.getItem(TOKEN) ?? 'null'));
+const jwt = cachedWritable<string>(TOKEN);
 
 export const isLoggedIn = derived(jwt, Boolean);
 
@@ -23,10 +33,6 @@ export const user = derived(jwt, (jwt) => {
 	} catch (e) {
 		return null;
 	}
-});
-
-jwt.subscribe((jwt) => {
-	globalThis.localStorage?.setItem(TOKEN, JSON.stringify(jwt));
 });
 
 type LoginInput = Record<'userName' | 'password', string>;

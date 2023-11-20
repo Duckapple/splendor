@@ -1,13 +1,17 @@
-<script>
-	import { authed, user } from '$lib/main';
+<script lang="ts">
+	import { authed } from '$lib/main';
 	import { readable } from 'svelte/store';
-	import { createMutation, createQuery } from '@tanstack/svelte-query';
-	const search = readable(new URLSearchParams(globalThis.location?.search));
+	import { createQuery } from '@tanstack/svelte-query';
+
+	import Actions from './Actions.svelte';
+
+	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
+
 	const game = createQuery({
-		queryKey: ['game', $search],
-		queryFn: () => {
-			const rawParams = Object.fromEntries($search.entries());
-			const params = { id: rawParams.id };
+		queryKey: ['game', $searchId],
+		queryFn() {
+			if ($searchId == null) throw { message: 'ID undefined' };
+			const params = { id: $searchId };
 			return authed({
 				route: '/game',
 				method: 'GET',
@@ -18,11 +22,10 @@
 </script>
 
 <div>
-	{$search}
-	<button on:click={() => globalThis.location && (globalThis.location.search = '?id=null')}>
-		Change search query
-	</button>
+	{$searchId}
 	{JSON.stringify($game.error)}
+
+	{#if $searchId != null}<Actions gameId={$searchId} />{/if}
 
 	<pre>{JSON.stringify($game.data, null, 2)}</pre>
 </div>

@@ -103,6 +103,7 @@ export const SplendorGameSelect = {
   shown: SplendorGame.shown,
   tokens: SplendorGame.tokens,
   turn: SplendorGame.turn,
+  playerCount: SplendorGame.playerCount,
 };
 export type SplendorGameSelect = typeof SplendorGameSelect;
 

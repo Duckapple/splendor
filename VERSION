@@ -1,22 +1,22 @@
 {
   "register": {
-    "hash": "c791a1b0baded9da",
-    "version": 8
+    "hash": "cf8c772f8632ef10",
+    "version": 9
   },
   "log-in": {
-    "hash": "92f518b58dcb7d81",
-    "version": 15
+    "hash": "0a996f3e48554372",
+    "version": 16
   },
   "game": {
-    "hash": "1112107a5e82186f",
+    "hash": "e22b4c2542ad4dd2",
     "version": 9
   },
   "room": {
-    "hash": "22380dbeff8d4f3a",
-    "version": 9
+    "hash": "b5dd6337f7093662",
+    "version": 10
   },
   "action": {
-    "hash": "173dc8d3e5743a6e",
-    "version": 6
+    "hash": "496454f1f84304f1",
+    "version": 8
   }
 }
