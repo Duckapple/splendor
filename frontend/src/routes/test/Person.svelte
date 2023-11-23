@@ -9,7 +9,7 @@
 <div
 	class="relative w-16 h-16 border border-black rounded-lg select-none md:w-32 md:h-32 md:text-4xl aspect-square bg-gradient-to-br from-slate-50 to-slate-200"
 >
-	<span class="absolute text-3xl md:text-6xl left-1.5 top-0 md:left-2 md:top-2">{p}</span>
+	<span class="absolute text-3xl md:text-6xl left-1.5 top-0 md:left-2 md:top-1">{p}</span>
 	<div
 		class="absolute flex gap-0.5 md:gap-1 leading-none md:leading-7 left-1 md:left-2 bottom-1 md:bottom-2"
 	>
