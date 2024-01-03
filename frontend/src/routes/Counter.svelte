@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { textColorOf } from '$lib/color';
 	import { spring } from 'svelte/motion';
-	import { Color } from '../../../common/model';
+	import type { Color } from '../../../common/model';
 
-	let min = 0;
-	let count = 0;
-	let max = 5;
+	export let color: Color;
+
+	export let min = 0;
+	export let count = 0;
+	export let max = 5;
 
 	const displayed_count = spring();
 	$: displayed_count.set(count);
@@ -36,7 +38,8 @@
 	</button>
 
 	<div
-		class={'w-8 h-12 md:w-14 md:h-16 overflow-hidden text-center relative ' + textColorOf[Color.R]}
+		class={'w-8 h-12 md:w-14 md:h-16 overflow-hidden text-center relative cursor-default ' +
+			textColorOf[color]}
 		class:text-opacity-60={count === 0}
 	>
 		<div

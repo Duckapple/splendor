@@ -4,18 +4,19 @@
 	import Person from './Person.svelte';
 	import Card from './Card.svelte';
 	import { writable } from 'svelte/store';
+	import BuyModal from '$lib/BuyModal.svelte';
 	const piles = ['high', 'middle', 'low'] as const;
-	const current = writable<HTMLElement | undefined>();
+	let current: HTMLElement | undefined = undefined;
 	function setCurrent(newVal: HTMLElement | undefined) {
-		if ($current) {
-			$current.setAttribute('style', '');
+		if (current) {
+			current.setAttribute('style', '');
 		}
-		$current = newVal;
+		current = newVal;
 	}
 	function handleClick(e: MouseEvent | KeyboardEvent) {
 		const target = e.currentTarget;
 		if (target instanceof HTMLElement) {
-			if ($current === target) {
+			if (current === target) {
 				setCurrent(undefined);
 				return;
 			}
@@ -44,14 +45,17 @@
 		{/each}
 	{/each}
 </div>
+
+<BuyModal closeModal={() => setCurrent(undefined)} open={current != null} />
+
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions a11y-click-events-have-key-events -->
-<dialog
+<!-- <dialog
 	open={$current != null}
 	on:click|self={() => setCurrent(undefined)}
 	class="z-20 bg-white cursor-default backdrop:bg-black backdrop:bg-opacity-50 rounded-xl"
->
-	<!-- svelte-ignore a11y-no-static-element-interactions a11y-click-events-have-key-events -->
-	<div on:click|stopPropagation>
+> -->
+<!-- svelte-ignore a11y-no-static-element-interactions a11y-click-events-have-key-events -->
+<!-- <div on:click|stopPropagation>
 		<div class="w-96 h-96" />
 		<div class="flex w-full pt-12">
 			<button
@@ -64,7 +68,7 @@
 			<button type="button">Buy</button>
 		</div>
 	</div>
-</dialog>
+</dialog> -->
 <!-- <button
 	class="fixed top-0 bottom-0 left-0 right-0 z-10 flex items-center justify-center w-full h-full translate-x-0 bg-gray-700 bg-opacity-50"
 	class:bg-opacity-0={$current == null}

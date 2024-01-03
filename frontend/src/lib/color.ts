@@ -10,12 +10,12 @@ export const bgColorOf = [
 ] satisfies Record<Color, string>;
 
 export const textColorOf = [
-	'text-gray-100 bg-gray-700',
-	'text-blue-600 bg-white',
-	'text-green-600 bg-white',
-	'text-red-600 bg-white',
-	'text-slate-900 bg-white',
-	'text-yellow-500 bg-white',
+	'text-slate-500',
+	'text-blue-600',
+	'text-green-600',
+	'text-red-600',
+	'text-black',
+	'text-yellow-500',
 ] satisfies Record<Color, string>;
 
 export const gradientOf = [
