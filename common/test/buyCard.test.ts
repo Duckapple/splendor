@@ -1,7 +1,7 @@
 import { expect, it, describe } from 'bun:test';
 import { cardFromId } from '../defaults';
-import { performAction } from '../logic';
-import { InnerAction, Player } from '../model';
+import { canAfford, performAction } from '../logic';
+import { Card, InnerAction, Player } from '../model';
 
 describe('performAction.buyCard', () => {
 	// +---------+
@@ -158,11 +158,21 @@ describe('performAction.buyCard', () => {
 
 		const res = performAction(structuredClone(game), localPlayer, localAction);
 
-		if (res.isOk()) expect(res.value).toBeUndefined();
+		if (res.isOk()) return expect(res.value).toBeUndefined();
 
-		expect(res.isErr()).toBe(true);
+		expect(res.error.data).toEqual({ type: 'BUY_CARD', playerTokens: [0, 0, -2, 0, 0, 0] });
+	});
+});
 
-		if (res.isErr())
-			expect(res.error.data).toEqual({ type: 'BUY_CARD', playerTokens: [0, 0, -2, 0, 0, 0] });
+describe('canAfford', () => {
+	it('bad case 1', () => {
+		const card: Card = cardFromId(14);
+		const localPlayer: Player = { cards: [0, 1, 2, 3], reserved: [], tokens: [2, 0, 0, 0, 0, 1] };
+
+		const result = canAfford(card, localPlayer, [0, 0, 0, 0, 0, 0]);
+
+		if (result.isOk()) return expect(result.value).toBeUndefined();
+
+		expect(result.error).toEqual({ cost: card.cost });
 	});
 });

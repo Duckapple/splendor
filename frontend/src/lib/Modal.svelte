@@ -1,6 +1,10 @@
 <script lang="ts">
 	export let closeModal: () => void;
 	export let open: boolean;
+	export let className: string = '';
+	export let actions: { colorClass: string; text: string; handler: () => void }[] = [];
+	$: cn = ' ' + className;
+	$: allActions = [{ colorClass: '', text: 'Cancel', handler: closeModal }, ...actions];
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -11,18 +15,20 @@
 	class:hidden={!open}
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div class="p-4 bg-white rounded-md" on:click|stopPropagation on:keypress|stopPropagation>
+	<div class={'p-4 bg-white rounded-md' + cn} on:click|stopPropagation on:keypress|stopPropagation>
 		<slot name="header" />
 		<slot />
-		<!-- svelte-ignore a11y-autofocus -->
-		<button
-			class="block"
-			autofocus
-			on:click={() => closeModal()}
-			on:keypress={(e) => ['Space', 'Enter'].includes(e.key) && closeModal()}
-		>
-			close modal
-		</button>
+		{#each allActions as action}
+			<!-- svelte-ignore a11y-autofocus -->
+			<button
+				class={'px-3 py-1 border border-black rounded' + action.colorClass}
+				autofocus={action.text === 'Cancel'}
+				on:click={() => action.handler()}
+				on:keypress={(e) => ['Space', 'Enter'].includes(e.key) && action.handler()}
+			>
+				{action.text}
+			</button>
+		{/each}
 	</div>
 </div>
 

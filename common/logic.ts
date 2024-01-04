@@ -1,5 +1,5 @@
-import { err, ok, type Result } from 'neverthrow';
-import type { Card, GameState, InnerAction, Player } from './model';
+import { type Err, err, type Ok, ok, type Result } from 'neverthrow';
+import type { Card, GameState, InnerAction, Player, TokenHold } from './model';
 import { Color } from './model';
 import { cardFromId } from './defaults';
 import { pick, sum } from './utils';
@@ -136,14 +136,13 @@ export function performAction(
 	}
 }
 
-type CanAfford = Result<true, { cost: Card['cost'] } | { playerTokens: [number, ...Card['cost']] }>;
+type CanAfford =
+	| Ok<true, never>
+	| Err<never, { cost: Card['cost'] } | { playerTokens: [number, ...Card['cost']] }>;
 
 export function canAfford(card: Card, player: Player, tokens: Record<Color, number>): CanAfford {
 	const cost = [...card.cost] as Card['cost'];
-	const playerTokens = [...(player.tokens as [number, ...Card['cost']])] as [
-		number,
-		...Card['cost']
-	];
+	const playerTokens = [...player.tokens] as TokenHold;
 
 	for (let i = 0; i < 6; i++) {
 		const i2 = i as Color;
@@ -152,17 +151,30 @@ export function canAfford(card: Card, player: Player, tokens: Record<Color, numb
 
 	if (playerTokens.some((value) => value < 0)) return err({ playerTokens });
 
-	for (const card of player.cards) {
-		const c = cardFromId(card).c;
-		if (c !== Color.Y) cost[c] -= 1;
+	const playerBonus = getBonusFromCards(player.cards);
+
+	for (let i = 0; i < cost.length; i++) {
+		cost[i] -= playerBonus[i];
 	}
 
 	for (let i = 0; i < 5; i++) {
 		const i2: Exclude<Color, Color.Y> = i;
 		cost[i2] -= tokens[i2];
+		cost[i2] = Math.max(0, cost[i2]);
 	}
 
 	if (sum(cost) === tokens[Color.Y]) return ok(true);
 
 	return err({ cost });
+}
+
+export function getBonusFromCards(cardIds: number[]) {
+	const res = [0, 0, 0, 0, 0, 0] as TokenHold;
+
+	for (const card of cardIds) {
+		const c = cardFromId(card).c;
+		if (c !== Color.Y) res[c] += 1;
+	}
+
+	return res;
 }

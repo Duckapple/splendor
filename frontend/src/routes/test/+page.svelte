@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { cards } from '../../../../common/defaults';
-	import type { Card as CardType } from '../../../../common/model';
 	import Person from './Person.svelte';
 	import Card from './Card.svelte';
-	import { writable } from 'svelte/store';
 	import BuyModal from '$lib/BuyModal.svelte';
 	const piles = ['high', 'middle', 'low'] as const;
+	let center: HTMLDivElement;
 	let current: HTMLElement | undefined = undefined;
 	function setCurrent(newVal: HTMLElement | undefined) {
 		if (current) {
@@ -21,16 +20,19 @@
 				return;
 			}
 			setCurrent(target);
-			const w2 = window.innerWidth / 2;
-			const h2 = window.innerHeight / 2;
-			const { left, top } = target.getBoundingClientRect();
+			requestAnimationFrame(() => {
+				// const w2 = window.innerWidth / 2;
+				// const h2 = window.innerHeight / 2;
+				const { left, top } = target.getBoundingClientRect();
+				const { x: centerLeft, y: centerTop } = center.getBoundingClientRect();
 
-			target.setAttribute(
-				'style',
-				`transform: rotate(0) translate(${w2 - left - target.clientWidth / 2}px, ${
-					h2 - top - target.clientHeight / 2
-				}px) scale(2); z-index: 30`
-			);
+				target.setAttribute(
+					'style',
+					`transform: rotate(0) translate(${centerLeft - left - target.clientWidth / 2}px, ${
+						centerTop - top - target.clientHeight / 2
+					}px) scale(2); z-index: 30`
+				);
+			});
 		}
 	}
 </script>
@@ -46,7 +48,13 @@
 	{/each}
 </div>
 
-<BuyModal closeModal={() => setCurrent(undefined)} open={current != null} />
+<BuyModal
+	closeModal={() => setCurrent(undefined)}
+	open={current != null}
+	cardId={current?.dataset.cardId ? Number(current?.dataset.cardId) : undefined}
+	player={{ cards: [0, 1, 2, 3], reserved: [], tokens: [2, 0, 0, 0, 0, 1] }}
+	bind:center
+/>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions a11y-click-events-have-key-events -->
 <!-- <dialog
