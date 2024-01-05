@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { cards } from '../../../../common/defaults';
+	import type { Card } from '../../../../common/model';
 	import { bgColorOf } from '$lib/color';
-	export let card: (typeof cards.persons)[number];
+	export let card: Card;
 	const { cost, id, p } = card;
 	const persons = ['👨🏼‍🌾', '👩🏽‍🔧', '👩🏿‍💻', '🧑🏻‍💼', '👨🏽‍🎨', '👩🏿‍🚒', '🕵🏼', '👸🏾', '🤵🏻‍♂️', '🧙🏽‍♂️'];
 </script>

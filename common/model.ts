@@ -4,7 +4,7 @@ export enum Color { W, U, G, R, B, Y }
 export interface Card {
 	id: number;
 	/** Point value */
-	p?: number;
+	p: number;
 	/** Color */
 	c: Color;
 	/** 5-Tuple of ordered color costs */

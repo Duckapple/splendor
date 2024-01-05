@@ -7,7 +7,7 @@
 	export let hideCost = false;
 
 	const { c, cost, id, p } = card;
-	const filtered = cost.filter(Boolean);
+	const filteredLength = cost.filter(Boolean).length;
 	const cols = [' grid-cols-1', ' grid-cols-1', ' grid-cols-2 md:grid-cols-1', ' grid-cols-2'];
 	let secondPos = -1;
 	for (let i = 0; i < cost.length; i++) {
@@ -37,10 +37,10 @@
 	</div>
 	<div
 		class={'text-sm md:text-3xl md:leading-5 pl-1 md:pl-2 pb-1 md:pb-2 grid w-12 md:w-20 gap-1 leading-none md:gap-2' +
-			cols[filtered.length - 1]}
+			cols[filteredLength - 1]}
 	>
 		{#each cost as co, i}
-			{#if filtered.length === 3 && secondPos === i}
+			{#if filteredLength === 3 && secondPos === i}
 				<div class="md:hidden" />
 			{/if}
 			{#if !hideCost && co}

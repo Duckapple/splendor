@@ -91,10 +91,4 @@
 	{:else}
 		<div class="h-6 md:h-8" />
 	{/if}
-	<script lang="ts">
-		(async function () {
-			const allowedNotifications = await window.Notification.requestPermission();
-			console.log(allowedNotifications);
-		});
-	</script>
 </div>

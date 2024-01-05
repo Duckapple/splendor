@@ -30,7 +30,7 @@ export type Routes = {
 	'/game': {
 		POST: { id: GameState };
 		GET: {
-			id: { game: Omit<SplendorGame, 'piles'>; player: SplendorGamePlayer }[];
+			id: Omit<SplendorGame & { players: SplendorGamePlayer[] }, 'piles'>;
 		};
 	};
 	'/action': {

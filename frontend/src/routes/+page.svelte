@@ -1,5 +1,4 @@
 <script>
-	import Counter from './Counter.svelte';
 	import { authed, isLoggedIn, loginRegister, logout, user } from '$lib/main';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import ArbitraryData from '$lib/ArbitraryData.svelte';
@@ -54,6 +53,8 @@
 				</a>
 			{/each}
 		</div>
+	{:else if $rooms.isError}
+		<pre>{JSON.stringify($rooms.error)}</pre>
 	{/if}
 
 	{#if !$isLoggedIn}
@@ -87,8 +88,12 @@
 			>Log out of {$user?.userName}</button
 		>
 	{/if}
-
-	<Counter />
+	<script lang="ts">
+		(async function () {
+			const allowedNotifications = await window.Notification.requestPermission();
+			console.log(allowedNotifications);
+		});
+	</script>
 </section>
 
 <ArbitraryData />

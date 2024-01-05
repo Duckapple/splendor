@@ -18,7 +18,9 @@
 	$: bonus = player != null ? getBonusFromCards(player.cards) : null;
 
 	$: maxValues = bonus?.map((b, i) =>
-		Math.min(player?.tokens[i] ?? 0, Math.max(0, (card?.cost[i] ?? 0) - b))
+		i === Color.Y
+			? player?.tokens[i] ?? 0
+			: Math.min(player?.tokens[i] ?? 0, Math.max(0, (card?.cost[i] ?? 0) - b))
 	);
 
 	let values = [0, 0, 0, 0, 0, 0];
@@ -41,9 +43,6 @@
 	}
 
 	$: cardId == null ? ((values = [0, 0, 0, 0, 0, 0]), (isFree = false)) : init();
-
-	$: console.log(minValues);
-	$: console.log('values', values);
 </script>
 
 <Modal bind:closeModal bind:open>
