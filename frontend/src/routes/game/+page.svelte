@@ -4,9 +4,9 @@
 	import { createQuery } from '@tanstack/svelte-query';
 
 	import Actions from './Actions.svelte';
-	import Card from '../test/Card.svelte';
+	import Card from './Card.svelte';
 	import { cardFromId } from '../../../../common/defaults';
-	import Person from '../test/Person.svelte';
+	import Person from './Person.svelte';
 	import BuyModal from '$lib/BuyModal.svelte';
 
 	let center: HTMLDivElement;
