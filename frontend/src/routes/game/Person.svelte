@@ -7,7 +7,7 @@
 </script>
 
 <button
-	class="relative w-16 h-16 transition-transform border border-black rounded-lg select-none md:w-32 md:h-32 md:text-4xl aspect-square bg-gradient-to-br from-slate-50 to-slate-200"
+	class="relative transition-transform border border-black rounded-lg select-none w-14 h-14 md:w-32 md:h-32 md:text-4xl aspect-square bg-gradient-to-br from-slate-50 to-slate-200"
 	data-card-id={id}
 	on:click
 	on:keypress
@@ -19,7 +19,7 @@
 		{#each cost as co, i}
 			{#if co}
 				<span
-					class={'p-0.5 md:p-1 text-center border border-black rounded-sm md:rounded ' +
+					class={'px-0.5 md:p-1 text-center border border-black rounded-sm md:rounded ' +
 						bgColorOf[i]}
 				>
 					{co}
@@ -27,7 +27,7 @@
 			{/if}
 		{/each}
 	</div>
-	<span class="absolute right-0.5 text-2xl top-1 md:text-6xl md:right-2 md:top-2">
+	<span class="absolute top-0 right-0 text-2xl md:text-6xl md:right-2 md:top-2">
 		{persons[id - 0xc0] ?? ''}
 	</span>
 </button>

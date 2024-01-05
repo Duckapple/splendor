@@ -55,7 +55,6 @@
 			textColorOf[color]}
 		class:text-opacity-60={value === 0}
 	>
-		>
 		<div
 			class="absolute inset-0 text-5xl font-normal md:text-7xl"
 			style="transform: translate(0, {100 * offset}%)"

@@ -22,18 +22,20 @@
 </script>
 
 <button
-	class={'flex flex-col justify-between w-16 h-24 transition-transform border border-black rounded-lg select-none md:w-32 md:h-48 md:text-3xl shadow-lg aspect-square bg-gradient-to-br ' +
+	class={'flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-transform border border-black rounded-lg select-none md:w-32 md:h-48 md:text-3xl shadow-lg aspect-square bg-gradient-to-br ' +
 		gradientOf[c]}
 	class:md:-mt-32={stacked}
 	class:-mt-16={stacked}
+	class:cursor-default={stacked}
 	class:hover:scale-110={!stacked}
 	class:hover:z-10={!stacked}
+	disabled={stacked}
 	data-card-id={id}
 	on:click
 	on:keypress
 >
-	<div class={'py-0.5 px-2 text-3xl md:text-6xl rounded-t-lg text-left ' + bgColorOf[c]}>
-		<span class={p ? '' : 'opacity-20'}>{p ?? '0'}</span>
+	<div class={'md:py-0.5 px-1 md:px-2 text-3xl md:text-6xl rounded-t-lg text-left ' + bgColorOf[c]}>
+		<span class={p ? '' : 'opacity-20'}>{p}</span>
 	</div>
 	<div
 		class={'text-sm md:text-3xl md:leading-5 pl-1 md:pl-2 pb-1 md:pb-2 grid w-12 md:w-20 gap-1 leading-none md:gap-2' +
