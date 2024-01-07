@@ -100,16 +100,15 @@
 			<Coin {color} {stackSize} on:click={() => console.log(color)} />
 		{/each}
 	</div>
-
-	<details class="mt-8 mb-12 md:mt-10">
-		<summary>JSON dump</summary>
-
-		{JSON.stringify($game.error)}
-
-		{#if $searchId != null}<Actions gameId={$searchId} />{/if}
-		<pre>{JSON.stringify($game.data, null, 2)}</pre>
-	</details>
 </div>
+<details class="mt-8 mb-12 md:mt-10">
+	<summary>JSON dump</summary>
+
+	{JSON.stringify($game.error)}
+
+	{#if $searchId != null}<Actions gameId={$searchId} />{/if}
+	<pre>{JSON.stringify($game.data, null, 2)}</pre>
+</details>
 
 <BuyModal
 	closeModal={() => setCurrent(undefined)}

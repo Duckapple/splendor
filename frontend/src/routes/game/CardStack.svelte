@@ -12,7 +12,7 @@
 		>
 			<div
 				class="flex items-end justify-end w-full h-full px-1 text-2xl text-white md:py-1 md:px-2 md:text-4xl card-pattern"
-				class:bg-sky-800={tier === 'high'}
+				class:bg-cyan-800={tier === 'high'}
 				class:bg-amber-800={tier === 'middle'}
 				class:bg-green-800={tier === 'low'}
 			>
