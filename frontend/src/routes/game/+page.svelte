@@ -9,6 +9,7 @@
 	import Person from './Person.svelte';
 	import BuyModal from '$lib/BuyModal.svelte';
 	import Coin from './Coin.svelte';
+	import CardStack from './CardStack.svelte';
 
 	let center: HTMLDivElement;
 	let target: HTMLElement | undefined = undefined;
@@ -64,43 +65,50 @@
 	});
 </script>
 
-<div>
+<svelte:head>
+	<title>Game</title>
+</svelte:head>
+
+<div class="flex">
 	<div class="space-y-4">
-		<div class="flex gap-2 md:gap-4">
+		<div class="flex justify-center gap-2 md:gap-4">
 			{#each $game.data?.data.shown.persons ?? [] as cardId}
 				<Person card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
 		</div>
 		<div class="flex gap-2 md:gap-4">
+			<CardStack count={$game.data?.data.piles.high.length} tier="high" />
 			{#each $game.data?.data.shown.high ?? [] as cardId}
 				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
 		</div>
 		<div class="flex gap-2 md:gap-4">
+			<CardStack count={$game.data?.data.piles.middle.length} tier="middle" />
 			{#each $game.data?.data.shown.middle ?? [] as cardId}
 				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
 		</div>
 		<div class="flex gap-2 md:gap-4">
+			<CardStack count={$game.data?.data.piles.low.length} tier="low" />
 			{#each $game.data?.data.shown.low ?? [] as cardId}
 				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
 		</div>
 	</div>
-	<div class="flex gap-2 pt-6 md:pt-12">
+	<div class="flex flex-col gap-5 pt-6 pl-2 md:pt-12 md:pl-4 md:gap-20">
 		{#each $game.data?.data.tokens ?? [] as stackSize, color}
-			<Coin {color} {stackSize} />
+			<Coin {color} {stackSize} on:click={() => console.log(color)} />
 		{/each}
 	</div>
 
-	<details class="mt-8 mb-12 md:mt-10">
+	<!-- <details class="mt-8 mb-12 md:mt-10">
 		<summary>JSON dump</summary>
 
 		{JSON.stringify($game.error)}
 
 		{#if $searchId != null}<Actions gameId={$searchId} />{/if}
 		<pre>{JSON.stringify($game.data, null, 2)}</pre>
-	</details>
+	</details> -->
 </div>
 
 <BuyModal

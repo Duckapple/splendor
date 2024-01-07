@@ -22,7 +22,7 @@
 </script>
 
 <button
-	class={'flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-transform border border-black rounded-lg select-none md:w-32 md:h-48 md:text-3xl shadow-lg aspect-square bg-gradient-to-br ' +
+	class={'flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-transform border border-black select-none md:w-32 md:h-48 md:text-3xl shadow-lg aspect-square bg-gradient-to-br ' +
 		gradientOf[c]}
 	class:md:-mt-32={stacked}
 	class:-mt-16={stacked}

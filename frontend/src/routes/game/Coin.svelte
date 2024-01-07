@@ -7,7 +7,7 @@
 	export let hideNumber = false;
 </script>
 
-<button on:click>
+<button on:click class="flex flex-col w-10 h-10">
 	{#each Array(stackSize) as _, i}
 		<div
 			class="md:text-4xl h-10 w-10 md:h-24 md:w-24 select-none transition-transform flex items-center last:mb-0 -mb-11 md:-mb-[6.5rem] last:hover:-translate-y-2 justify-center border border-black rounded-full aspect-square ring-white ring-2 md:ring-4 {bgColorOf[

@@ -1,10 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import {
-	SplendorGame,
-	SplendorGamePlayer,
-	SplendorRoom as Room,
-	SplendorGameSelect,
-} from '../db/schema';
+import { SplendorGame, SplendorGamePlayer, SplendorRoom as Room } from '../db/schema';
 import { db } from './common/db';
 import { FunctionError, Request, authedHandler, httpGuarded } from './common/httpGuarded';
 import { AuthUser } from '../common/communication';
@@ -43,7 +38,7 @@ async function get(user: AuthUser, req: Request) {
 	if (typeof id !== 'string') throw new FunctionError(400, { message: 'Bad game ID' });
 
 	const result = await db
-		.select({ game: SplendorGameSelect, player: SplendorGamePlayer })
+		.select({ game: SplendorGame, player: SplendorGamePlayer })
 		.from(SplendorGame)
 		.innerJoin(SplendorGamePlayer, eq(SplendorGamePlayer.gameId, SplendorGame.id))
 		.where(eq(SplendorGame.id, id));
@@ -53,7 +48,15 @@ async function get(user: AuthUser, req: Request) {
 	if (!result.some(({ player }) => player?.userId === user.id))
 		throw new FunctionError(403, { message: 'Forbidden' });
 
-	const game = { ...result[0].game, players: result.map(({ player }) => omit(player, 'gameId')) };
+	const piles = (['low', 'middle', 'high'] as const).map((x) => ({
+		length: result[0].game.piles[x].length,
+	}));
+
+	const game = {
+		...result[0].game,
+		piles,
+		players: result.map(({ player }) => omit(player, 'gameId')),
+	};
 
 	return { message: 'Gotten!', data: game };
 }
