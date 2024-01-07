@@ -77,19 +77,19 @@
 			{/each}
 		</div>
 		<div class="flex gap-2 md:gap-4">
-			<CardStack count={$game.data?.data.piles.high.length} tier="high" />
+			<CardStack count={$game.data?.data.piles.high?.length} tier="high" />
 			{#each $game.data?.data.shown.high ?? [] as cardId}
 				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
 		</div>
 		<div class="flex gap-2 md:gap-4">
-			<CardStack count={$game.data?.data.piles.middle.length} tier="middle" />
+			<CardStack count={$game.data?.data.piles.middle?.length} tier="middle" />
 			{#each $game.data?.data.shown.middle ?? [] as cardId}
 				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
 		</div>
 		<div class="flex gap-2 md:gap-4">
-			<CardStack count={$game.data?.data.piles.low.length} tier="low" />
+			<CardStack count={$game.data?.data.piles.low?.length} tier="low" />
 			{#each $game.data?.data.shown.low ?? [] as cardId}
 				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
@@ -101,14 +101,14 @@
 		{/each}
 	</div>
 
-	<!-- <details class="mt-8 mb-12 md:mt-10">
+	<details class="mt-8 mb-12 md:mt-10">
 		<summary>JSON dump</summary>
 
 		{JSON.stringify($game.error)}
 
 		{#if $searchId != null}<Actions gameId={$searchId} />{/if}
 		<pre>{JSON.stringify($game.data, null, 2)}</pre>
-	</details> -->
+	</details>
 </div>
 
 <BuyModal

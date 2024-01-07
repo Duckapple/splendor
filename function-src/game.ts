@@ -4,7 +4,7 @@ import { db } from './common/db';
 import { FunctionError, Request, authedHandler, httpGuarded } from './common/httpGuarded';
 import { AuthUser } from '../common/communication';
 import { newGameState } from '../common/defaults';
-import { omit } from '../common/utils';
+import { mapValues, omit } from '../common/utils';
 
 httpGuarded('game', {
 	POST: authedHandler(post),
@@ -48,9 +48,7 @@ async function get(user: AuthUser, req: Request) {
 	if (!result.some(({ player }) => player?.userId === user.id))
 		throw new FunctionError(403, { message: 'Forbidden' });
 
-	const piles = (['low', 'middle', 'high'] as const).map((x) => ({
-		length: result[0].game.piles[x].length,
-	}));
+	const piles = mapValues(result[0].game.piles, ({ length }) => ({ length }));
 
 	const game = {
 		...result[0].game,

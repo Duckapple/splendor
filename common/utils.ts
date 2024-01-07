@@ -43,4 +43,11 @@ export function omit<T extends object, K extends keyof T>(obj: T, ...keys: K[]):
 	return obj;
 }
 
+export function mapValues<T extends object, U, K extends (string | number) & keyof T>(
+	t: T,
+	f: (t: T[K]) => U
+): { [X in K]: U } {
+	return Object.fromEntries(Object.entries(t).map(([k, v]) => [k, f(v)])) as never;
+}
+
 export type Extends<T1, T2> = T1 extends T2 ? true : false;
