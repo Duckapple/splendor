@@ -1,8 +1,8 @@
 <script>
 	import { authed, isLoggedIn, loginRegister, logout, user } from '$lib/main';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
-	import ArbitraryData from '$lib/ArbitraryData.svelte';
 	import { timeAgo } from '$lib/timeAgo';
+	import Spinner from '$lib/Spinner.svelte';
 	$: userName = '';
 	$: password = '';
 	$: register = false;
@@ -10,8 +10,9 @@
 
 	const loginMutation = createMutation({
 		mutationKey: ['login'],
-		mutationFn: () => {
-			return loginRegister({ userName, password }, register);
+		mutationFn: async () => {
+			await loginRegister({ userName, password }, register);
+			void $rooms.refetch();
 		},
 	});
 
@@ -32,15 +33,22 @@
 </svelte:head>
 
 <section class="flex flex-col justify-center items-center flex-[0.6]">
-	{#if isLoggedIn && $rooms.isSuccess}
+	{#if $isLoggedIn && $rooms.isLoading}
+		<div class="p-8">
+			<Spinner />
+		</div>
+	{/if}
+	{#if $isLoggedIn && $rooms.isSuccess}
 		<div class="flex flex-col gap-4">
 			{#each $rooms.data.data as room}
 				<a class="block p-2 border border-gray-700" href={`/game?id=${room.id}`}>
 					<p>
 						{room.id}
-						{#if room.started} - started{/if}
+						{#if room.started}
+							- started
+						{/if}
 					</p>
-					<p>
+					<p title="Updated {timeAgo(room.updatedAt)} ({room.updatedAt.toString()})">
 						Created by {room.players.find(({ userId }) => room.ownerId === userId)?.userName}
 						{timeAgo(room.createdAt)}
 					</p>
@@ -53,8 +61,8 @@
 				</a>
 			{/each}
 		</div>
-	{:else if $rooms.isError}
-		<pre>{JSON.stringify($rooms.error)}</pre>
+	{:else if $rooms.isError && $rooms.error.message !== 'Unauthorized'}
+		<span class="text-red-500">{$rooms.error.message}</span>
 	{/if}
 
 	{#if !$isLoggedIn}
@@ -72,6 +80,9 @@
 					on:click={() => (register = true)}
 					type="submit"
 				>
+					{#if $loginMutation.isPending && register}
+						<Spinner />
+					{/if}
 					Register
 				</button>
 				<button
@@ -79,6 +90,9 @@
 					on:click={() => (register = false)}
 					type="submit"
 				>
+					{#if $loginMutation.isPending && !register}
+						<Spinner />
+					{/if}
 					Log in
 				</button>
 			</div>
@@ -95,5 +109,3 @@
 		});
 	</script>
 </section>
-
-<ArbitraryData />

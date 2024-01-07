@@ -16,7 +16,6 @@
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div class={'p-4 bg-white rounded-md' + cn} on:click|stopPropagation on:keypress|stopPropagation>
-		<slot name="header" />
 		<slot />
 		{#each allActions as action}
 			<!-- svelte-ignore a11y-autofocus -->

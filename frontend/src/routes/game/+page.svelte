@@ -8,6 +8,7 @@
 	import { cardFromId } from '../../../../common/defaults';
 	import Person from './Person.svelte';
 	import BuyModal from '$lib/BuyModal.svelte';
+	import Coin from './Coin.svelte';
 
 	let center: HTMLDivElement;
 	let target: HTMLElement | undefined = undefined;
@@ -17,6 +18,20 @@
 			target.setAttribute('style', '');
 		}
 		target = newVal;
+	}
+	function moveTo(target: HTMLElement, position: HTMLElement | Record<'x' | 'y', number>) {
+		requestAnimationFrame(() => {
+			const { left, top } = target.getBoundingClientRect();
+			const { x, y } =
+				position instanceof HTMLElement ? position.getBoundingClientRect() : position;
+
+			target.setAttribute(
+				'style',
+				`transform: rotate(0) translate(${x - left - target.clientWidth / 2}px, ${
+					y - top - target.clientHeight / 2
+				}px) scale(2); z-index: 30`
+			);
+		});
 	}
 	function handleClick(e: MouseEvent | KeyboardEvent) {
 		if ('key' in e && !['Space', 'Enter'].includes(e.key)) {
@@ -29,17 +44,7 @@
 				return;
 			}
 			setCurrent(newTarget);
-			requestAnimationFrame(() => {
-				const { left, top } = newTarget.getBoundingClientRect();
-				const { x: centerLeft, y: centerTop } = center.getBoundingClientRect();
-
-				newTarget.setAttribute(
-					'style',
-					`transform: rotate(0) translate(${centerLeft - left - newTarget.clientWidth / 2}px, ${
-						centerTop - top - newTarget.clientHeight / 2
-					}px) scale(2); z-index: 30`
-				);
-			});
+			moveTo(newTarget, center);
 		}
 	}
 
@@ -60,11 +65,6 @@
 </script>
 
 <div>
-	{$searchId}
-	{JSON.stringify($game.error)}
-
-	{#if $searchId != null}<Actions gameId={$searchId} />{/if}
-
 	<div class="space-y-4">
 		<div class="flex gap-2 md:gap-4">
 			{#each $game.data?.data.shown.persons ?? [] as cardId}
@@ -87,8 +87,20 @@
 			{/each}
 		</div>
 	</div>
+	<div class="flex gap-2 pt-6 md:pt-12">
+		{#each $game.data?.data.tokens ?? [] as stackSize, color}
+			<Coin {color} {stackSize} />
+		{/each}
+	</div>
 
-	<pre>{JSON.stringify($game.data, null, 2)}</pre>
+	<details class="mt-8 mb-12 md:mt-10">
+		<summary>JSON dump</summary>
+
+		{JSON.stringify($game.error)}
+
+		{#if $searchId != null}<Actions gameId={$searchId} />{/if}
+		<pre>{JSON.stringify($game.data, null, 2)}</pre>
+	</details>
 </div>
 
 <BuyModal

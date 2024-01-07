@@ -23,10 +23,4 @@
 			<slot />
 		</QueryClientProvider>
 	</main>
-
-	<footer class="flex flex-col items-center justify-center p-3 min-[480px]:px-0">
-		<p>
-			visit <a class="font-bold" href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit
-		</p>
-	</footer>
 </div>
