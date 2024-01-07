@@ -95,7 +95,7 @@
 			{/each}
 		</div>
 	</div>
-	<div class="flex flex-col gap-5 pt-6 pl-2 md:pt-12 md:pl-4 md:gap-20">
+	<div class="flex flex-col gap-5 pt-6 pl-2 md:pt-12 md:pl-4 md:gap-6">
 		{#each $game.data?.data.tokens ?? [] as stackSize, color}
 			<Coin {color} {stackSize} on:click={() => console.log(color)} />
 		{/each}

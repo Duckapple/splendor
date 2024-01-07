@@ -15,12 +15,8 @@
 	});
 </script>
 
-<div class="flex flex-col min-h-screen">
-	<Header />
-
-	<main class="box-border flex flex-col flex-1 w-full max-w-5xl p-4 mx-auto">
-		<QueryClientProvider client={queryClient}>
-			<slot />
-		</QueryClientProvider>
-	</main>
-</div>
+<main class="box-border flex flex-col flex-1 w-full max-w-5xl min-h-screen p-4 mx-auto">
+	<QueryClientProvider client={queryClient}>
+		<slot />
+	</QueryClientProvider>
+</main>
