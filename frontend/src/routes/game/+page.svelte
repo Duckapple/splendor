@@ -70,25 +70,25 @@
 </svelte:head>
 
 <div class="flex">
-	<div class="space-y-4">
-		<div class="flex justify-center gap-2 md:gap-4">
+	<div class="space-y-3">
+		<div class="flex justify-center gap-2 md:gap-3">
 			{#each $game.data?.data.shown.persons ?? [] as cardId}
 				<Person card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
 		</div>
-		<div class="flex gap-2 md:gap-4">
+		<div class="flex gap-2 md:gap-3">
 			<CardStack count={$game.data?.data.piles.high?.length} tier="high" />
 			{#each $game.data?.data.shown.high ?? [] as cardId}
 				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
 		</div>
-		<div class="flex gap-2 md:gap-4">
+		<div class="flex gap-2 md:gap-3">
 			<CardStack count={$game.data?.data.piles.middle?.length} tier="middle" />
 			{#each $game.data?.data.shown.middle ?? [] as cardId}
 				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
 			{/each}
 		</div>
-		<div class="flex gap-2 md:gap-4">
+		<div class="flex gap-2 md:gap-3">
 			<CardStack count={$game.data?.data.piles.low?.length} tier="low" />
 			{#each $game.data?.data.shown.low ?? [] as cardId}
 				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
