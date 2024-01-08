@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { Card as CardType } from '../../../../../common/model';
-	import { cardFromId } from '../../../../../common/defaults';
+	import { cardFromId, cards } from '../../../../../common/defaults';
 	import Card from '../Card.svelte';
 	import Coin from '../Coin.svelte';
-	const cards = [0x08, 0x19, 0xc2, 0x4a, 0x42, 0x09, 0x4e, 0x24, 0x90, 0x91];
+	const handCards = [0x08, 0x19, 0xc2, 0x4a, 0x42, 0x09, 0x4e, 0x24, 0x90, 0x91];
 	$: tokens = [1, 0, 3, 2, 1, 1];
 	const sorted: CardType[][] = [[], [], [], [], [], []];
-	for (const cardId of cards) {
+	for (const cardId of handCards) {
 		const card = cardFromId(cardId);
 		sorted[card.c].push(card);
 	}
@@ -25,5 +25,10 @@
 				{/if}
 			</div>
 		</div>
+	{/each}
+</div>
+<div class="flex flex-wrap">
+	{#each [...cards.high, ...cards.middle, ...cards.low] as card}
+		<Card {card} />
 	{/each}
 </div>

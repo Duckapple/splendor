@@ -113,7 +113,7 @@
 <BuyModal
 	closeModal={() => setCurrent(undefined)}
 	open={target != null}
-	cardId={target?.dataset.cardId ? Number(target?.dataset.cardId) : undefined}
+	cardId={target?.dataset.cardId ? Number(target.dataset.cardId) : undefined}
 	player={{ cards: [0, 1, 2, 3], reserved: [], tokens: [2, 0, 0, 0, 0, 1] }}
 	bind:center
 />
