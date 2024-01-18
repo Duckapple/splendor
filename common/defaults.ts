@@ -146,3 +146,14 @@ export function newGameState(id: string, playerCount: 1 | 2 | 3 | 4): GameState 
 
 	return { id, shown, tokens, piles, turn: 0, playerCount };
 }
+
+export function positionFromCardId(shown: GameState['shown'], cardId: number) {
+	return (['high', 'middle', 'low', 'persons'] as const)
+		.map((k) => [k, shown[k].findIndex((id) => id === cardId)] as const)
+		.find(([, rowIndex]) => rowIndex !== -1);
+}
+
+export function reservePositionFromCardId(reserved: number[], cardId: number) {
+	const value = reserved.findIndex((id) => cardId === id);
+	return value !== -1 ? (['reserve', value] as const) : undefined;
+}

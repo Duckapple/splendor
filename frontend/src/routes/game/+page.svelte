@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { authed } from '$lib/main';
+	import { authed, user } from '$lib/main';
 	import { readable } from 'svelte/store';
 	import { createQuery } from '@tanstack/svelte-query';
 
 	import Actions from './Actions.svelte';
 	import Card from './Card.svelte';
-	import { cardFromId } from '../../../../common/defaults';
+	import { cardFromId, positionFromCardId } from '../../../../common/defaults';
 	import Person from './Person.svelte';
 	import BuyModal from '$lib/BuyModal.svelte';
 	import Coin from './Coin.svelte';
@@ -113,7 +113,8 @@
 <BuyModal
 	closeModal={() => setCurrent(undefined)}
 	open={target != null}
+	game={$game.data?.data}
 	cardId={target?.dataset.cardId ? Number(target.dataset.cardId) : undefined}
-	player={{ cards: [0, 1, 2, 3], reserved: [], tokens: [2, 0, 0, 0, 0, 1] }}
+	player={$game.data?.data.players.find(({ userId }) => userId === $user?.id)}
 	bind:center
 />

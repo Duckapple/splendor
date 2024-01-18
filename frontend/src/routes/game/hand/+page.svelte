@@ -4,7 +4,7 @@
 	import Card from '../Card.svelte';
 	import Coin from '../Coin.svelte';
 	const handCards = [0x08, 0x19, 0xc2, 0x4a, 0x42, 0x09, 0x4e, 0x24, 0x90, 0x91];
-	$: tokens = [1, 0, 3, 2, 1, 1];
+	$: tokens = [1, 6, 3, 2, 1, 1];
 	const sorted: CardType[][] = [[], [], [], [], [], []];
 	for (const cardId of handCards) {
 		const card = cardFromId(cardId);

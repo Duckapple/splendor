@@ -7,7 +7,9 @@
  * //    x = [{ a: true }] satisfies { a: boolean }[];
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function assertField<Field extends string, T extends { [K in Field]?: unknown }>(field: Field) {
+export function assertField<Field extends string, T extends { [K in Field]?: unknown }>(
+	field: Field
+) {
 	return (item: T): item is T & { [K in Field]: NonNullable<T[K]> } =>
 		field in item && item[field] != null;
 }

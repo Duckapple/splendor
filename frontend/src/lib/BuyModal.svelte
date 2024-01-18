@@ -1,14 +1,21 @@
 <script lang="ts">
-	import { Color, type Card, type Player } from '../../../common/model';
-	import { cardFromId } from '../../../common/defaults';
+	import { Color, type Card, type Player, type GameState } from '../../../common/model';
+	import {
+		cardFromId,
+		positionFromCardId,
+		reservePositionFromCardId,
+	} from '../../../common/defaults';
 	import { getBonusFromCards, canAfford } from '../../../common/logic';
 	import { only } from '../../../common/filter-utils';
 
 	import Counter from '../routes/Counter.svelte';
 	import Modal from './Modal.svelte';
+	import { authed } from './main';
+	import { createMutation } from '@tanstack/svelte-query';
 
 	export let closeModal: () => void;
 	export let open: boolean;
+	export let game: GameState | undefined;
 	export let cardId: number | undefined;
 	export let player: Player | undefined;
 
@@ -43,16 +50,56 @@
 	}
 
 	$: cardId == null ? ((values = [0, 0, 0, 0, 0, 0]), (isFree = false)) : init();
+
+	$: buyMutation = createMutation({
+		mutationKey: ['action', 'BUY_CARD', cardId],
+		async mutationFn() {
+			if (!player || !game || cardId == null) {
+				throw { message: 'Invalid initial state. Retry the action, this time slowly' };
+			}
+			const position =
+				positionFromCardId(game.shown, cardId) ??
+				reservePositionFromCardId(player.reserved, cardId);
+			if (position == null || position[0] === 'persons') {
+				throw { message: 'Card is somehow not in play?' };
+			}
+			const [row, i] = position;
+
+			const body = {
+				type: 'BUY_CARD',
+				data: { row, i, card: cardId, tokens: values },
+			};
+
+			await authed({
+				method: 'POST',
+				route: '/action',
+				params: { gameId: game.id },
+				body,
+			});
+
+			closeModal();
+		},
+	});
 </script>
 
-<Modal bind:closeModal bind:open>
+<Modal
+	bind:closeModal
+	bind:open
+	actions={[
+		{
+			colorClass: 'bg-green-400',
+			text: 'Buy',
+			handler: $buyMutation.mutateAsync,
+		},
+	]}
+>
 	<div class="w-56 h-56 md:w-[28rem] md:h-[28rem] flex justify-center items-center">
 		<div bind:this={center} class="w-0 h-0" />
 	</div>
 	{#if isFree}
 		<div>You can buy it for free!</div>
 	{:else}
-		Want to buy this card?
+		Want to buy this card? {#if $buyMutation.isError}{$buyMutation.error?.message}{/if}
 		<div class="flex justify-center gap-2">
 			{#each Object.values(Color).filter(only('number')) as color}
 				<Counter
