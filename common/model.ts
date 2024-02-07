@@ -43,7 +43,7 @@ export type Action = InnerAction & {
 	timestamp: Date;
 };
 
-export type InnerAction = BuyCard | TakePerson | TakeTokens | Reserve;
+export type InnerAction = BuyCard | TakeTokens | Reserve;
 
 export type BuyCard = {
 	type: 'BUY_CARD';
@@ -52,12 +52,8 @@ export type BuyCard = {
 		i: number;
 		card: number;
 		tokens: TokenHold;
+		person?: { i: 0 | 1 | 2 | 3 | 4; id: number };
 	};
-};
-
-export type TakePerson = {
-	type: 'TAKE_PERSON';
-	data: { i: 0 | 1 | 2 | 3 | 4; card: number };
 };
 
 export type TakeTokens = {
@@ -74,6 +70,6 @@ export type Reserve = {
 		row: 'high' | 'middle' | 'low';
 		i: number;
 		card: number;
-		withToken: boolean;
+		returnToken?: Color;
 	};
 };

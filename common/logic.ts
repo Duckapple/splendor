@@ -20,10 +20,15 @@ type TakeTokensError = {
 		| 'TOO_FEW_FOR_RETURN';
 };
 
+type ReserveError = {
+	type: 'RESERVE';
+	code: 'TOO_MANY' | 'TOO_FEW_FOR_RETURN' | 'INVALID_CARD' | 'INVALID_RETURN';
+};
+
 type ActionError = {
 	message: string;
 	status?: number;
-	data?: BuyCardError | TakeTokensError;
+	data?: BuyCardError | TakeTokensError | ReserveError;
 };
 
 export function performAction(
@@ -69,10 +74,11 @@ export function performAction(
 			for (let i = 0; i < action.data.tokens.length; i++) {
 				const i2 = i as Color;
 				player.tokens[i2] -= action.data.tokens[i2];
+				game.tokens[i2] += action.data.tokens[i2];
 			}
 
 			return ok({
-				game: pick(game, 'piles', 'shown', 'turn'),
+				game: pick(game, 'piles', 'shown', 'turn', 'tokens'),
 				player: pick(player, 'cards', 'reserved', 'tokens'),
 			});
 		case 'TAKE_TOKENS':
@@ -129,10 +135,56 @@ export function performAction(
 				});
 
 			return ok({ game: pick(game, 'tokens', 'turn'), player: pick(player, 'tokens') });
-		case 'TAKE_PERSON':
-			return err({ message: 'Not implemented', status: 500 });
 		case 'RESERVE':
-			return err({ message: 'Not implemented', status: 500 });
+			if (player.reserved.length >= 3)
+				return err({
+					message: 'Cannot have more than 3 cards reserved at once',
+					data: { type: 'RESERVE', code: 'TOO_MANY' },
+				});
+
+			const didNotReturnWhenWarranted =
+				(sum(player.tokens) === 10) === (action.data.returnToken == null);
+
+			if (game.tokens[Color.Y] > 0 && didNotReturnWhenWarranted)
+				return err({
+					message: 'Need to return token when going over 10 tokens',
+					data: { type: 'RESERVE', code: 'TOO_FEW_FOR_RETURN' },
+				});
+
+			if (action.data.returnToken != null && player.tokens[action.data.returnToken] <= 0)
+				return err({
+					message: 'Need to return a token you hold',
+					data: { type: 'RESERVE', code: 'INVALID_RETURN' },
+				});
+
+			if (game.shown[action.data.row][action.data.i] !== action.data.card)
+				return err({
+					message: 'Card was not on position',
+					data: { type: 'RESERVE', code: 'INVALID_CARD' },
+				});
+
+			const newCard = game.piles[action.data.row].pop();
+
+			game.shown[action.data.row].splice(action.data.i, 1);
+
+			if (newCard != null) game.shown[action.data.row].splice(action.data.i, 0, newCard);
+
+			player.reserved.push(action.data.card);
+
+			if (game.tokens[Color.Y] !== 0) {
+				game.tokens[Color.Y] -= 1;
+				player.tokens[Color.Y] += 1;
+			}
+
+			if (action.data.returnToken != null) {
+				game.tokens[action.data.returnToken] += 1;
+				player.tokens[action.data.returnToken] -= 1;
+			}
+
+			return ok({
+				game: pick(game, 'piles', 'shown', 'tokens', 'turn'),
+				player: pick(player, 'reserved', 'tokens'),
+			});
 	}
 }
 
