@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages and Cloud Functions
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v1
         with:
@@ -50,3 +50,22 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v2
+
+  deploy-functions:
+    needs: build_site
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Authenticate to Google Cloud
+        id: gcloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.SERVICE_ACCOUNT }}
+          export_environment_variables: true
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2.1.0
+
+      - name: Build and deploy
+        run: |
+          bun run build:function deploy

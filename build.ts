@@ -1,86 +1,54 @@
-import Bun from "bun";
+import Bun from 'bun';
 
-console.log(new Date());
-
-const versions = await Bun.file("./VERSION").json();
+console.log('Built at', new Date());
 
 const minify = true;
-const naming = "[dir]/index.[ext]";
+const naming = '[dir]/index.[ext]';
 const external = [
-  "@google-cloud/functions-framework",
-  "@google-cloud/datastore",
-  "web-push",
-  "@planetscale/database",
-  "crypto",
-  "jsonwebtoken",
-  "bcrypt",
+	'@google-cloud/functions-framework',
+	'@google-cloud/datastore',
+	'web-push',
+	'@planetscale/database',
+	'crypto',
+	'jsonwebtoken',
+	'bcrypt',
 ];
-const pkgJson = Bun.file("./function-src/package.json");
+const pkgJson = Bun.file('./function-src/package.json');
 
 async function buildFunction<T extends string>(functionName: T) {
-  const res = await Bun.build({
-    entrypoints: [`./function-src/${functionName}.ts`],
-    outdir: `./out/${functionName}`,
-    naming,
-    external,
-    minify,
-    target: "node",
-  });
-  await Bun.write(`./out/${functionName}/package.json`, pkgJson);
-  const hash = res.outputs[0].hash;
-  const oldData = versions[functionName];
-  const version =
-    oldData?.hash === hash
-      ? oldData?.version ?? 0
-      : (oldData?.version ?? 0) + 1;
-  return [functionName, { hash, version }] as const;
+	await Bun.build({
+		entrypoints: [`./function-src/${functionName}.ts`],
+		outdir: `./out/${functionName}`,
+		naming,
+		external,
+		minify,
+		target: 'node',
+	});
+	await Bun.write(`./out/${functionName}/package.json`, pkgJson);
+	return functionName;
 }
 
 await Bun.build({
-  entrypoints: ["./function-src/index.ts"],
-  outdir: "./function",
-  external,
-  minify,
+	entrypoints: ['./function-src/index.ts'],
+	outdir: './function',
+	external,
+	minify,
 });
 
-const functions = ["register", "log-in", "game", "room", "action"] as const;
+const functions = ['register', 'log-in', 'game', 'room', 'action'] as const;
 
-const outputs = await Promise.all(functions.map(buildFunction));
+await Promise.all(functions.map(buildFunction));
 
-const newVersions = Object.fromEntries(outputs) as {
-  [T in (typeof functions)[number]]: { hash: string; version: any };
-};
+console.log('All built successfully!');
 
-console.log("Built successfully!");
+if (!Bun.argv.includes('deploy')) process.exit(0);
 
-if (!Bun.argv.includes("deploy")) process.exit(0);
+console.log('Deploying to', ...functions);
 
 function deploy(functionName: string) {
-  return Bun.spawn({
-    cmd: [
-      "gcloud",
-      "functions",
-      "deploy",
-      functionName,
-      "--region=europe-west3",
-      "--trigger-http",
-      "--runtime=nodejs20",
-      `--source=out/${functionName}`,
-      "--allow-unauthenticated",
-      "--gen2",
-      "--env-vars-file",
-      ".env.yaml",
-    ],
-  });
+	return Bun.$`gcloud functions deploy ${functionName} --region=europe-west3 --trigger-http --runtime=nodejs20 --source=out/${functionName} --allow-unauthenticated --gen2 --env-vars-file .env.yaml`.quiet();
 }
 
-for (const fun of functions) {
-  if (newVersions[fun].version === versions[fun]?.version) continue;
-  console.log("Deploying", fun);
-  const proc = deploy(fun);
-}
+await Promise.all(functions.map(deploy));
 
-// Only update version files if deployment happened
-await Bun.write(Bun.file("./VERSION"), JSON.stringify(newVersions, null, 2));
-
-console.log("All deployed!");
+console.log('All deployed successfully!');
