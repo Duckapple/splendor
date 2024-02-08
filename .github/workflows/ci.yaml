@@ -56,6 +56,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: |
+          bun install
+
       - name: Authenticate to Google Cloud
         id: gcloud
         uses: google-github-actions/auth@v1

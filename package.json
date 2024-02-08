@@ -8,7 +8,6 @@
     "preview": "bun run frontend build && bun run frontend preview"
   },
   "devDependencies": {
-    "@google-cloud/datastore": "^8.2.2",
     "@google-cloud/functions-framework": "^3.3.0",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.5",

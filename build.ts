@@ -6,12 +6,11 @@ const minify = true;
 const naming = '[dir]/index.[ext]';
 const external = [
 	'@google-cloud/functions-framework',
-	'@google-cloud/datastore',
 	'web-push',
 	'@planetscale/database',
 	'crypto',
 	'jsonwebtoken',
-	'bcrypt',
+	// 'bcrypt',
 ];
 const pkgJson = Bun.file('./function-src/package.json');
 
