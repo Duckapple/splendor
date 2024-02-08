@@ -14,7 +14,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/web-push": "^3.6.2",
     "bun-types": "latest",
-    "drizzle-kit": "^0.19.13",
+    "drizzle-kit": "^0.20.14",
     "web-push": "^3.6.6"
   },
   "name": "splendor",
@@ -24,9 +24,9 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@planetscale/database": "^1.11.0",
+    "@planetscale/database": "^1.15.0",
     "bcrypt": "^5.1.1",
-    "drizzle-orm": "^0.28.6",
+    "drizzle-orm": "^0.29.3",
     "drizzle-valibot": "^0.1.1",
     "jsonwebtoken": "^9.0.2",
     "neverthrow": "^6.1.0",

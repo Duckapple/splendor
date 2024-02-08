@@ -7,6 +7,7 @@ import { pick, sum } from './utils';
 type BuyCardError = { type: 'BUY_CARD' } & (
 	| { cost: Card['cost'] }
 	| { playerTokens: [number, ...Card['cost']] }
+	| { code: 'PERSON' | 'PERSON_INDEX' }
 );
 
 type TakeTokensError = {
@@ -75,6 +76,38 @@ export function performAction(
 				const i2 = i as Color;
 				player.tokens[i2] -= action.data.tokens[i2];
 				game.tokens[i2] += action.data.tokens[i2];
+			}
+
+			const earnedPeople = game.shown.persons
+				.map((personId, index) => [personId, index] as const)
+				.filter(([personId]) => {
+					const person = cardFromId(personId);
+					const x = canAfford(person, player, [0, 0, 0, 0, 0, 0]);
+					return x.isOk();
+				});
+
+			if ((earnedPeople.length === 0) === (action.data.person != null)) {
+				const should = earnedPeople.length === 0 ? 'Cannot' : 'Should';
+				const not = should ? 'not ' : '';
+				return err({
+					message: `${should} claim person when ${not}earned`,
+					data: { type: 'BUY_CARD', code: 'PERSON' },
+				});
+			}
+
+			const chosen = earnedPeople.find(
+				([personId, i]) => action.data.person?.i === i && action.data.person?.id === personId
+			);
+
+			if (chosen == null && action.data.person != null)
+				return err({
+					message: 'Did not choose an earned person',
+					data: { type: 'BUY_CARD', code: 'PERSON_INDEX' },
+				});
+
+			if (chosen != null) {
+				game.shown.persons.splice(chosen[1], 1);
+				player.cards.push(chosen[0]);
 			}
 
 			return ok({
