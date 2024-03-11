@@ -12,14 +12,15 @@
 	on:click
 	on:keypress
 >
-	<span class="absolute text-3xl md:text-6xl left-1.5 top-0 md:left-2 md:top-1">{p}</span>
+	<span class="absolute top-0 text-3xl leading-none md:text-6xl left-1 md:left-2 md:top-1">{p}</span
+	>
 	<div
 		class="absolute flex gap-0.5 md:gap-1 leading-none md:leading-7 left-1 md:left-2 bottom-1 md:bottom-2"
 	>
 		{#each cost as co, i}
 			{#if co}
 				<span
-					class={'px-0.5 md:p-1 text-center border border-black rounded-sm md:rounded ' +
+					class={'p-[1pt] md:p-1 text-center border border-black rounded-sm md:rounded ' +
 						bgColorOf[i]}
 				>
 					{co}
