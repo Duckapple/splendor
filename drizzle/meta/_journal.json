@@ -1,54 +1,12 @@
 {
   "version": "5",
-  "dialect": "mysql",
+  "dialect": "pg",
   "entries": [
     {
       "idx": 0,
       "version": "5",
-      "when": 1699487140650,
-      "tag": "0000_abnormal_random",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1699568707823,
-      "tag": "0001_flashy_mastermind",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1700004568151,
-      "tag": "0002_slow_thunderball",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1700175535001,
-      "tag": "0003_groovy_exiles",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1700335801420,
-      "tag": "0004_good_kang",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1700359619801,
-      "tag": "0005_mean_jetstream",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1700415417016,
-      "tag": "0006_old_skaar",
+      "when": 1710196457529,
+      "tag": "0000_curly_gideon",
       "breakpoints": true
     }
   ]
