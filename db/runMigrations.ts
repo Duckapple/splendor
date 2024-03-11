@@ -1,16 +1,16 @@
-import { drizzle } from "drizzle-orm/planetscale-serverless";
-import { migrate } from "drizzle-orm/planetscale-serverless/migrator";
-import { connect } from "@planetscale/database";
-import { env } from "./env";
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import { migrate } from 'drizzle-orm/neon-serverless/migrator';
 
-const connection = connect({
-  host: env.DATABASE_HOST,
-  username: env.DATABASE_USERNAME,
-  password: env.DATABASE_PASSWORD,
-});
+import { env } from './env';
+import * as schema from './schema';
 
-const db = drizzle(connection, { logger: true });
+const connection = new Pool({ connectionString: env.DATABASE_URL });
 
-await migrate(db, { migrationsFolder: "./drizzle" });
+const db = drizzle(connection, { logger: true, schema });
 
-console.log("Done!");
+await migrate(db, { migrationsFolder: './drizzle' });
+
+console.log('Done!');
+
+connection.end();
