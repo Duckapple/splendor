@@ -76,11 +76,6 @@
 		<span class="text-red-500">{$rooms.error.message}</span>
 	{/if}
 
-	<button
-		class="p-1 my-2 border border-black rounded"
-		on:click|preventDefault={() => $createRoom.mutate()}>Create new room</button
-	>
-
 	{#if !$isLoggedIn}
 		<form on:submit|preventDefault={() => $loginMutation.mutate()} class="flex flex-col">
 			<label for="userName">User name</label>
@@ -114,6 +109,11 @@
 			</div>
 		</form>
 	{:else}
+		<button
+			class="p-1 my-2 border border-black rounded"
+			on:click|preventDefault={() => $createRoom.mutate()}>Create new room</button
+		>
+
 		<button class="p-1 border border-black rounded" on:click={() => logout()}
 			>Log out of {$user?.userName}</button
 		>
