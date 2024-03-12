@@ -25,6 +25,17 @@
 			});
 		},
 	});
+
+	const createRoom = createMutation({
+		mutationKey: ['rooms'],
+		mutationFn: async () => {
+			await authed({
+				method: 'POST',
+				route: '/room',
+			});
+			await $rooms.refetch();
+		},
+	});
 </script>
 
 <svelte:head>
@@ -64,6 +75,11 @@
 	{:else if $rooms.isError && $rooms.error.message !== 'Unauthorized'}
 		<span class="text-red-500">{$rooms.error.message}</span>
 	{/if}
+
+	<button
+		class="p-1 my-2 border border-black rounded"
+		on:click|preventDefault={() => $createRoom.mutate()}>Create new room</button
+	>
 
 	{#if !$isLoggedIn}
 		<form on:submit|preventDefault={() => $loginMutation.mutate()} class="flex flex-col">
