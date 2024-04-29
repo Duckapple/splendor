@@ -1,4 +1,4 @@
-import type { SplendorAction, SplendorGamePlayer, SplendorGame, SplendorRoom } from '../db/schema';
+import type { SplendorGamePlayer, SplendorGame, SplendorRoom } from '../db/schema';
 import type { Action, GameState } from './model';
 export type AuthUser = {
 	id: string;
@@ -30,7 +30,7 @@ export type Routes = {
 	'/game': {
 		POST: { id: GameState };
 		GET: {
-			id: SplendorGame & { players: SplendorGamePlayer[] };
+			id: SplendorGame & { players: (SplendorGamePlayer & { userName: string })[] };
 		};
 	};
 	'/action': {

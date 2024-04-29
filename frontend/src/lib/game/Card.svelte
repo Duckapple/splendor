@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Color, type Card } from '../../../../common/model';
-	import { bgColorOf, gradientOf, ringColorOf } from '$lib/color';
+	import { type Card } from '../../../../common/model';
+	import { bgColorOf, gradientOf } from '$lib/color';
 
 	export let stacked = false;
 	export let card: Card;

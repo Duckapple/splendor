@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { SplendorGame, SplendorGamePlayer, SplendorRoom as Room } from '../db/schema';
+import { SplendorGame, SplendorGamePlayer, SplendorRoom as Room, User } from '../db/schema';
 import { db } from './common/db';
 import { FunctionError, Request, authedHandler, httpGuarded } from './common/httpGuarded';
 import { AuthUser } from '../common/communication';
@@ -38,9 +38,10 @@ async function get(user: AuthUser, req: Request) {
 	if (typeof id !== 'string') throw new FunctionError(400, { message: 'Bad game ID' });
 
 	const result = await db
-		.select({ game: SplendorGame, player: SplendorGamePlayer })
+		.select({ game: SplendorGame, player: SplendorGamePlayer, userName: User.userName })
 		.from(SplendorGame)
 		.innerJoin(SplendorGamePlayer, eq(SplendorGamePlayer.gameId, SplendorGame.id))
+		.innerJoin(User, eq(User.id, SplendorGamePlayer.userId))
 		.where(eq(SplendorGame.id, id));
 
 	if (result.length === 0) throw new FunctionError(404, { message: 'Game not found' });
@@ -53,8 +54,11 @@ async function get(user: AuthUser, req: Request) {
 	const game = {
 		...result[0].game,
 		piles,
-		players: result.map(({ player }) => omit(player, 'gameId')),
+		players: result.map(({ player, userName }) => ({
+			...omit(player, 'gameId'),
+			userName,
+		})),
 	};
 
-	return { message: 'Gotten!', data: game };
+	return { data: game };
 }

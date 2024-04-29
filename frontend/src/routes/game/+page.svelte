@@ -12,6 +12,8 @@
 
 	import Actions from './Actions.svelte';
 	import { cardFromId } from '../../../../common/defaults';
+	import Hand from '$lib/compose/Hand.svelte';
+	import { range } from '../../../../common/utils';
 
 	let cardCenter = { value: undefined as unknown as HTMLDivElement };
 	let coinCenter = { value: undefined as unknown as HTMLDivElement };
@@ -123,6 +125,14 @@
 			<Coin {color} {stackSize} on:click={handleCoin} />
 		{/each}
 	</div>
+	<div class="grid w-full gap-4 pl-4 md:grid-cols-2">
+		{#each $game.data?.data.players ?? [] as player}
+			<Hand {player} turn={$game.data?.data.turn} />
+		{/each}
+		{#each range(4 - ($game.data?.data.players.length ?? 0)) as _}
+			<div class=""></div>
+		{/each}
+	</div>
 </div>
 <details class="mt-8 mb-12 md:mt-10">
 	<summary>JSON dump</summary>
@@ -130,7 +140,6 @@
 	{JSON.stringify($game.error)}
 
 	{#if $searchId != null}<Actions gameId={$searchId} />{/if}
-	<pre>{JSON.stringify($game.data, null, 2)}</pre>
 </details>
 
 <BuyModal
