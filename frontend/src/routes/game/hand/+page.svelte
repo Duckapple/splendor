@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Card as CardType } from '../../../../../common/model';
 	import { cardFromId, cards } from '../../../../../common/defaults';
-	import Card from '../Card.svelte';
-	import Coin from '../Coin.svelte';
+	import Card from '$lib/game/Card.svelte';
+	import Coin from '$lib/game/Coin.svelte';
 	const handCards = [0x08, 0x19, 0xc2, 0x4a, 0x42, 0x09, 0x4e, 0x24, 0x90, 0x91];
 	$: tokens = [1, 6, 3, 2, 1, 1];
 	const sorted: CardType[][] = [[], [], [], [], [], []];

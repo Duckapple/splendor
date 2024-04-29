@@ -3,14 +3,15 @@
 	import { readable } from 'svelte/store';
 	import { createQuery } from '@tanstack/svelte-query';
 
+	import BuyModal from '$lib/compose/BuyModal.svelte';
+	import TakeModal from '$lib/compose/TakeModal.svelte';
+	import Card from '$lib/game/Card.svelte';
+	import CardStack from '$lib/game/CardStack.svelte';
+	import Coin from '$lib/game/Coin.svelte';
+	import Person from '$lib/game/Person.svelte';
+
 	import Actions from './Actions.svelte';
-	import Card from './Card.svelte';
 	import { cardFromId } from '../../../../common/defaults';
-	import Person from './Person.svelte';
-	import BuyModal from '$lib/BuyModal.svelte';
-	import Coin from './Coin.svelte';
-	import CardStack from './CardStack.svelte';
-	import TakeModal from '$lib/TakeModal.svelte';
 
 	let cardCenter = { value: undefined as unknown as HTMLDivElement };
 	let coinCenter = { value: undefined as unknown as HTMLDivElement };

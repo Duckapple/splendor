@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { Color, type Card, type Player, type GameState } from '../../../common/model';
+	import { Color, type Card, type Player, type GameState } from '../../../../common/model';
 	import {
 		cardFromId,
 		positionFromCardId,
 		reservePositionFromCardId,
-	} from '../../../common/defaults';
-	import { getBonusFromCards, canAfford } from '../../../common/logic';
-	import { only } from '../../../common/filter-utils';
+	} from '../../../../common/defaults';
+	import { getBonusFromCards, canAfford } from '../../../../common/logic';
+	import { only } from '../../../../common/filter-utils';
 
-	import Counter from '../routes/Counter.svelte';
-	import Modal from './Modal.svelte';
-	import { authed } from './main';
+	import Counter from '../../routes/Counter.svelte';
+	import Modal from '../Modal.svelte';
+	import { authed } from '../main';
 	import { createMutation } from '@tanstack/svelte-query';
-	import InfoTooltip from './InfoTooltip.svelte';
+	import InfoTooltip from '../InfoTooltip.svelte';
 
 	export let closeModal: () => void;
 	export let open: boolean;

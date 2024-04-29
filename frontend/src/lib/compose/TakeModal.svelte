@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { createMutation } from '@tanstack/svelte-query';
-	import Modal from './Modal.svelte';
-	import type { Color, GameState, Player } from '../../../common/model';
-	import { authed } from './main';
-	import Coin from '../routes/game/Coin.svelte';
-	import { range } from '../../../common/utils';
+	import Modal from '../Modal.svelte';
+	import type { Color, GameState, Player } from '../../../../common/model';
+	import { authed } from '../main';
+	import Coin from '../game/Coin.svelte';
+	import { range } from '../../../../common/utils';
 
 	export let closeModal: () => void;
 	export let open: boolean;
