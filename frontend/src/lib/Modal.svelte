@@ -15,19 +15,25 @@
 	class:hidden={!open}
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div class={'p-4 bg-white rounded-md' + cn} on:click|stopPropagation on:keypress|stopPropagation>
+	<div
+		class={'p-2 md:p-4 bg-white rounded-lg md:rounded-2xl shadow' + cn}
+		on:click|stopPropagation
+		on:keypress|stopPropagation
+	>
 		<slot />
-		{#each allActions as action}
-			<!-- svelte-ignore a11y-autofocus -->
-			<button
-				class={'px-3 py-1 border border-black rounded' + action.colorClass}
-				autofocus={action.text === 'Cancel'}
-				on:click={() => action.handler()}
-				on:keypress={(e) => ['Space', 'Enter'].includes(e.key) && action.handler()}
-			>
-				{action.text}
-			</button>
-		{/each}
+		<div class="flex justify-end gap-2">
+			{#each allActions as action}
+				<!-- svelte-ignore a11y-autofocus -->
+				<button
+					class={'px-3 py-1 border border-gray-400 rounded-md ' + action.colorClass}
+					autofocus={action.text === 'Cancel'}
+					on:click={() => action.handler()}
+					on:keypress={(e) => ['Space', 'Enter'].includes(e.key) && action.handler()}
+				>
+					{action.text}
+				</button>
+			{/each}
+		</div>
 	</div>
 </div>
 

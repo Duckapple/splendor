@@ -5,13 +5,15 @@
 
 	import Actions from './Actions.svelte';
 	import Card from './Card.svelte';
-	import { cardFromId, positionFromCardId } from '../../../../common/defaults';
+	import { cardFromId } from '../../../../common/defaults';
 	import Person from './Person.svelte';
 	import BuyModal from '$lib/BuyModal.svelte';
 	import Coin from './Coin.svelte';
 	import CardStack from './CardStack.svelte';
+	import TakeModal from '$lib/TakeModal.svelte';
 
-	let center: HTMLDivElement;
+	let cardCenter = { value: undefined as unknown as HTMLDivElement };
+	let coinCenter = { value: undefined as unknown as HTMLDivElement };
 	let target: HTMLElement | undefined = undefined;
 
 	function setCurrent(newVal: HTMLElement | undefined) {
@@ -20,34 +22,54 @@
 		}
 		target = newVal;
 	}
-	function moveTo(target: HTMLElement, position: HTMLElement | Record<'x' | 'y', number>) {
+
+	function moveTo(target: HTMLElement, transform: HTMLElement | Record<'x' | 'y', number>) {
 		requestAnimationFrame(() => {
 			const { left, top } = target.getBoundingClientRect();
 			const { x, y } =
-				position instanceof HTMLElement ? position.getBoundingClientRect() : position;
+				transform instanceof HTMLElement ? transform.getBoundingClientRect() : transform;
+
+			const scale = target.dataset.coinColor ? 1 : 2;
+			const opacity = target.dataset.coinColor ? 0 : 1;
+			const zIndex = target.dataset.coinColor ? '' : 'z-index: 30;';
 
 			target.setAttribute(
 				'style',
 				`transform: rotate(0) translate(${x - left - target.clientWidth / 2}px, ${
 					y - top - target.clientHeight / 2
-				}px) scale(2); z-index: 30`
+				}px) scale(${scale}); ${zIndex} opacity: ${opacity}`
 			);
+
+			if (target.dataset.coinColor) {
+				target.classList.add('z-30');
+				setTimeout(() => {
+					target.classList.remove('z-30');
+				}, 200);
+			}
 		});
 	}
-	function handleClick(e: MouseEvent | KeyboardEvent) {
+
+	function handleClick(
+		setter: (target: HTMLElement | undefined) => void,
+		center: { value?: HTMLDivElement },
+		e: MouseEvent | KeyboardEvent
+	) {
 		if ('key' in e && !['Space', 'Enter'].includes(e.key)) {
 			return;
 		}
 		const newTarget = e.currentTarget;
 		if (newTarget instanceof HTMLElement) {
 			if (target === newTarget) {
-				setCurrent(undefined);
+				setter(undefined);
 				return;
 			}
-			setCurrent(newTarget);
-			moveTo(newTarget, center);
+			setter(newTarget);
+			center.value && moveTo(newTarget, center.value);
 		}
 	}
+
+	const handleCard = handleClick.bind({}, setCurrent, cardCenter);
+	const handleCoin = handleClick.bind({}, setCurrent, coinCenter);
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
 
@@ -73,31 +95,31 @@
 	<div class="space-y-3">
 		<div class="flex justify-center gap-2 md:gap-3">
 			{#each $game.data?.data.shown.persons ?? [] as cardId}
-				<Person card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
+				<Person card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
 			{/each}
 		</div>
 		<div class="flex gap-2 md:gap-3">
 			<CardStack count={$game.data?.data.piles.high?.length} tier="high" />
 			{#each $game.data?.data.shown.high ?? [] as cardId}
-				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
+				<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
 			{/each}
 		</div>
 		<div class="flex gap-2 md:gap-3">
 			<CardStack count={$game.data?.data.piles.middle?.length} tier="middle" />
 			{#each $game.data?.data.shown.middle ?? [] as cardId}
-				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
+				<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
 			{/each}
 		</div>
 		<div class="flex gap-2 md:gap-3">
 			<CardStack count={$game.data?.data.piles.low?.length} tier="low" />
 			{#each $game.data?.data.shown.low ?? [] as cardId}
-				<Card card={cardFromId(cardId)} on:click={handleClick} on:keypress={handleClick} />
+				<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
 			{/each}
 		</div>
 	</div>
 	<div class="flex flex-col gap-5 pt-6 pl-2 md:pt-12 md:pl-4 md:gap-6">
 		{#each $game.data?.data.tokens ?? [] as stackSize, color}
-			<Coin {color} {stackSize} on:click={() => console.log(color)} />
+			<Coin {color} {stackSize} on:click={handleCoin} />
 		{/each}
 	</div>
 </div>
@@ -112,9 +134,19 @@
 
 <BuyModal
 	closeModal={() => setCurrent(undefined)}
-	open={target != null}
+	open={target != null && !target.dataset.coinColor}
 	game={$game.data?.data}
 	cardId={target?.dataset.cardId ? Number(target.dataset.cardId) : undefined}
 	player={$game.data?.data.players.find(({ userId }) => userId === $user?.id)}
-	bind:center
+	bind:center={cardCenter.value}
+/>
+
+<TakeModal
+	closeModal={() => setCurrent(undefined)}
+	open={target != null && !!target.dataset.coinColor}
+	game={$game.data?.data}
+	targetCoin={target}
+	initialCoinColor={target == null ? null : Number(target.dataset.coinColor)}
+	player={$game.data?.data.players.find(({ userId }) => userId === $user?.id)}
+	bind:center={coinCenter.value}
 />

@@ -12,6 +12,7 @@
 	import Modal from './Modal.svelte';
 	import { authed } from './main';
 	import { createMutation } from '@tanstack/svelte-query';
+	import InfoTooltip from './InfoTooltip.svelte';
 
 	export let closeModal: () => void;
 	export let open: boolean;
@@ -87,19 +88,25 @@
 	bind:open
 	actions={[
 		{
-			colorClass: 'bg-green-400',
+			colorClass: 'bg-green-200',
 			text: 'Buy',
 			handler: $buyMutation.mutateAsync,
 		},
 	]}
 >
+	<h1 class="flex justify-between text-xl">
+		<span>Buy/reserve card</span>
+		<InfoTooltip size="xl"><p>To buy a card, you need to be able to afford it.</p></InfoTooltip>
+	</h1>
 	<div class="w-56 h-56 md:w-[28rem] md:h-[28rem] flex justify-center items-center">
 		<div bind:this={center} class="w-0 h-0" />
 	</div>
 	{#if isFree}
 		<div>You can buy it for free!</div>
 	{:else}
-		Want to buy this card? {#if $buyMutation.isError}{$buyMutation.error?.message}{/if}
+		Want to buy this card? {#if $buyMutation.isError}<span class="text-red-600"
+				>{$buyMutation.error?.message}</span
+			>{/if}
 		<div class="flex justify-center gap-2">
 			{#each Object.values(Color).filter(only('number')) as color}
 				<Counter

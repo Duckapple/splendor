@@ -60,7 +60,7 @@ export type AuthInput<
 	Route extends keyof Routes,
 	Method extends keyof Routes[Route],
 	// @ts-expect-error ts(2344) It don't know NONE, but works
-	Params extends keyof Routes[Route][Method] = NONE
+	Params extends keyof Routes[Route][Method] = NONE,
 > = {
 	route: Route;
 	method: Method;
@@ -77,7 +77,7 @@ export async function authed<
 	Route extends keyof Routes,
 	Method extends keyof Routes[Route],
 	// @ts-expect-error ts(2344) It don't know NONE, but works
-	Params extends keyof Routes[Route][Method] = NONE
+	Params extends keyof Routes[Route][Method] = NONE,
 >({
 	route,
 	method,
@@ -103,3 +103,6 @@ export async function authed<
 
 	return await data.json();
 }
+
+// @ts-expect-error ts(7017) It doesn't know
+globalThis.authed = authed;
