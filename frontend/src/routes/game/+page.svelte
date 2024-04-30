@@ -94,36 +94,38 @@
 	<title>Game</title>
 </svelte:head>
 
-<div class="flex flex-col md:flex-row">
-	<div class="space-y-3">
-		<div class="flex justify-center gap-2 md:gap-3">
-			{#each $game.data?.data.shown.persons ?? [] as cardId}
-				<Person card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
+<div class="flex flex-col lg:flex-row">
+	<div class="flex flex-col md:flex-row">
+		<div class="space-y-3">
+			<div class="flex justify-center gap-2 md:gap-3">
+				{#each $game.data?.data.shown.persons ?? [] as cardId}
+					<Person card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
+				{/each}
+			</div>
+			<div class="flex gap-2 md:gap-3">
+				<CardStack count={$game.data?.data.piles.high?.length} tier="high" />
+				{#each $game.data?.data.shown.high ?? [] as cardId}
+					<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
+				{/each}
+			</div>
+			<div class="flex gap-2 md:gap-3">
+				<CardStack count={$game.data?.data.piles.middle?.length} tier="middle" />
+				{#each $game.data?.data.shown.middle ?? [] as cardId}
+					<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
+				{/each}
+			</div>
+			<div class="flex gap-2 md:gap-3">
+				<CardStack count={$game.data?.data.piles.low?.length} tier="low" />
+				{#each $game.data?.data.shown.low ?? [] as cardId}
+					<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
+				{/each}
+			</div>
+		</div>
+		<div class="flex gap-3 py-6 pl-2 md:flex-col md:pt-12 md:pl-4 md:gap-6">
+			{#each $game.data?.data.tokens ?? [] as stackSize, color}
+				<Coin {color} {stackSize} on:click={handleCoin} />
 			{/each}
 		</div>
-		<div class="flex gap-2 md:gap-3">
-			<CardStack count={$game.data?.data.piles.high?.length} tier="high" />
-			{#each $game.data?.data.shown.high ?? [] as cardId}
-				<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
-			{/each}
-		</div>
-		<div class="flex gap-2 md:gap-3">
-			<CardStack count={$game.data?.data.piles.middle?.length} tier="middle" />
-			{#each $game.data?.data.shown.middle ?? [] as cardId}
-				<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
-			{/each}
-		</div>
-		<div class="flex gap-2 md:gap-3">
-			<CardStack count={$game.data?.data.piles.low?.length} tier="low" />
-			{#each $game.data?.data.shown.low ?? [] as cardId}
-				<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
-			{/each}
-		</div>
-	</div>
-	<div class="flex gap-3 py-6 pl-2 md:flex-col md:pt-12 md:pl-4 md:gap-6">
-		{#each $game.data?.data.tokens ?? [] as stackSize, color}
-			<Coin {color} {stackSize} on:click={handleCoin} />
-		{/each}
 	</div>
 	<div class="grid w-full gap-4 md:pl-4 md:grid-cols-2">
 		{#each $game.data?.data.players ?? [] as player}

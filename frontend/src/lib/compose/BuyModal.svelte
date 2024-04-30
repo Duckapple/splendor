@@ -52,6 +52,16 @@
 
 	$: cardId == null ? ((values = [0, 0, 0, 0, 0, 0]), (isFree = false)) : init();
 
+	$: decrement = (color: Color) => {
+		values[color] -= 1;
+		if (color !== Color.Y && (maxValues?.[Color.Y] ?? 0) > values[Color.Y]) values[Color.Y] += 1;
+	};
+
+	$: increment = (color: Color) => {
+		values[color] += 1;
+		if (color !== Color.Y && minValues[Color.Y] < values[Color.Y]) values[Color.Y] -= 1;
+	};
+
 	$: buyMutation = createMutation({
 		mutationKey: ['action', 'BUY_CARD', cardId],
 		async mutationFn() {
@@ -147,11 +157,11 @@
 			{#each Object.values(Color).filter(only('number')) as color}
 				<Counter
 					bind:color
-					increment={() => (values[color] += 1)}
+					{increment}
 					max={maxValues?.[color]}
 					value={values[color]}
 					min={minValues?.[color]}
-					decrement={() => (values[color] -= 1)}
+					{decrement}
 					invalid={values[color] < (minValues?.[color] ?? 0) ||
 						values[color] > (maxValues?.[color] ?? 0)}
 				/>

@@ -9,6 +9,10 @@ export const bgColorOf = [
 	'bg-yellow-500 text-white',
 ] satisfies Record<Color, string>;
 
+export const fadeTextBgColorOf = bgColorOf.map((c) =>
+	c.replace('text-white', 'text-slate-400').replace('text-gray-700', 'text-gray-500')
+);
+
 export const textColorOf = [
 	'text-slate-500',
 	'text-sky-600',

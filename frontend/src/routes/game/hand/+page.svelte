@@ -5,12 +5,15 @@
 	import Coin from '$lib/game/Coin.svelte';
 	const handCards = [0x08, 0x19, 0xc2, 0x4a, 0x42, 0x09, 0x4e, 0x24, 0x90, 0x91];
 	$: tokens = [1, 6, 3, 2, 1, 1];
-	const sorted: CardType[][] = [[], [], [], [], [], []];
-	for (const cardId of handCards) {
-		const card = cardFromId(cardId);
-		sorted[card.c].push(card);
-	}
-	const shownCards = sorted.slice(0, 5);
+	$: sorted = (() => {
+		const sorted: CardType[][] = [[], [], [], [], [], []];
+		for (const cardId of handCards) {
+			const card = cardFromId(cardId);
+			sorted[card.c].push(card);
+		}
+		return sorted;
+	})();
+	$: shownCards = sorted.slice(0, 5);
 </script>
 
 <div class="flex justify-center gap-2 px-2 pt-2 border border-black md:pt-4 md:px-4">

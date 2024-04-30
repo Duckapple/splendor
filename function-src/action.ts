@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 import { AuthUser } from '../common/communication';
 import { FunctionError, Request, authedHandler, httpGuarded } from './common/httpGuarded';
-import { and, eq, gt, gte } from 'drizzle-orm';
+import { and, eq, gt } from 'drizzle-orm';
 import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
 import { db } from './common/db';
 import { actionSchema } from '../common/actions';
@@ -39,7 +39,8 @@ async function get(user: AuthUser, req: Request) {
 	const actions = await db
 		.select()
 		.from(SplendorAction)
-		.where(and(...conditions));
+		.where(and(...conditions))
+		.orderBy(SplendorAction.timestamp);
 
 	return { message: 'Got actions', data: actions };
 }

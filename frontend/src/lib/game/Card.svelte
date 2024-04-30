@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type Card } from '../../../../common/model';
-	import { bgColorOf, gradientOf } from '$lib/color';
+	import { bgColorOf, fadeTextBgColorOf, gradientOf } from '$lib/color';
 
 	export let stacked = false;
 	export let card: Card;
@@ -30,6 +30,8 @@
 	$: cardStyle = !small ? 'md:w-32 md:h-48 md:text-3xl' : '';
 	$: pointStyle = !small ? 'md:py-0.5 md:px-2 md:text-6xl' : '';
 	$: costStyle = !small ? 'md:text-2xl md:leading-5 md:pl-2 md:pb-2 md:w-20' : '';
+
+	$: fadeText = card.p === 0;
 </script>
 
 <button
@@ -46,8 +48,12 @@
 	on:click
 	on:keypress
 >
-	<div class="px-1 text-3xl rounded-t-lg text-left {pointStyle} {bgColorOf[card.c]}">
-		<span class:opacity-60={card.p === 0}>{card.p}</span>
+	<div
+		class="px-1 text-3xl rounded-t-lg text-left {pointStyle} {fadeText
+			? fadeTextBgColorOf[card.c]
+			: bgColorOf[card.c]}"
+	>
+		<span>{card.p}</span>
 	</div>
 	<div
 		class="text-sm pl-1 pb-1 grid w-12 gap-1 leading-none {costStyle} {cols[filteredLength - 1]}"

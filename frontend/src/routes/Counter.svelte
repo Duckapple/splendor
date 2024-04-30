@@ -12,8 +12,8 @@
 	export let invalid = false;
 	export let noButtons = false;
 
-	export let decrement = () => {};
-	export let increment = () => {};
+	export let decrement = (color: Color) => {};
+	export let increment = (color: Color) => {};
 
 	const displayed_count = spring();
 	$: displayed_count.set(value);
@@ -34,7 +34,7 @@
 			class="flex items-center justify-center h-6 p-0 bg-transparent border-0 md:h-8 rounded-t-md md:rounded-t-xl touch-manipulation"
 			class:cursor-not-allowed={value >= max}
 			class:hover:bg-slate-200={value < max}
-			on:click={() => value < max && increment()}
+			on:click={() => value < max && increment(color)}
 			aria-label="Increase the counter by one"
 		>
 			<svg aria-hidden="true" viewBox="0 0 1 1" class="w-1/2 h-1/2">
@@ -75,7 +75,7 @@
 			class="flex items-center justify-center h-6 p-0 bg-transparent border-0 md:h-8 rounded-b-md md:rounded-b-xl touch-manipulation"
 			class:cursor-not-allowed={value <= min}
 			class:hover:bg-slate-200={value !== min}
-			on:click={() => value > min && decrement()}
+			on:click={() => value > min && decrement(color)}
 			aria-label="Decrease the counter by one"
 		>
 			<svg aria-hidden="true" viewBox="0 0 1 1" class="w-1/2 h-1/2">
