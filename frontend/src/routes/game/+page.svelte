@@ -14,10 +14,12 @@
 	import { cardFromId } from '../../../../common/defaults';
 	import Hand from '$lib/compose/Hand.svelte';
 	import { range } from '../../../../common/utils';
+	import { moveTo } from '$lib/move';
 
 	let cardCenter = { value: undefined as unknown as HTMLDivElement };
 	let coinCenter = { value: undefined as unknown as HTMLDivElement };
 	let target: HTMLElement | undefined = undefined;
+	let reserved = false;
 
 	function setCurrent(newVal: HTMLElement | undefined) {
 		if (target) {
@@ -26,40 +28,16 @@
 		target = newVal;
 	}
 
-	function moveTo(target: HTMLElement, transform: HTMLElement | Record<'x' | 'y', number>) {
-		requestAnimationFrame(() => {
-			const { left, top } = target.getBoundingClientRect();
-			const { x, y } =
-				transform instanceof HTMLElement ? transform.getBoundingClientRect() : transform;
-
-			const scale = target.dataset.coinColor ? 1 : 2;
-			const opacity = target.dataset.coinColor ? 0 : 1;
-			const zIndex = target.dataset.coinColor ? '' : 'z-index: 30;';
-
-			target.setAttribute(
-				'style',
-				`transform: rotate(0) translate(${x - left - target.clientWidth / 2}px, ${
-					y - top - target.clientHeight / 2
-				}px) scale(${scale}); ${zIndex} opacity: ${opacity}`
-			);
-
-			if (target.dataset.coinColor) {
-				target.classList.add('z-30');
-				setTimeout(() => {
-					target.classList.remove('z-30');
-				}, 200);
-			}
-		});
-	}
-
 	function handleClick(
 		setter: (target: HTMLElement | undefined) => void,
 		center: { value?: HTMLDivElement },
+		isReserved: boolean,
 		e: MouseEvent | KeyboardEvent
 	) {
 		if ('key' in e && !['Space', 'Enter'].includes(e.key)) {
 			return;
 		}
+		reserved = isReserved;
 		const newTarget = e.currentTarget;
 		if (newTarget instanceof HTMLElement) {
 			if (target === newTarget) {
@@ -71,8 +49,9 @@
 		}
 	}
 
-	const handleCard = handleClick.bind({}, setCurrent, cardCenter);
-	const handleCoin = handleClick.bind({}, setCurrent, coinCenter);
+	const handleBuyCard = handleClick.bind({}, setCurrent, cardCenter, false);
+	const handleReserveCard = handleClick.bind({}, setCurrent, cardCenter, true);
+	const handleCoin = handleClick.bind({}, setCurrent, coinCenter, false);
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
 
@@ -99,37 +78,42 @@
 		<div class="space-y-3">
 			<div class="flex justify-center gap-2 md:gap-3">
 				{#each $game.data?.data.shown.persons ?? [] as cardId}
-					<Person card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
+					<Person card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$game.data?.data.piles.high?.length} tier="high" />
 				{#each $game.data?.data.shown.high ?? [] as cardId}
-					<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
+					<Card card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$game.data?.data.piles.middle?.length} tier="middle" />
 				{#each $game.data?.data.shown.middle ?? [] as cardId}
-					<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
+					<Card card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$game.data?.data.piles.low?.length} tier="low" />
 				{#each $game.data?.data.shown.low ?? [] as cardId}
-					<Card card={cardFromId(cardId)} on:click={handleCard} on:keypress={handleCard} />
+					<Card card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
 				{/each}
 			</div>
 		</div>
 		<div class="flex gap-3 py-6 pl-2 md:flex-col md:pt-12 md:pl-4 md:gap-6">
 			{#each $game.data?.data.tokens ?? [] as stackSize, color}
-				<Coin {color} {stackSize} on:click={handleCoin} />
+				<Coin {color} {stackSize} on:click={handleCoin} on:keypress={handleCoin} />
 			{/each}
 		</div>
 	</div>
 	<div class="grid w-full gap-4 md:pl-4 md:grid-cols-2">
 		{#each $game.data?.data.players ?? [] as player}
-			<Hand {player} turn={$game.data?.data.turn} />
+			<Hand
+				{player}
+				turn={$game.data?.data.turn}
+				buyReserved={handleReserveCard}
+				targetCardId={Number(target?.dataset.cardId)}
+			/>
 		{/each}
 		{#each range(4 - ($game.data?.data.players.length ?? 0)) as _}
 			<div class=""></div>
@@ -151,6 +135,7 @@
 	cardId={target?.dataset.cardId ? Number(target.dataset.cardId) : undefined}
 	player={$game.data?.data.players.find(({ userId }) => userId === $user?.id)}
 	bind:center={cardCenter.value}
+	{reserved}
 />
 
 <TakeModal

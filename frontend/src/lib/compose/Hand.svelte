@@ -8,10 +8,13 @@
 
 	export let player: SplendorGamePlayer & { userName: string };
 	export let turn: number | undefined;
+	export let buyReserved: (e: MouseEvent | KeyboardEvent) => void;
+	export let targetCardId: number;
 
-	const isUser = $user?.id === player.userId;
+	$: isUser = $user?.id === player.userId;
 
 	$: currentPlayer = isUser ? " - It's your turn!" : ' - Current player';
+	$: handleBuyReserved = isUser ? buyReserved : () => {};
 
 	$: sorted = (() => {
 		const sorted: CardType[][] = [[], [], [], [], [], []];
@@ -64,9 +67,15 @@
 		</div>
 	{/if}
 	<div class="relative" class:min-h-14={player.reserved.length !== 0}>
-		<div class="absolute space-y-2 origin-top-right -rotate-90 -left-14">
+		<div class="flex pl-4 -mt-4 space-x-10">
 			{#each player.reserved as cardId}
-				<Card card={cardFromId(cardId)} small />
+				<Card
+					card={cardFromId(cardId)}
+					small={cardId !== targetCardId}
+					rotated
+					on:click={(e) => handleBuyReserved(e)}
+					on:keypress={(e) => handleBuyReserved(e)}
+				/>
 			{/each}
 		</div>
 	</div>

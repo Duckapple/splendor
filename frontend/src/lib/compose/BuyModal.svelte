@@ -19,6 +19,7 @@
 	export let game: GameState | undefined;
 	export let cardId: number | undefined;
 	export let player: Player | undefined;
+	export let reserved: boolean;
 
 	export let center: HTMLDivElement;
 
@@ -123,17 +124,19 @@
 	});
 
 	$: errorMessage = $buyMutation.error?.message ?? $reserveMutation.error?.message;
+
+	$: reserveAction = {
+		colorClass: 'bg-amber-200',
+		text: 'Reserve',
+		handler: $reserveMutation.mutateAsync,
+	};
 </script>
 
 <Modal
 	bind:closeModal
 	bind:open
 	actions={[
-		{
-			colorClass: 'bg-amber-200',
-			text: 'Reserve',
-			handler: $reserveMutation.mutateAsync,
-		},
+		...(reserved ? [] : [reserveAction]),
 		{
 			colorClass: 'bg-green-200',
 			text: 'Buy',

@@ -14,6 +14,7 @@
 <button
 	data-coin-color={color}
 	on:click
+	on:keypress
 	class="{!small && boxMd} flex flex-col w-10 h-10 transition-[transform,opacity] group"
 >
 	{#each Array(stackSize) as _, i}

@@ -6,6 +6,7 @@
 	export let card: Card;
 	export let hideCost = false;
 	export let small = false;
+	export let rotated = false;
 
 	$: filteredLength = card.cost.filter(Boolean).length;
 	const cols = [
@@ -43,6 +44,7 @@
 	class:cursor-default={stacked}
 	class:hover:scale-110={!stacked}
 	class:hover:z-10={!stacked}
+	class:-rotate-90={rotated}
 	disabled={stacked}
 	data-card-id={card.id}
 	on:click
