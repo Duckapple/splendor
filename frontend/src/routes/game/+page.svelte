@@ -94,7 +94,7 @@
 	<title>Game</title>
 </svelte:head>
 
-<div class="flex">
+<div class="flex flex-col md:flex-row">
 	<div class="space-y-3">
 		<div class="flex justify-center gap-2 md:gap-3">
 			{#each $game.data?.data.shown.persons ?? [] as cardId}
@@ -120,12 +120,12 @@
 			{/each}
 		</div>
 	</div>
-	<div class="flex flex-col gap-5 pt-6 pl-2 md:pt-12 md:pl-4 md:gap-6">
+	<div class="flex gap-3 py-6 pl-2 md:flex-col md:pt-12 md:pl-4 md:gap-6">
 		{#each $game.data?.data.tokens ?? [] as stackSize, color}
 			<Coin {color} {stackSize} on:click={handleCoin} />
 		{/each}
 	</div>
-	<div class="grid w-full gap-4 pl-4 md:grid-cols-2">
+	<div class="grid w-full gap-4 md:pl-4 md:grid-cols-2">
 		{#each $game.data?.data.players ?? [] as player}
 			<Hand {player} turn={$game.data?.data.turn} />
 		{/each}

@@ -51,9 +51,10 @@
 	{/if}
 
 	<div
-		class={'w-8 h-12 md:w-14 md:h-16 overflow-hidden text-center relative cursor-default ' +
+		class={'w-8 h-12 md:w-14 md:h-16 overflow-hidden text-center relative cursor-default border-red-500 ' +
 			textColorOf[color]}
 		class:text-opacity-60={value === 0}
+		class:border-b-2={invalid}
 	>
 		<div
 			class="absolute inset-0 text-5xl font-normal md:text-7xl"
@@ -63,9 +64,8 @@
 				class="absolute flex items-center justify-center w-full h-full select-none -top-full"
 				aria-hidden="true">{Math.floor($displayed_count + 1)}</span
 			>
-			<span
-				class="absolute flex items-center justify-center w-full h-full decoration-red-500"
-				class:underline={invalid}>{Math.floor($displayed_count)}</span
+			<span class="absolute flex items-center justify-center w-full h-full"
+				>{Math.floor($displayed_count)}</span
 			>
 		</div>
 	</div>

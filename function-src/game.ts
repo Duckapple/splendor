@@ -42,7 +42,8 @@ async function get(user: AuthUser, req: Request) {
 		.from(SplendorGame)
 		.innerJoin(SplendorGamePlayer, eq(SplendorGamePlayer.gameId, SplendorGame.id))
 		.innerJoin(User, eq(User.id, SplendorGamePlayer.userId))
-		.where(eq(SplendorGame.id, id));
+		.where(eq(SplendorGame.id, id))
+		.orderBy(SplendorGamePlayer.position);
 
 	if (result.length === 0) throw new FunctionError(404, { message: 'Game not found' });
 
