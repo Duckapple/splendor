@@ -44,9 +44,11 @@
 			No reserved cards
 		</div>
 	{/if}
-	<div class="rotate-90">
-		{#each player.reserved as cardId}
-			<Card card={cardFromId(cardId)} hideCost small />
-		{/each}
+	<div class="relative" class:min-h-14={player.reserved.length !== 0}>
+		<div class="absolute space-y-2 origin-top-right -rotate-90 -left-14">
+			{#each player.reserved as cardId}
+				<Card card={cardFromId(cardId)} small />
+			{/each}
+		</div>
 	</div>
 </div>

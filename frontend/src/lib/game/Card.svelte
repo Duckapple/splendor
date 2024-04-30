@@ -8,7 +8,12 @@
 	export let small = false;
 
 	$: filteredLength = card.cost.filter(Boolean).length;
-	const cols = [' grid-cols-1', ' grid-cols-1', ' grid-cols-2 md:grid-cols-1', ' grid-cols-2'];
+	const cols = [
+		' grid-cols-1',
+		' grid-cols-1',
+		' grid-cols-2' + (!small ? ' md:grid-cols-1' : ''),
+		' grid-cols-2',
+	];
 	$: secondPos = (() => {
 		let x = -1;
 		for (let i = 0; i < card.cost.length; i++) {

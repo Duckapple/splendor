@@ -81,12 +81,49 @@
 			closeModal();
 		},
 	});
+
+	$: reserveMutation = createMutation({
+		mutationKey: ['action', 'RESERVE', cardId],
+		async mutationFn() {
+			if (!player || !game || cardId == null) {
+				throw { message: 'Invalid initial state. Retry the action, this time slowly' };
+			}
+			const position =
+				positionFromCardId(game.shown, cardId) ??
+				reservePositionFromCardId(player.reserved, cardId);
+			if (position == null || position[0] === 'persons') {
+				throw { message: 'Card is somehow not in play?' };
+			}
+			const [row, i] = position;
+
+			const body = {
+				type: 'RESERVE',
+				data: { row, i, card: cardId },
+			};
+
+			await authed({
+				method: 'POST',
+				route: '/action',
+				params: { gameId: game.id },
+				body,
+			});
+
+			closeModal();
+		},
+	});
+
+	$: errorMessage = $buyMutation.error?.message ?? $reserveMutation.error?.message;
 </script>
 
 <Modal
 	bind:closeModal
 	bind:open
 	actions={[
+		{
+			colorClass: 'bg-amber-200',
+			text: 'Reserve',
+			handler: $reserveMutation.mutateAsync,
+		},
 		{
 			colorClass: 'bg-green-200',
 			text: 'Buy',
@@ -104,8 +141,7 @@
 	{#if isFree}
 		<div>You can buy it for free!</div>
 	{:else}
-		Want to buy this card? {#if $buyMutation.isError}<span class="text-red-600"
-				>{$buyMutation.error?.message}</span
+		Want to buy this card? {#if errorMessage != null}<span class="text-red-600">{errorMessage}</span
 			>{/if}
 		<div class="flex justify-center gap-2">
 			{#each Object.values(Color).filter(only('number')) as color}
