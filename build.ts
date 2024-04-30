@@ -53,6 +53,8 @@ Bun.write('./VERSION', JSON.stringify(versions, null, 2));
 
 if (!Bun.argv.includes('deploy')) process.exit(0);
 
+const envArg = Bun.argv.includes('no-env') ? '' : '--env-vars-file=.env.yaml';
+
 const deployFunctions = functions.filter((func) => versions[func] !== oldVersions[func]);
 
 if (deployFunctions.length === 0) {
@@ -63,7 +65,7 @@ if (deployFunctions.length === 0) {
 console.log('Deploying to:', deployFunctions.join(', '));
 
 async function deploy(functionName: string) {
-	await Bun.$`gcloud functions deploy ${functionName} --region=europe-west3 --trigger-http --runtime=nodejs20 --source=out/${functionName} --allow-unauthenticated --gen2 --env-vars-file .env.yaml`.quiet();
+	await Bun.$`gcloud functions deploy ${functionName} --region=europe-west3 --trigger-http --runtime=nodejs20 --source=out/${functionName} --allow-unauthenticated --gen2 ${envArg}`.quiet();
 	console.log('Deployed', functionName);
 }
 

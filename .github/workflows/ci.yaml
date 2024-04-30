@@ -79,4 +79,4 @@ jobs:
 
       - name: Build and deploy
         run: |
-          bun run build:function deploy
+          bun run build:function deploy no-env
