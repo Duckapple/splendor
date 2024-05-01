@@ -5,7 +5,7 @@
 		positionFromCardId,
 		reservePositionFromCardId,
 	} from '../../../../common/defaults';
-	import { getBonusFromCards, canAfford } from '../../../../common/logic';
+	import { getBonusFromCards, canAfford, getEarnedPeople } from '../../../../common/logic';
 	import { only } from '../../../../common/filter-utils';
 
 	import Counter from '../../routes/Counter.svelte';
@@ -13,6 +13,7 @@
 	import { authed } from '../main';
 	import { createMutation } from '@tanstack/svelte-query';
 	import InfoTooltip from '../InfoTooltip.svelte';
+	import Person from '$lib/game/Person.svelte';
 
 	export let closeModal: () => void;
 	export let open: boolean;
@@ -53,6 +54,13 @@
 
 	$: cardId == null ? ((values = [0, 0, 0, 0, 0, 0]), (isFree = false)) : init();
 
+	$: potentialPersons =
+		player && card
+			? getEarnedPeople(game?.shown.persons ?? [], { ...player, cards: [...player.cards, card.id] })
+			: [];
+
+	let selectedPerson: number | null;
+
 	$: decrement = (color: Color) => {
 		values[color] -= 1;
 		if (color !== Color.Y && (maxValues?.[Color.Y] ?? 0) > values[Color.Y]) values[Color.Y] += 1;
@@ -77,9 +85,15 @@
 			}
 			const [row, i] = position;
 
+			const personData =
+				potentialPersons.length === 1
+					? potentialPersons[0]
+					: potentialPersons.find((p) => p[0] === selectedPerson);
+			const person = personData != null ? { id: personData[0], i: personData[1] } : undefined;
+
 			const body = {
 				type: 'BUY_CARD',
-				data: { row, i, card: cardId, tokens: values },
+				data: { row, i, card: cardId, tokens: values, person },
 			};
 
 			await authed({
@@ -123,8 +137,6 @@
 		},
 	});
 
-	$: errorMessage = $buyMutation.error?.message ?? $reserveMutation.error?.message;
-
 	$: reserveAction = {
 		colorClass: 'bg-amber-200',
 		text: 'Reserve',
@@ -152,10 +164,15 @@
 		<div bind:this={center} class="w-0 h-0" />
 	</div>
 	{#if isFree}
-		<div>You can buy it for free!</div>
+		<div>
+			You can buy it for free! <span class="text-red-600"
+				>{$buyMutation.error?.message ?? $reserveMutation.error?.message ?? ''}</span
+			>
+		</div>
 	{:else}
-		Want to buy this card? {#if errorMessage != null}<span class="text-red-600">{errorMessage}</span
-			>{/if}
+		Want to buy this card? <span class="text-red-600"
+			>{$buyMutation.error?.message ?? $reserveMutation.error?.message ?? ''}</span
+		>
 		<div class="flex justify-center gap-2">
 			{#each Object.values(Color).filter(only('number')) as color}
 				<Counter
@@ -168,6 +185,20 @@
 					invalid={values[color] < (minValues?.[color] ?? 0) ||
 						values[color] > (maxValues?.[color] ?? 0)}
 				/>
+			{/each}
+		</div>
+	{/if}
+	{#if potentialPersons.length > 0}
+		By buying this card, you also get a noble.
+		{potentialPersons.length > 1 ? 'Choose one:' : ''}
+		<div class="flex justify-center gap-4 p-2 md:gap-6">
+			{#each potentialPersons as [personId, index]}
+				<div class="rounded-md ring-4 ring-offset-4" class:ring-4={selectedPerson === personId}>
+					<Person
+						card={cardFromId(personId)}
+						on:click={() => (selectedPerson = selectedPerson === personId ? null : personId)}
+					/>
+				</div>
 			{/each}
 		</div>
 	{/if}

@@ -78,17 +78,11 @@ export function performAction(
 				game.tokens[i2] += action.data.tokens[i2];
 			}
 
-			const earnedPeople = game.shown.persons
-				.map((personId, index) => [personId, index] as const)
-				.filter(([personId]) => {
-					const person = cardFromId(personId);
-					const x = canAfford(person, player, [0, 0, 0, 0, 0, 0]);
-					return x.isOk();
-				});
+			const earnedPeople = getEarnedPeople(game.shown.persons, player);
 
 			if ((earnedPeople.length === 0) === (action.data.person != null)) {
 				const should = earnedPeople.length === 0 ? 'Cannot' : 'Should';
-				const not = should ? 'not ' : '';
+				const not = earnedPeople.length === 0 ? 'not ' : '';
 				return err({
 					message: `${should} claim person when ${not}earned`,
 					data: { type: 'BUY_CARD', code: 'PERSON' },
@@ -262,4 +256,20 @@ export function getBonusFromCards(cardIds: number[]) {
 	}
 
 	return res;
+}
+
+export function getEarnedPeople(
+	persons: number[],
+	player: Player,
+	extraCards = [0, 0, 0, 0, 0, 0] as TokenHold
+) {
+	return persons
+		.map((personId, index) => [personId, index] as const)
+		.filter(([personId]) => {
+			const person = cardFromId(personId);
+			console.log('person', person);
+			const x = canAfford(person, player, extraCards);
+			console.log('x', x);
+			return x.isOk();
+		});
 }

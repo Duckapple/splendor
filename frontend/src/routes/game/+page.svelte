@@ -80,6 +80,7 @@
 				{#each $game.data?.data.shown.persons ?? [] as cardId}
 					<Person card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
 				{/each}
+				<div class="h-14 md:h-32"></div>
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$game.data?.data.piles.high?.length} tier="high" />

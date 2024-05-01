@@ -1,10 +1,11 @@
 <script lang="ts">
-	import type { Card as CardType } from '../../../../common/model';
+	import { Color, type Card as CardType } from '../../../../common/model';
 	import Card from '$lib/game/Card.svelte';
 	import Coin from '$lib/game/Coin.svelte';
 	import { user } from '$lib/main';
 	import { cardFromId } from '../../../../common/defaults';
 	import type { SplendorGamePlayer } from '../../../../db/schema';
+	import Person from '$lib/game/Person.svelte';
 
 	export let player: SplendorGamePlayer & { userName: string };
 	export let turn: number | undefined;
@@ -25,6 +26,7 @@
 		return sorted;
 	})();
 	$: shownCards = sorted.slice(0, 5);
+	$: persons = sorted[Color.Y];
 </script>
 
 <div class="p-2 space-y-1 border rounded">
@@ -33,6 +35,12 @@
 			? currentPlayer
 			: ''}
 	</h1>
+	{#if persons.length}
+		<h2 class="text-sm">Nobles</h2>
+		{#each persons as person}
+			<Person card={person} small />
+		{/each}
+	{/if}
 	<h2 class="text-sm">Cards</h2>
 	{#if player.cards.length === 0}
 		<div

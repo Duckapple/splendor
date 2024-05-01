@@ -2,33 +2,34 @@
 	import type { Card } from '../../../../common/model';
 	import { bgColorOf } from '$lib/color';
 	export let card: Card;
+	export let small = false;
 	const { cost, id, p } = card;
 	const persons = ['👨🏼‍🌾', '👩🏽‍🔧', '👩🏿‍💻', '🧑🏻‍💼', '👨🏽‍🎨', '👩🏿‍🚒', '🕵🏼', '👸🏾', '🤵🏻‍♂️', '🧙🏽‍♂️'];
+
+	$: buttonMd = small ? '' : 'md:w-32 md:h-32 md:text-4xl';
+	$: pointsMd = small ? '' : 'md:text-6xl md:left-2 md:top-1';
+	$: costsMd = small ? '' : 'md:gap-1 md:leading-7 md:left-2 md:bottom-2';
+	$: costMd = small ? '' : 'md:p-1 md:rounded';
+	$: personMd = small ? '' : 'md:text-6xl md:right-2 md:top-2';
 </script>
 
 <button
-	class="relative transition-transform border border-black rounded-lg select-none w-14 h-14 md:w-32 md:h-32 md:text-4xl aspect-square bg-gradient-to-br from-slate-50 to-slate-200"
+	class="relative transition-transform border border-black rounded-lg select-none w-14 h-14 aspect-square bg-gradient-to-br from-slate-50 to-slate-200 hover:scale-110 {buttonMd}"
 	data-card-id={id}
 	on:click
 	on:keypress
 >
-	<span class="absolute top-0 text-3xl leading-none md:text-6xl left-1 md:left-2 md:top-1">{p}</span
-	>
-	<div
-		class="absolute flex gap-0.5 md:gap-1 leading-none md:leading-7 left-1 md:left-2 bottom-1 md:bottom-2"
-	>
+	<span class="absolute top-0 text-3xl leading-none left-1 {pointsMd}">{p}</span>
+	<div class="absolute flex gap-0.5 leading-none left-1 bottom-1 {costsMd}">
 		{#each cost as co, i}
 			{#if co}
-				<span
-					class={'p-[1pt] md:p-1 text-center border border-black rounded-sm md:rounded ' +
-						bgColorOf[i]}
-				>
+				<span class="p-[1pt] text-center border border-black rounded-sm {costMd} {bgColorOf[i]}">
 					{co}
 				</span>
 			{/if}
 		{/each}
 	</div>
-	<span class="absolute top-0 right-0 text-2xl md:text-6xl md:right-2 md:top-2">
+	<span class="absolute top-0 right-0 text-2xl {personMd}">
 		{persons[id - 0xc0] ?? ''}
 	</span>
 </button>

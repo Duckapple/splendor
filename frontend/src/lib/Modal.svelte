@@ -21,7 +21,7 @@
 		on:keypress|stopPropagation
 	>
 		<slot />
-		<div class="flex justify-end gap-2">
+		<div class="flex justify-end gap-2 pt-2">
 			{#each allActions as action}
 				<!-- svelte-ignore a11y-autofocus -->
 				<button
