@@ -5,6 +5,7 @@
 	import { authed } from '../main';
 	import Coin from '../game/Coin.svelte';
 	import { range } from '../../../../common/utils';
+	import InfoTooltip from '$lib/InfoTooltip.svelte';
 
 	export let closeModal: () => void;
 	export let open: boolean;
@@ -82,7 +83,29 @@
 		},
 	]}
 >
-	<h1 class="text-xl">Take tokens</h1>
+	<h1 class="flex justify-between text-xl">
+		<span>Take tokens</span>
+		<InfoTooltip size="xl">
+			<div class="space-y-1">
+				<p>On your turn, you can take up to three tokens. The following has to be satisfied:</p>
+				<ul class="pl-4 list-disc">
+					<li class="pb-1">You may take three different tokens</li>
+					<li>You may take two of a kind, but:</li>
+					<ul class="pb-1 pl-4 list-disc">
+						<li>There have to be four or more tokens of that kind available</li>
+						<li>You may not take a third token</li>
+					</ul>
+					<li>You can only have a max of 10 tokens</li>
+					<ul class="pl-4 list-disc">
+						<li>
+							If your total comes over 10 by taking tokens, you can return some to get below or at
+							10 (WIP)
+						</li>
+					</ul>
+				</ul>
+			</div>
+		</InfoTooltip>
+	</h1>
 	<div class="flex flex-col-reverse gap-4 pt-4 pb-2 md:pt-6 md:gap-8">
 		<div class="flex gap-1.5 md:gap-4">
 			{#each leftOverOfEach ?? [] as stackSize, color}

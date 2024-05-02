@@ -142,6 +142,7 @@
 	closeModal={() => setCurrent(undefined)}
 	open={target != null && !target.dataset.coinColor}
 	game={$game.data?.data}
+	{target}
 	cardId={target?.dataset.cardId ? Number(target.dataset.cardId) : undefined}
 	player={$game.data?.data.players.find(({ userId }) => userId === $user?.id)}
 	bind:center={cardCenter.value}

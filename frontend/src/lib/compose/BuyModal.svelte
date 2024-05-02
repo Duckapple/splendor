@@ -21,6 +21,7 @@
 	export let cardId: number | undefined;
 	export let player: Player | undefined;
 	export let reserved: boolean;
+	export let target: HTMLElement | undefined;
 
 	export let center: HTMLDivElement;
 
@@ -158,7 +159,48 @@
 >
 	<h1 class="flex justify-between text-xl">
 		<span>Buy/reserve card</span>
-		<InfoTooltip size="xl"><p>To buy a card, you need to be able to afford it.</p></InfoTooltip>
+		<InfoTooltip
+			size="xl"
+			on:pointerenter={() => {
+				if (window.matchMedia('(min-width: 768px)').matches) return;
+				target && target.setAttribute('style', target.getAttribute('style') + '; opacity: 0');
+			}}
+			on:pointerleave={() =>
+				target &&
+				target.setAttribute(
+					'style',
+					target.getAttribute('style')?.replace('; opacity: 0', '') ?? ''
+				)}
+		>
+			<div class="space-y-1">
+				<p>To buy a card, you need to afford it through bonuses and tokens.</p>
+				<p>
+					The cost can be seen in the bottom left corner of the card, where each circle shows the
+					cost along with what color is needed.
+				</p>
+				<p>
+					Each card you possess counts towards paying the cost, and you can spend tokens to make up
+					any difference.
+				</p>
+				<p>
+					Additionally, the yellow tokens are "wild", and can act as any other color when buying a
+					card.
+				</p>
+				<br />
+				<p>
+					To buy a card, make sure you can afford it, and press the "buy" button. You know you can
+					afford it by the counters under the card, where a red underline means you don't have the
+					required amount of tokens.
+				</p>
+				{#if !reserved}
+					<br />
+					<p>
+						Alternatively, you can reserve the card so you can buy it on a later turn. If you choose
+						to do so, you also get a yellow token to go with it.
+					</p>
+				{/if}
+			</div>
+		</InfoTooltip>
 	</h1>
 	<div class="w-56 h-56 md:w-[28rem] md:h-[28rem] flex justify-center items-center">
 		<div bind:this={center} class="w-0 h-0" />
@@ -192,7 +234,7 @@
 		By buying this card, you also get a noble.
 		{potentialPersons.length > 1 ? 'Choose one:' : ''}
 		<div class="flex justify-center gap-4 p-2 md:gap-6">
-			{#each potentialPersons as [personId, index]}
+			{#each potentialPersons as [personId]}
 				<div class="rounded-md ring-4 ring-offset-4" class:ring-4={selectedPerson === personId}>
 					<Person
 						card={cardFromId(personId)}

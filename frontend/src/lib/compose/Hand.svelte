@@ -37,9 +37,11 @@
 	</h1>
 	{#if persons.length}
 		<h2 class="text-sm">Nobles</h2>
-		{#each persons as person}
-			<Person card={person} small />
-		{/each}
+		<div class="flex gap-2">
+			{#each persons as person}
+				<Person card={person} small />
+			{/each}
+		</div>
 	{/if}
 	<h2 class="text-sm">Cards</h2>
 	{#if player.cards.length === 0}
