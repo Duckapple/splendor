@@ -35,6 +35,8 @@ export const user = derived(jwt, (jwt) => {
 	}
 });
 
+export const userNames = cachedWritable<Record<string, string>>('user-name-cache', {});
+
 type LoginInput = Record<'userName' | 'password', string>;
 export async function loginRegister(input: LoginInput, isRegister = false) {
 	const endpoint = isRegister ? '/register' : '/log-in';

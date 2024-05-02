@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authed, user } from '$lib/main';
+	import { authed, user, userNames } from '$lib/main';
 	import { readable } from 'svelte/store';
 	import { createQuery } from '@tanstack/svelte-query';
 
@@ -57,14 +57,18 @@
 
 	const game = createQuery({
 		queryKey: ['game', $searchId],
-		queryFn() {
+		async queryFn() {
 			if ($searchId == null) throw { message: 'ID undefined' };
 			const params = { id: $searchId };
-			return authed({
+			const result = await authed({
 				route: '/game',
 				method: 'GET',
 				params,
 			});
+			for (const { userName, userId } of result.data.players) {
+				$userNames[userId] = userName;
+			}
+			return result;
 		},
 	});
 </script>
@@ -121,12 +125,17 @@
 		{/each}
 	</div>
 </div>
-<details class="mt-8 mb-12 md:mt-10">
-	<summary>JSON dump</summary>
+<details class="absolute w-64 rounded-md md:w-auto top-4 left-4 open:bg-white">
+	<summary class="block cursor-pointer">
+		<!-- prettier-ignore -->
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+			<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+		</svg>
+	</summary>
 
-	{JSON.stringify($game.error)}
-
-	{#if $searchId != null}<Actions gameId={$searchId} />{/if}
+	<div class="relative">
+		{#if $searchId != null}<Actions gameId={$searchId} />{/if}
+	</div>
 </details>
 
 <BuyModal
