@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { authed, user, userNames } from '$lib/main';
+	import { authed, cachedWritable, user, userNames } from '$lib/main';
 	import { readable } from 'svelte/store';
-	import { createQuery } from '@tanstack/svelte-query';
+	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
 	import BuyModal from '$lib/compose/BuyModal.svelte';
 	import TakeModal from '$lib/compose/TakeModal.svelte';
@@ -15,6 +15,7 @@
 	import Hand from '$lib/compose/Hand.svelte';
 	import { range } from '../../../../common/utils';
 	import { moveTo } from '$lib/move';
+	import type { GameAndPlayers } from '../../../../common/communication';
 
 	let cardCenter = { value: undefined as unknown as HTMLDivElement };
 	let coinCenter = { value: undefined as unknown as HTMLDivElement };
@@ -55,6 +56,8 @@
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
 
+	const gameCache = cachedWritable<GameAndPlayers>(`game-${$searchId}`);
+
 	const game = createQuery({
 		queryKey: ['game', $searchId],
 		async queryFn() {
@@ -68,7 +71,20 @@
 			for (const { userName, userId } of result.data.players) {
 				$userNames[userId] = userName;
 			}
+			gameCache.update(() => result.data);
 			return result;
+		},
+	});
+
+	const notify = createMutation({
+		mutationKey: ['notifications', $user?.id],
+		async mutationFn() {
+			let allowed = window.Notification.permission;
+			if (allowed === 'default') {
+				allowed = await window.Notification.requestPermission();
+			}
+			console.log(allowed);
+			// return authed({});
 		},
 	});
 </script>
@@ -81,46 +97,46 @@
 	<div class="flex flex-col md:flex-row">
 		<div class="space-y-3">
 			<div class="flex justify-center gap-2 md:gap-3">
-				{#each $game.data?.data.shown.persons ?? [] as cardId}
+				{#each $gameCache?.shown.persons ?? [] as cardId}
 					<Person card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
 				{/each}
 				<div class="h-14 md:h-32"></div>
 			</div>
 			<div class="flex gap-2 md:gap-3">
-				<CardStack count={$game.data?.data.piles.high?.length} tier="high" />
-				{#each $game.data?.data.shown.high ?? [] as cardId}
+				<CardStack count={$gameCache?.piles.high?.length} tier="high" />
+				{#each $gameCache?.shown.high ?? [] as cardId}
 					<Card card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
-				<CardStack count={$game.data?.data.piles.middle?.length} tier="middle" />
-				{#each $game.data?.data.shown.middle ?? [] as cardId}
+				<CardStack count={$gameCache?.piles.middle?.length} tier="middle" />
+				{#each $gameCache?.shown.middle ?? [] as cardId}
 					<Card card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
-				<CardStack count={$game.data?.data.piles.low?.length} tier="low" />
-				{#each $game.data?.data.shown.low ?? [] as cardId}
+				<CardStack count={$gameCache?.piles.low?.length} tier="low" />
+				{#each $gameCache?.shown.low ?? [] as cardId}
 					<Card card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
 				{/each}
 			</div>
 		</div>
 		<div class="flex gap-3 py-6 pl-2 md:flex-col md:pt-12 md:pl-4 md:gap-6">
-			{#each $game.data?.data.tokens ?? [] as stackSize, color}
+			{#each $gameCache?.tokens ?? [] as stackSize, color}
 				<Coin {color} {stackSize} on:click={handleCoin} on:keypress={handleCoin} />
 			{/each}
 		</div>
 	</div>
 	<div class="grid w-full gap-4 md:pl-4 md:grid-cols-2">
-		{#each $game.data?.data.players ?? [] as player}
+		{#each $gameCache?.players ?? [] as player}
 			<Hand
 				{player}
-				turn={$game.data?.data.turn}
+				turn={$gameCache?.turn}
 				buyReserved={handleReserveCard}
 				targetCardId={Number(target?.dataset.cardId)}
 			/>
 		{/each}
-		{#each range(4 - ($game.data?.data.players.length ?? 0)) as _}
+		{#each range(4 - ($gameCache?.players.length ?? 0)) as _}
 			<div class=""></div>
 		{/each}
 	</div>
@@ -137,6 +153,12 @@
 		{#if $searchId != null}<Actions gameId={$searchId} />{/if}
 	</div>
 </details>
+<button class="absolute top-4 left-14" on:click={() => $notify.mutate()}>
+	<!-- prettier-ignore -->
+	<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+		<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+	</svg>
+</button>
 
 <BuyModal
 	closeModal={() => setCurrent(undefined)}
@@ -144,7 +166,7 @@
 	game={$game.data?.data}
 	{target}
 	cardId={target?.dataset.cardId ? Number(target.dataset.cardId) : undefined}
-	player={$game.data?.data.players.find(({ userId }) => userId === $user?.id)}
+	player={$gameCache?.players.find(({ userId }) => userId === $user?.id)}
 	bind:center={cardCenter.value}
 	{reserved}
 />
@@ -155,6 +177,6 @@
 	game={$game.data?.data}
 	targetCoin={target}
 	initialCoinColor={target == null ? null : Number(target.dataset.coinColor)}
-	player={$game.data?.data.players.find(({ userId }) => userId === $user?.id)}
+	player={$gameCache?.players.find(({ userId }) => userId === $user?.id)}
 	bind:center={coinCenter.value}
 />

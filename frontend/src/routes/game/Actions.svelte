@@ -19,7 +19,7 @@
 
 	const actionsCache = cachedWritable<Action[]>(`actions-${gameId}`, []);
 
-	const actions = createQuery({
+	createQuery({
 		queryKey: ['actions', gameId],
 		async queryFn() {
 			const last = $actionsCache.at(-1);
@@ -36,7 +36,7 @@
 		initialData: $actionsCache,
 	});
 
-	$: orderedActions = [...($actions.data ?? [])].reverse();
+	$: orderedActions = [...($actionsCache ?? [])].reverse();
 
 	$: cardClick = (card: EventTarget | null) => {
 		if (!(card instanceof HTMLElement)) return;

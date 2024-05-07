@@ -18,6 +18,10 @@ type RoomAndPlayers = SplendorRoom & {
 	}[];
 };
 
+export type GameAndPlayers = SplendorGame & {
+	players: (SplendorGamePlayer & { userName: string })[];
+};
+
 export type Routes = {
 	'/room': {
 		GET: {
@@ -30,7 +34,7 @@ export type Routes = {
 	'/game': {
 		POST: { id: GameState };
 		GET: {
-			id: SplendorGame & { players: (SplendorGamePlayer & { userName: string })[] };
+			id: GameAndPlayers;
 		};
 	};
 	'/action': {

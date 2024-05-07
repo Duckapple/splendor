@@ -35,7 +35,7 @@ await Bun.build({
 	minify,
 });
 
-const functions = ['register', 'log-in', 'game', 'room', 'action'] as const;
+const functions = ['register', 'log-in', 'game', 'room', 'action', 'notifications'] as const;
 type Funcs = (typeof functions)[number];
 
 const versions = Object.fromEntries(await Promise.all(functions.map(buildFunction))) as Record<

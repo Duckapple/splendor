@@ -1,18 +1,28 @@
+/// <reference types="@sveltejs/kit" />
 /// <reference no-default-lib="true"/>
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
-/// <reference types="@sveltejs/kit" />
+// @ts-check
 
 import { build, files, version } from '$service-worker';
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
+
+function urlB64ToUint8Array(base64: string) {
+	const rawData = sw.atob(base64);
+	const outputArray = new Uint8Array(rawData.length);
+	for (let i = 0; i < rawData.length; ++i) {
+		outputArray[i] = rawData.charCodeAt(i);
+	}
+	return outputArray;
+}
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
 
 const ASSETS = [
 	...build, // the app itself
-	...files // everything in `static`
+	...files, // everything in `static`
 ];
 
 sw.addEventListener('install', (event: ExtendableEvent) => {
@@ -67,36 +77,46 @@ sw.addEventListener('fetch', (event: FetchEvent) => {
 	event.respondWith(respond());
 });
 
-sw.navigator.permissions.query({ name: 'notifications' });
-
 sw.addEventListener('push', async (e) => {
 	const canNotify = await sw.navigator.permissions.query({ name: 'notifications' });
 
 	if (canNotify.state === 'granted') {
-		sw.registration.showNotification(e.data?.text() ?? 'no text lol', { requireInteraction: true });
+		sw.registration.showNotification(e.data?.text() ?? 'no text lol', {
+			requireInteraction: true,
+		});
 	} else {
 		console.log(e.data?.text());
 	}
 });
 
-function urlB64ToUint8Array(base64: string) {
-	const rawData = sw.atob(base64);
-	const outputArray = new Uint8Array(rawData.length);
-	for (let i = 0; i < rawData.length; ++i) {
-		outputArray[i] = rawData.charCodeAt(i);
-	}
-	return outputArray;
-}
-
 const publicKey = urlB64ToUint8Array(
 	'BNRsMC5kgbxxk77s+DIigDX4+4PQZSEIaR4mCXXWkH5aNfyrqEGPUKwaglZNBPHAk+JB0O+RB6w/bHrMbv5XxSY='
 );
 
-sw.skipWaiting().then(async () => {
-	const subscription = await sw.registration.pushManager.subscribe({
-		userVisibleOnly: true, // Every push has to result in a Notification
-		applicationServerKey: publicKey
+// saveSubscription saves the subscription to the backend
+const saveSubscription = async (subscription: PushSubscription) => {
+	const SERVER_URL = 'http://localhost:4000/save-subscription';
+	const response = await fetch(SERVER_URL, {
+		method: 'post',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(subscription),
 	});
+	return response.json();
+};
 
-	console.log(subscription.toJSON());
+self.addEventListener('activate', async () => {
+	// This will be called only once when the service worker is activated.
+	try {
+		const options = {
+			applicationServerKey: publicKey,
+			userVisibleOnly: true,
+		};
+		const subscription = await sw.registration.pushManager.subscribe(options);
+		const response = await saveSubscription(subscription);
+		console.log(response);
+	} catch (err) {
+		console.log('Error', err);
+	}
 });
