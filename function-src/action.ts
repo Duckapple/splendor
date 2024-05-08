@@ -65,6 +65,7 @@ async function post(user: AuthUser, req: Request) {
 		throw new FunctionError(403, { message: 'Forbidden' });
 	}
 
+	// This is the bread and butter, right here
 	const res = performAction(dbRes.game, dbRes.player, action);
 
 	if (res.isErr()) throw new FunctionError(res.error.status ?? 400, res.error);
