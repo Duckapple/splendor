@@ -49,4 +49,7 @@ export type Routes = {
 			};
 		};
 	};
+	'/notifications': {
+		POST: {};
+	};
 };

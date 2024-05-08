@@ -5,10 +5,15 @@
 // @ts-check
 
 import { build, files, version } from '$service-worker';
+import { authed } from './lib/main';
 
-const sw = self as unknown as ServiceWorkerGlobalScope;
+const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
 
-function urlB64ToUint8Array(base64: string) {
+/**
+ * @param {string} base64
+ * @returns {Uint8Array}
+ */
+function urlB64ToUint8Array(base64) {
 	const rawData = sw.atob(base64);
 	const outputArray = new Uint8Array(rawData.length);
 	for (let i = 0; i < rawData.length; ++i) {
@@ -25,17 +30,19 @@ const ASSETS = [
 	...files, // everything in `static`
 ];
 
-sw.addEventListener('install', (event: ExtendableEvent) => {
+sw.addEventListener('install', (event) => {
+	const installEvent = /** @type {ExtendableEvent} */ (event);
 	// Create a new cache and add all files to it
 	async function addFilesToCache() {
 		const cache = await caches.open(CACHE);
 		await cache.addAll(ASSETS);
 	}
 
-	event.waitUntil(addFilesToCache());
+	installEvent.waitUntil(addFilesToCache());
 });
 
-sw.addEventListener('activate', (event: ExtendableEvent) => {
+sw.addEventListener('activate', (event) => {
+	const activateEvent = /** @type {ExtendableEvent} */ (event);
 	// Remove previous cached data from disk
 	async function deleteOldCaches() {
 		for (const key of await caches.keys()) {
@@ -43,38 +50,40 @@ sw.addEventListener('activate', (event: ExtendableEvent) => {
 		}
 	}
 
-	event.waitUntil(deleteOldCaches());
+	activateEvent.waitUntil(deleteOldCaches());
 });
 
-sw.addEventListener('fetch', (event: FetchEvent) => {
+sw.addEventListener('fetch', (event) => {
+	const fetchEvent = /** @type {FetchEvent} */ (event);
 	// ignore POST requests etc
-	if (event.request.method !== 'GET') return;
+	if (fetchEvent.request.method !== 'GET') return;
 
-	async function respond(): Promise<Response> {
-		const url = new URL(event.request.url);
+	/** @returns {Promise<Response>} */
+	async function respond() {
+		const url = new URL(fetchEvent.request.url);
 		const cache = await caches.open(CACHE);
 
 		// `build`/`files` can always be served from the cache
 		if (ASSETS.includes(url.pathname)) {
-			return cache.match(url.pathname) as Promise<Response>;
+			return /** @type {Promise<Response>} */ (cache.match(url.pathname));
 		}
 
 		// for everything else, try the network first, but
 		// fall back to the cache if we're offline
 		try {
-			const response = await fetch(event.request);
+			const response = await fetch(fetchEvent.request);
 
-			if (response.status === 200) {
-				cache.put(event.request, response.clone());
+			if (response.status === 200 && !fetchEvent.request.url.includes('chrome-extension://')) {
+				cache.put(fetchEvent.request, response.clone());
 			}
 
 			return response;
 		} catch {
-			return cache.match(event.request) as Promise<Response>;
+			return /** @type {Promise<Response>} */ (cache.match(fetchEvent.request));
 		}
 	}
 
-	event.respondWith(respond());
+	fetchEvent.respondWith(respond());
 });
 
 sw.addEventListener('push', async (e) => {
@@ -93,30 +102,25 @@ const publicKey = urlB64ToUint8Array(
 	'BNRsMC5kgbxxk77s+DIigDX4+4PQZSEIaR4mCXXWkH5aNfyrqEGPUKwaglZNBPHAk+JB0O+RB6w/bHrMbv5XxSY='
 );
 
-// saveSubscription saves the subscription to the backend
-const saveSubscription = async (subscription: PushSubscription) => {
-	const SERVER_URL = 'http://localhost:4000/save-subscription';
-	const response = await fetch(SERVER_URL, {
-		method: 'post',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(subscription),
-	});
-	return response.json();
-};
-
-self.addEventListener('activate', async () => {
-	// This will be called only once when the service worker is activated.
+const channel = new BroadcastChannel('service-worker');
+channel.addEventListener('message', async (event) => {
+	const data = JSON.parse(event.data);
 	try {
 		const options = {
 			applicationServerKey: publicKey,
 			userVisibleOnly: true,
 		};
-		const subscription = await sw.registration.pushManager.subscribe(options);
-		const response = await saveSubscription(subscription);
+		const subscription = /** @type {*} */ (await sw.registration.pushManager.subscribe(options));
+		const response = await authed({
+			route: '/notifications',
+			method: 'POST',
+			body: /** @type {Record<string, unknown>} */ (subscription),
+			jwt: data.jwt,
+		});
 		console.log(response);
 	} catch (err) {
 		console.log('Error', err);
 	}
 });
+
+sw.skipWaiting();

@@ -1,7 +1,7 @@
 import type { NONE, Routes } from '../../../common/communication';
 import { writable, derived, get, type Writable } from 'svelte/store';
 
-const BASE_URL = 'https://europe-west3-organic-folder-403021.cloudfunctions.net';
+export const BASE_URL = 'https://europe-west3-organic-folder-403021.cloudfunctions.net';
 
 const BASE_HEADERS = {
 	Accept: 'application/json',
@@ -19,7 +19,7 @@ export function cachedWritable<T>(key: string, defaultValue?: T) {
 
 const TOKEN = 'token' as const;
 
-const jwt = cachedWritable<string>(TOKEN);
+export const jwt = cachedWritable<string>(TOKEN);
 
 export const isLoggedIn = derived(jwt, Boolean);
 
@@ -68,6 +68,7 @@ export type AuthInput<
 	method: Method;
 	params?: Params extends NONE ? undefined : Record<Params | (string & {}), string>;
 	body?: Record<string, unknown>;
+	jwt?: string;
 };
 
 type Result<T> = {
@@ -85,9 +86,10 @@ export async function authed<
 	method,
 	params,
 	body,
+	jwt: jwtInput,
 }: AuthInput<Route, Method, Params>): Promise<Result<Routes[Route][Method][Params]>> {
-	const auth = get(jwt);
-	if (auth === null) throw { message: 'Unauthorized' };
+	const auth = jwtInput ?? get(jwt);
+	if (auth === null) throw { message: 'Unauthorized', origin: 'local' };
 
 	const endpoint = BASE_URL + route + '?' + new URLSearchParams(params);
 	const data = await fetch(endpoint, {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authed, cachedWritable, user, userNames } from '$lib/main';
+	import { authed, cachedWritable, jwt, user, userNames } from '$lib/main';
 	import { readable } from 'svelte/store';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
@@ -21,6 +21,8 @@
 	let coinCenter = { value: undefined as unknown as HTMLDivElement };
 	let target: HTMLElement | undefined = undefined;
 	let reserved = false;
+
+	const serviceWorker = new BroadcastChannel('service-worker');
 
 	function setCurrent(newVal: HTMLElement | undefined) {
 		if (target) {
@@ -82,6 +84,7 @@
 			let allowed = window.Notification.permission;
 			if (allowed === 'default') {
 				allowed = await window.Notification.requestPermission();
+				serviceWorker.postMessage(JSON.stringify({ type: 'notifications', jwt: $jwt }));
 			}
 			console.log(allowed);
 			// return authed({});

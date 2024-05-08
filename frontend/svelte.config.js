@@ -12,7 +12,7 @@ const config = {
 			fallback: '404.html',
 		}),
 		files: {
-			serviceWorker: 'src/service-worker.ts',
+			serviceWorker: 'src/service-worker.js',
 		},
 	},
 };

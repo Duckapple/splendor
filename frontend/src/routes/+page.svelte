@@ -79,9 +79,23 @@
 	{#if !$isLoggedIn}
 		<form on:submit|preventDefault={() => $loginMutation.mutate()} class="flex flex-col">
 			<label for="userName">User name</label>
-			<input class="p-1 rounded" type="text" name="userName" id="userName" bind:value={userName} />
+			<input
+				class="p-1 rounded"
+				type="text"
+				name="userName"
+				id="userName"
+				bind:value={userName}
+				autocomplete="username"
+			/>
 			<label for="password">Password</label>
-			<input class="p-1 rounded" type="password" name={pw} id={pw} bind:value={password} />
+			<input
+				class="p-1 rounded"
+				type="password"
+				name={pw}
+				id={pw}
+				bind:value={password}
+				autocomplete="current-password"
+			/>
 			{#if $loginMutation.error}
 				<span class="text-red-500">{$loginMutation.error?.message}</span>
 			{/if}
