@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Color, type Card as CardType } from '../../../../common/model';
+	import { Color, GamePhase, type Card as CardType } from '../../../../common/model';
 	import Card from '$lib/game/Card.svelte';
 	import Coin from '$lib/game/Coin.svelte';
 	import { user } from '$lib/main';
@@ -11,6 +11,7 @@
 	export let turn: number | undefined;
 	export let buyReserved: (e: MouseEvent | KeyboardEvent) => void;
 	export let targetCardId: number;
+	export let phase: GamePhase | undefined;
 
 	$: isUser = $user?.id === player.userId;
 
@@ -37,6 +38,9 @@
 			? currentPlayer
 			: ''}
 		<span class="text-sm">({points} points)</span>
+		{#if phase === GamePhase.ENDING}
+			<span class="text-sm capitalize">final turn</span>
+		{/if}
 	</h1>
 	{#if persons.length}
 		<h2 class="text-sm">Nobles</h2>

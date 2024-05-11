@@ -137,6 +137,7 @@
 				turn={$gameCache?.turn}
 				buyReserved={handleReserveCard}
 				targetCardId={Number(target?.dataset.cardId)}
+				phase={$gameCache?.phase}
 			/>
 		{/each}
 		{#each range(4 - ($gameCache?.players.length ?? 0)) as _}

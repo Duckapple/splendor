@@ -7,6 +7,7 @@ import { db } from './common/db';
 import { actionSchema } from '../common/actions';
 import { performAction } from '../common/logic';
 import { omit } from '../common/utils';
+import { GamePhase } from '../common/model';
 
 httpGuarded('action', {
 	GET: authedHandler(get),
@@ -63,6 +64,10 @@ async function post(user: AuthUser, req: Request) {
 
 	if (dbRes == null) {
 		throw new FunctionError(403, { message: 'Forbidden' });
+	}
+
+	if (dbRes.game.phase === GamePhase.FINISHED) {
+		throw new FunctionError(403, { message: 'Game is finished' });
 	}
 
 	// This is the bread and butter, right here
