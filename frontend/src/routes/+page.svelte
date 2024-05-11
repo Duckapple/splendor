@@ -29,11 +29,13 @@
 	const createRoom = createMutation({
 		mutationKey: ['rooms'],
 		mutationFn: async () => {
-			await authed({
+			const data = await authed({
 				method: 'POST',
 				route: '/room',
 			});
-			await $rooms.refetch();
+			if (!data.data?.id) throw { message: 'Failed to create room' };
+
+			window.location.href = `/new?id=${data.data.id}`;
 		},
 	});
 </script>
@@ -132,10 +134,4 @@
 			>Log out of {$user?.userName}</button
 		>
 	{/if}
-	<script lang="ts">
-		(async function () {
-			const allowedNotifications = await window.Notification.requestPermission();
-			console.log(allowedNotifications);
-		});
-	</script>
 </section>

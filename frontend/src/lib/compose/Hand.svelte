@@ -27,6 +27,8 @@
 	})();
 	$: shownCards = sorted.slice(0, 5);
 	$: persons = sorted[Color.Y];
+
+	$: points = sorted.reduce((acc, cards) => acc + cards.reduce((acc, card) => acc + card.p, 0), 0);
 </script>
 
 <div class="p-2 space-y-1 border rounded">
@@ -34,6 +36,7 @@
 		'<span class:underline={isUser}>{player.userName}</span>'{turn === player.position
 			? currentPlayer
 			: ''}
+		<span class="text-sm">({points} points)</span>
 	</h1>
 	{#if persons.length}
 		<h2 class="text-sm">Nobles</h2>

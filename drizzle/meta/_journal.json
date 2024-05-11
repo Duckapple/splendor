@@ -8,6 +8,13 @@
       "when": 1710196457529,
       "tag": "0000_curly_gideon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1715423325058,
+      "tag": "0001_furry_major_mapleleaf",
+      "breakpoints": true
     }
   ]
 }

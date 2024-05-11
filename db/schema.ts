@@ -16,7 +16,7 @@ import {
 import { sql } from 'drizzle-orm';
 import { object, string } from 'valibot';
 import { createInsertSchema } from 'drizzle-valibot';
-import type { IdDecks, TokenHold } from '../common/model';
+import type { GamePhase, IdDecks, TokenHold } from '../common/model';
 
 function indicesOn<T extends string>(
 	...keys: T[]
@@ -85,6 +85,7 @@ export const SplendorGame = pgTable("SplendorGame", {
   tokens: json("tokens").default(sql`('[0,0,0,0,0,0]')`).notNull().$type<TokenHold>(),
   turn: smallint("turn").notNull().default(0).$type<0 | 1 | 2 | 3>(),
   playerCount: smallint("playerCount").notNull().$type<1 | 2 | 3 | 4>(),
+	phase: smallint("phase").notNull().default(0).$type<GamePhase>(),
 });
 export type SplendorGame = typeof SplendorGame.$inferSelect;
 
@@ -94,6 +95,7 @@ export const SplendorGameSelect = {
 	tokens: SplendorGame.tokens,
 	turn: SplendorGame.turn,
 	playerCount: SplendorGame.playerCount,
+	phase: SplendorGame.phase,
 };
 export type SplendorGameSelect = typeof SplendorGameSelect;
 

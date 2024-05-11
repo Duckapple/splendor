@@ -24,6 +24,12 @@ export type Player = {
 
 export type ID = string;
 
+export enum GamePhase {
+	PLAYING,
+	ENDING,
+	FINISHED,
+}
+
 export type GameState = {
 	id: ID;
 	piles: IdDecks;
@@ -31,6 +37,7 @@ export type GameState = {
 	tokens: TokenHold;
 	turn: 0 | 1 | 2 | 3;
 	playerCount: 1 | 2 | 3 | 4;
+	phase: GamePhase;
 };
 
 export type ShownGameState = Omit<GameState, 'piles' | 'players'> & {

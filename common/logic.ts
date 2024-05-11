@@ -9,7 +9,7 @@ import type {
 	TakeTokens,
 	TokenHold,
 } from './model';
-import { Color } from './model';
+import { Color, GamePhase } from './model';
 import { cardFromId } from './defaults';
 import { pick, sum } from './utils';
 
@@ -49,14 +49,24 @@ export function performAction(
 	game = structuredClone(game);
 	game.turn = ((game.turn + 1) % game.playerCount) as GameState['turn'];
 	player = structuredClone(player);
+	let result: Result<{ game: Partial<GameState>; player: Partial<Player> }, ActionError>;
 	switch (action.type) {
 		case 'BUY_CARD':
-			return buyAction(game, player, action);
+			result = buyAction(game, player, action);
+			break;
 		case 'TAKE_TOKENS':
-			return takeAction(game, player, action);
+			result = takeAction(game, player, action);
+			break;
 		case 'RESERVE':
-			return reserveAction(game, player, action);
+			result = reserveAction(game, player, action);
+			break;
 	}
+	if (result.isErr()) return result;
+
+	const phase = result.value.game.phase ?? game.phase;
+	if (game.turn === 0 && phase === GamePhase.ENDING) result.value.game.phase = GamePhase.FINISHED;
+
+	return result;
 }
 
 function buyAction(
@@ -126,8 +136,12 @@ function buyAction(
 		player.cards.push(chosen[0]);
 	}
 
+	const points = player.cards.reduce((acc, card) => acc + cardFromId(card).p, 0);
+
+	if (points >= 15) game.phase = GamePhase.ENDING;
+
 	return ok({
-		game: pick(game, 'piles', 'shown', 'turn', 'tokens'),
+		game: pick(game, 'piles', 'shown', 'turn', 'tokens', 'phase'),
 		player: pick(player, 'cards', 'reserved', 'tokens'),
 	});
 }
