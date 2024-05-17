@@ -94,7 +94,7 @@
 	<title>Game</title>
 </svelte:head>
 
-<div class="flex flex-col lg:flex-row">
+<div class="flex flex-col p-2 lg:flex-row md:p-4">
 	<div class="flex flex-col md:flex-row">
 		<div class="space-y-3">
 			<div class="flex justify-center gap-2 md:gap-3">
@@ -143,7 +143,7 @@
 		{/each}
 	</div>
 </div>
-<details class="absolute w-64 rounded-md md:w-auto top-4 left-4 open:bg-white">
+<details class="absolute rounded-md md:w-auto top-4 left-4 open:bg-white">
 	<summary class="block cursor-pointer">
 		<!-- prettier-ignore -->
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">

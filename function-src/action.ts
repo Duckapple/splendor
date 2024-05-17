@@ -16,7 +16,7 @@ httpGuarded('action', {
 
 const getInput = v.object({
 	gameId: v.string([v.uuid()]),
-	since: v.optional(v.transform(v.string(), (v) => new Date(v), v.date())),
+	since: v.optional(v.transform(v.string(), (v) => new Date(v ?? 0), v.date())),
 });
 
 async function get(user: AuthUser, req: Request) {

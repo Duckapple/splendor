@@ -94,7 +94,7 @@ sw.addEventListener('push', async (e) => {
 			requireInteraction: true,
 		});
 	} else {
-		console.log(e.data?.text());
+		console.error('Received push when disallowed', e.data?.text());
 	}
 });
 
