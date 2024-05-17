@@ -25,7 +25,7 @@
 			{#each allActions as action}
 				<!-- svelte-ignore a11y-autofocus -->
 				<button
-					class={'px-3 py-1 border border-gray-400 rounded-md ' + action.colorClass}
+					class={'px-3 py-1 border border-slate-500 rounded-md ' + action.colorClass}
 					autofocus={action.text === 'Cancel'}
 					on:click={() => action.handler()}
 					on:keypress={(e) => ['Space', 'Enter'].includes(e.key) && action.handler()}
@@ -36,29 +36,3 @@
 		</div>
 	</div>
 </div>
-
-<!-- <style>
-	dialog[open] {
-		animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-	}
-	@keyframes zoom {
-		from {
-			transform: scale(0.95);
-		}
-		to {
-			transform: scale(1);
-		}
-	}
-
-	dialog[open]::backdrop {
-		animation: fade 0.2s ease-out;
-	}
-	@keyframes fade {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
-</style> -->

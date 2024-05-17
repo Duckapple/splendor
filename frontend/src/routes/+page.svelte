@@ -49,7 +49,7 @@
 			<div class="flex flex-col gap-4 pb-2 text-lg md:">
 				{#each $rooms.data.data as room}
 					<a
-						class="relative block p-2 border border-gray-700"
+						class="relative block p-2 border rounded border-slate-500"
 						href={`/${room.started ? 'game' : 'new'}?id=${room.id}`}
 					>
 						{#if room.started}
@@ -77,11 +77,12 @@
 			<Login onSuccess={() => void $rooms.refetch()} />
 		{:else}
 			<button
-				class="p-1 mt-2 border border-black rounded md:px-2 md:text-lg"
+				class="p-1 mt-2 border rounded border-slate-500 md:px-2 md:text-lg"
 				on:click|preventDefault={() => $createRoom.mutate()}>Create new room</button
 			>
-			<button class="p-1 border border-black rounded md:px-2 md:text-lg" on:click={() => logout()}
-				>Log out of {$user?.userName}</button
+			<button
+				class="p-1 border rounded border-slate-500 md:px-2 md:text-lg"
+				on:click={() => logout()}>Log out of {$user?.userName}</button
 			>
 		{/if}
 	</div>

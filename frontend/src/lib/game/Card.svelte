@@ -51,7 +51,7 @@
 	on:keypress
 >
 	<div
-		class="px-1 text-3xl rounded-t-lg text-left {pointStyle} {fadeText
+		class="px-1 text-3xl rounded-t-lg text-left w-full {pointStyle} {fadeText
 			? fadeTextBgColorOf[card.c]
 			: bgColorOf[card.c]}"
 	>

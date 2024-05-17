@@ -24,7 +24,7 @@
 <form on:submit|preventDefault={() => $loginMutation.mutate()} class="flex flex-col">
 	<label for="userName">User name</label>
 	<input
-		class="p-1 rounded"
+		class="p-1 border rounded border-slate-500"
 		type="text"
 		name="userName"
 		id="userName"
@@ -33,7 +33,7 @@
 	/>
 	<label for="password">Password</label>
 	<input
-		class="p-1 rounded"
+		class="p-1 border rounded border-slate-500"
 		type="password"
 		name={pw}
 		id={pw}
@@ -45,7 +45,7 @@
 	{/if}
 	<div class="flex gap-2">
 		<button
-			class="flex-grow p-1 mt-2 border border-black rounded"
+			class="flex-grow p-1 mt-2 border rounded border-slate-500"
 			on:click={() => (register = true)}
 			type="submit"
 		>
@@ -55,7 +55,7 @@
 			Register
 		</button>
 		<button
-			class="flex-grow p-1 mt-2 border border-black rounded"
+			class="flex-grow p-1 mt-2 border rounded border-slate-500"
 			on:click={() => (register = false)}
 			type="submit"
 		>
