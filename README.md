@@ -2,7 +2,7 @@
 
 This is a port of Splendor into an asynchronous web-based board game.
 
-Frontend is made with SvelteKit, backend is Google Cloud functions interacting with PlanetScale using Drizzle ORM. Everything is written in TypeScript, using Bun as package manager and bundler for the cloud functions.
+Frontend is made with SvelteKit, backend is Google Cloud functions interacting with Neon DB using Drizzle ORM. Everything is written in TypeScript, using Bun as package manager and bundler for the cloud functions.
 
 ## TODOs
 

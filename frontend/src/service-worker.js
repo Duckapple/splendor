@@ -90,9 +90,7 @@ sw.addEventListener('push', async (e) => {
 	const canNotify = await sw.navigator.permissions.query({ name: 'notifications' });
 
 	if (canNotify.state === 'granted') {
-		sw.registration.showNotification(e.data?.text() ?? 'no text lol', {
-			requireInteraction: true,
-		});
+		sw.registration.showNotification(e.data?.text() ?? 'no text lol', {});
 	} else {
 		console.error('Received push when disallowed', e.data?.text());
 	}

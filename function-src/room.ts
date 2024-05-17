@@ -77,7 +77,7 @@ async function get(user: AuthUser, req: Request) {
 	}
 
 	if (data.players.every((player) => player.userId !== user.id)) {
-		throw new FunctionError(404, { message: 'Not Found' });
+		throw new FunctionError(404, { message: 'Not part of room', data: 'NOT_IN_ROOM' as const });
 	}
 
 	return { message: 'Found room', data };
