@@ -14,7 +14,7 @@
 	});
 </script>
 
-<main class="box-border flex flex-col flex-1 w-full min-h-screen p-4 mx-auto">
+<main class="box-border flex flex-col flex-1 w-full min-h-screen mx-auto">
 	<QueryClientProvider client={queryClient}>
 		<slot />
 	</QueryClientProvider>

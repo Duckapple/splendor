@@ -86,8 +86,6 @@
 				allowed = await window.Notification.requestPermission();
 				serviceWorker.postMessage(JSON.stringify({ type: 'notifications', jwt: $jwt }));
 			}
-			console.log(allowed);
-			// return authed({});
 		},
 	});
 </script>
