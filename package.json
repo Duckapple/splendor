@@ -8,12 +8,12 @@
 		"preview": "bun run frontend build && bun run frontend preview"
 	},
 	"devDependencies": {
-		"@google-cloud/functions-framework": "^3.3.0",
+		"@google-cloud/functions-framework": "^3.4.0",
 		"@types/bcrypt": "^5.0.2",
 		"@types/jsonwebtoken": "^9.0.5",
 		"@types/web-push": "^3.6.2",
 		"bun-types": "^1.0.26",
-		"drizzle-kit": "^0.20.14",
+		"drizzle-kit": "^0.21.2",
 		"web-push": "^3.6.6"
 	},
 	"name": "splendor",
