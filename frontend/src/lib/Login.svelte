@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { authed, isLoggedIn, loginRegister, logout, user } from '$lib/main';
-	import { createMutation, createQuery } from '@tanstack/svelte-query';
-	import { timeAgo } from '$lib/timeAgo';
+	import { loginRegister } from '$lib/main';
+	import { createMutation } from '@tanstack/svelte-query';
 	import Spinner from '$lib/Spinner.svelte';
-	import Background from '$lib/compose/Background.svelte';
 
 	export let onSuccess: () => void;
 

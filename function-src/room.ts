@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, SQL } from 'drizzle-orm';
 import { SplendorGamePlayer, SplendorRoom, User } from '../db/schema';
 import { db } from './common/db';
 import { FunctionError, Request, authedHandler, httpGuarded } from './common/httpGuarded';
@@ -70,7 +70,9 @@ async function get(user: AuthUser, req: Request) {
 		return { message: 'Found rooms for user', data: manyResult };
 	}
 
-	const [data] = await getGame(eq(SplendorRoom.id, input.output.id));
+	const [data] = await getGame(
+		and(eq(SplendorRoom.id, input.output.id), eq(playerAgain.userId, user.id)) as SQL
+	);
 
 	if (data == null) {
 		throw new FunctionError(404, { message: 'Not Found' });

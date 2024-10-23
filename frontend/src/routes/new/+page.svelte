@@ -7,7 +7,6 @@
 	import Background from '$lib/compose/Background.svelte';
 	import { cardFromId } from '../../../../common/defaults';
 	import Login from '$lib/Login.svelte';
-	import { isHttpError } from '@sveltejs/kit';
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
 
@@ -100,8 +99,8 @@
 						{#if $joinRoom.isPending}
 							<Spinner />
 						{/if}
-						Start the game</button
-					>
+						Start the game
+					</button>
 				{/if}
 			</div>
 		{/if}
