@@ -81,17 +81,25 @@
 			{/if}
 		{/if}
 		{#if $room.isSuccess && $room.data.data != null}
-			<div class="max-w-md">
-				<p>
-					Opened {timeAgo($room.data.data.createdAt)}
+			{@const data = $room.data.data}
+			{@const ownerName = data.players.find(({ userId }) => data?.ownerId === userId)?.userName}
+			<div class="max-w-md p-2">
+				<h1 class="pb-4 pr-20 text-5xl">New game</h1>
+				<p class="text-sm text-right">
+					Opened {timeAgo(data.createdAt)}
+					<br />
+					by {ownerName}
 				</p>
 				Players:
 				<ul class="pl-6 list-disc">
-					{#each $room.data.data.players as player}
-						<li>{player.userName}</li>
+					{#each data.players as player}
+						<li>
+							{player.userName}
+							{#if player.userId === data.ownerId}👑{/if}
+						</li>
 					{/each}
 				</ul>
-				{#if $room.data.data.ownerId === $user?.id}
+				{#if data.ownerId === $user?.id}
 					<button
 						class="p-1 mt-2 border border-black rounded md:px-2 md:text-lg"
 						on:click={() => $startGame.mutate()}
@@ -103,6 +111,14 @@
 					</button>
 				{/if}
 			</div>
+		{:else if $room.isSuccess}
+			Game doesn't exist
+			<button
+				class="p-1 mt-2 border border-black rounded md:px-2 md:text-lg"
+				on:click={() => window.history.back()}
+			>
+				Go back
+			</button>
 		{/if}
 	</div>
 </div>

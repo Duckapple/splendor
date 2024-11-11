@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Card from '$lib/game/Card.svelte';
+	import { onMount } from 'svelte';
 	import { cardFromId } from '../../../../common/defaults';
 
 	export let card = cardFromId(75);
@@ -26,8 +27,14 @@
 		? Math.sin((Math.PI * 12) / 180) * Math.cos((Math.PI * 12) / 180) * window.innerWidth
 		: 0;
 
-	globalThis.window?.addEventListener('resize', () => {
-		cardSize = globalThis.window.innerWidth < 768 ? [54, 86] : [189, 285];
+	onMount(() => {
+		const cb = () => {
+			cardSize = globalThis.window.innerWidth < 768 ? [54, 86] : [189, 285];
+		};
+		if (globalThis.window) {
+			window.addEventListener('resize', cb);
+			return () => window.removeEventListener('resize', cb);
+		}
 	});
 </script>
 

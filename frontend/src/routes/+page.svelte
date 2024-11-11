@@ -41,7 +41,7 @@
 	<div class="p-2 m-2 rounded-md shadow md:p-4 bg-slate-50">
 		<h1 class="pb-6 text-7xl md:text-8xl">Splendor</h1>
 		{#if $isLoggedIn && $rooms.isLoading}
-			<div class="p-8">
+			<div class="p-8 flex justify-center">
 				<Spinner />
 			</div>
 		{/if}
@@ -76,14 +76,16 @@
 		{#if !$isLoggedIn}
 			<Login onSuccess={() => void $rooms.refetch()} />
 		{:else}
-			<button
-				class="p-1 mt-2 border rounded border-slate-500 md:px-2 md:text-lg"
-				on:click|preventDefault={() => $createRoom.mutate()}>Create new room</button
-			>
-			<button
-				class="p-1 border rounded border-slate-500 md:px-2 md:text-lg"
-				on:click={() => logout()}>Log out of {$user?.userName}</button
-			>
+			<div class="flex justify-stretch gap-2 mt-2">
+				<button
+					class="p-1 border rounded border-slate-500 md:px-2 md:text-lg"
+					on:click|preventDefault={() => $createRoom.mutate()}>Create new room</button
+				>
+				<button
+					class="p-1 border rounded border-slate-500 md:px-2 md:text-lg"
+					on:click={() => logout()}>Log out of {$user?.userName}</button
+				>
+			</div>
 		{/if}
 	</div>
 </section>
