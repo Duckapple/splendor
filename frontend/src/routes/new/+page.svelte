@@ -7,6 +7,7 @@
 	import Background from '$lib/compose/Background.svelte';
 	import { cardFromId } from '../../../../common/defaults';
 	import Login from '$lib/Login.svelte';
+	import Button from '$lib/base/Button.svelte';
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
 
@@ -20,8 +21,8 @@
 				params: { id: $searchId },
 			});
 		},
-		retry(_failureCount, error) {
-			return !('data' in error && error.data === 'NOT_IN_ROOM');
+		retry(failureCount, error) {
+			return !('data' in error && error.data === 'NOT_IN_ROOM' && failureCount < 2);
 		},
 	});
 
@@ -66,16 +67,10 @@
 		{/if}
 		{#if $room.isError}
 			{#if 'data' in $room.error && $room.error.data === 'NOT_IN_ROOM'}
-				<span class="text-2xl">You are not in this room!</span>
-				<button
-					class="p-1 mt-2 border border-black rounded md:px-2 md:text-lg"
-					on:click={() => $joinRoom.mutate()}
-				>
-					{#if $joinRoom.isPending}
-						<Spinner />
-					{/if}
-					Join the room</button
-				>
+				<span class="text-2xl mb-2">You are not in this room!</span>
+				<Button loading={$joinRoom.isPending} onClick={() => $joinRoom.mutate()}>
+					Join the room
+				</Button>
 			{:else if $room.error?.message !== 'Unauthorized'}
 				<span class="text-red-500">{$room.error.message}</span>
 			{/if}
@@ -99,26 +94,15 @@
 						</li>
 					{/each}
 				</ul>
-				{#if data.ownerId === $user?.id}
-					<button
-						class="p-1 mt-2 border border-black rounded md:px-2 md:text-lg"
-						on:click={() => $startGame.mutate()}
-					>
-						{#if $joinRoom.isPending}
-							<Spinner />
-						{/if}
+				{#if data.ownerId === $user?.id && data.players.length > 1}
+					<Button onClick={() => $startGame.mutate()} loading={$startGame.isPending} class="mt-2">
 						Start the game
-					</button>
+					</Button>
 				{/if}
 			</div>
 		{:else if $room.isSuccess}
 			Game doesn't exist
-			<button
-				class="p-1 mt-2 border border-black rounded md:px-2 md:text-lg"
-				on:click={() => window.history.back()}
-			>
-				Go back
-			</button>
+			<Button onClick={window.history.back} class="mt-2">Go back</Button>
 		{/if}
 	</div>
 </div>

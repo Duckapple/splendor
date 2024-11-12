@@ -23,7 +23,10 @@ async function post(user: AuthUser, req: Request) {
 
 	if (room == null) throw new FunctionError(400, { message: 'Bad Request' });
 
-	const game = newGameState(id, (rest.length + 1) as 1 | 2 | 3 | 4);
+	if (rest.length === 0)
+		throw new FunctionError(400, { message: 'Cannot start game with only 1 player' });
+
+	const game = newGameState(id, (rest.length + 1) as 2 | 3 | 4);
 
 	await Promise.all([
 		db.insert(SplendorGame).values(game),

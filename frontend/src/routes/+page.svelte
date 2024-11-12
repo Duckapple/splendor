@@ -5,6 +5,7 @@
 	import Spinner from '$lib/Spinner.svelte';
 	import Background from '$lib/compose/Background.svelte';
 	import Login from '$lib/Login.svelte';
+	import Button from '$lib/base/Button.svelte';
 
 	const rooms = createQuery({
 		queryKey: ['rooms'],
@@ -77,14 +78,10 @@
 			<Login onSuccess={() => void $rooms.refetch()} />
 		{:else}
 			<div class="flex justify-stretch gap-2 mt-2">
-				<button
-					class="p-1 border rounded border-slate-500 md:px-2 md:text-lg"
-					on:click|preventDefault={() => $createRoom.mutate()}>Create new room</button
-				>
-				<button
-					class="p-1 border rounded border-slate-500 md:px-2 md:text-lg"
-					on:click={() => logout()}>Log out of {$user?.userName}</button
-				>
+				<Button onClick={() => $createRoom.mutate()} loading={$createRoom.isPending}>
+					Create new room
+				</Button>
+				<Button onClick={() => logout()}>Log out of {$user?.userName}</Button>
 			</div>
 		{/if}
 	</div>
