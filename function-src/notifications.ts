@@ -1,41 +1,41 @@
-import { randomUUID } from 'crypto';
-import { object, parse, string } from 'valibot';
 import webPush from 'web-push';
+import { t } from 'elysia';
+import { Check, Convert, Value } from '@sinclair/typebox/value';
 
 import { AuthUser } from '../common/communication';
 import { db } from './common/db';
-import { httpGuarded, authedHandler, Request } from './common/httpGuarded';
 import { Push } from '../db/schema';
+import { Infer } from './common/type';
 
-const validSub = object({
-	endpoint: string(),
-	keys: object({
-		p256dh: string(),
-		auth: string(),
+const validSub = t.Object({
+	endpoint: t.String(),
+	keys: t.Object({
+		p256dh: t.String(),
+		auth: t.String(),
 	}),
 });
 
-const validEnv = object({
-	MAIL: string(),
-	PUBLIC_KEY: string(),
-	PRIVATE_KEY: string(),
+const validEnv = t.Object({
+	MAIL: t.String(),
+	PUBLIC_KEY: t.String(),
+	PRIVATE_KEY: t.String(),
 });
 
-const env = parse(validEnv, process.env);
+const env = process.env;
+const envFits = Check(validEnv, env);
+if (!envFits) {
+	throw new Error('Env variables not set for notifications!');
+}
 
 webPush.setVapidDetails(env.MAIL, env.PUBLIC_KEY, env.PRIVATE_KEY);
 
-httpGuarded('notifications', {
-	POST: authedHandler(post),
-	// GET: authedHandler(get),
-});
-
-async function post(user: AuthUser, req: Request) {
-	const subscriptionInput = parse(validSub, req.body);
+post.params = { body: validSub };
+export async function post(user: AuthUser, req: Infer<typeof post.params>) {
+	const subscriptionInput = req.body;
 
 	await db.insert(Push).values({ userId: user.id, ...subscriptionInput });
 
-	const nonce = randomUUID();
+	const nonce = crypto.randomUUID();
 
 	webPush.sendNotification(
 		subscriptionInput,

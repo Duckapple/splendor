@@ -7,6 +7,7 @@ import * as gameRoutes from './function-src/game';
 import * as actionRoutes from './function-src/action';
 import * as loginRoutes from './function-src/log-in';
 import * as registerRoutes from './function-src/register';
+import * as notificationsRoutes from './function-src/notifications';
 
 import { FunctionError } from './function-src/common/httpGuarded';
 import { authSchema, loginSchema } from './function-src/common/auth';
@@ -67,6 +68,13 @@ export const App = new Elysia()
 				({ user, query, body }) => actionRoutes.post(user, { query, body }),
 				actionRoutes.post.params
 			)
+	)
+	.group('/notifications', { auth: true }, (app) =>
+		app.post(
+			'/',
+			({ user, body }) => notificationsRoutes.post(user, { body }),
+			notificationsRoutes.post.params
+		)
 	)
 	.listen(3000);
 
