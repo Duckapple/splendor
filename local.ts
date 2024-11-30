@@ -4,6 +4,7 @@ import jwt from '@elysiajs/jwt';
 
 import * as roomRoutes from './function-src/room';
 import * as gameRoutes from './function-src/game';
+import * as actionRoutes from './function-src/action';
 import * as loginRoutes from './function-src/log-in';
 import * as registerRoutes from './function-src/register';
 
@@ -57,6 +58,15 @@ export const App = new Elysia()
 		app
 			.get('/', ({ user, query }) => gameRoutes.get(user, { query }), gameRoutes.get.params)
 			.post('/', ({ user, query }) => gameRoutes.post(user, { query }), gameRoutes.post.params)
+	)
+	.group('/action', { auth: true }, (app) =>
+		app
+			.get('/', ({ user, query }) => actionRoutes.get(user, { query }), actionRoutes.get.params)
+			.post(
+				'/',
+				({ user, query, body }) => actionRoutes.post(user, { query, body }),
+				actionRoutes.post.params
+			)
 	)
 	.listen(3000);
 

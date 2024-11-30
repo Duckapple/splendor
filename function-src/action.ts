@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 import { AuthUser } from '../common/communication';
-import { FunctionError, Request, authedHandler, httpGuarded } from './common/httpGuarded';
+import { FunctionError } from './common/httpGuarded';
 import { and, eq, gt } from 'drizzle-orm';
 import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
 import { db } from './common/db';
@@ -8,19 +8,17 @@ import { actionSchema } from '../common/actions';
 import { performAction } from '../common/logic';
 import { omit } from '../common/utils';
 import { GamePhase } from '../common/model';
+import { t } from 'elysia';
+import { Infer } from './common/type';
 
-httpGuarded('action', {
-	GET: authedHandler(get),
-	POST: authedHandler(post),
+const getInput = t.Object({
+	gameId: t.String(),
+	since: t.Optional(t.Date()),
 });
 
-const getInput = v.object({
-	gameId: v.string([v.uuid()]),
-	since: v.optional(v.transform(v.string(), (v) => new Date(v ?? 0), v.date())),
-});
-
-async function get(user: AuthUser, req: Request) {
-	const { gameId, since } = v.parse(getInput, req.query);
+get.params = { query: getInput };
+export async function get(user: AuthUser, req: Infer<typeof get.params>) {
+	const { gameId, since } = req.query;
 
 	const [game] = await db
 		.select({ id: SplendorGame.id })
@@ -46,9 +44,13 @@ async function get(user: AuthUser, req: Request) {
 	return { message: 'Got actions', data: actions };
 }
 
-async function post(user: AuthUser, req: Request) {
-	const { gameId } = v.parse(v.object({ gameId: v.string([v.uuid()]) }), req.query);
-	const action = v.parse(actionSchema, req.body);
+post.params = {
+	query: t.Object({ gameId: t.String() }),
+	body: actionSchema,
+};
+export async function post(user: AuthUser, req: Infer<typeof post.params>) {
+	const { gameId } = req.query;
+	const action = req.body;
 
 	const [dbRes] = await db
 		.select({ game: SplendorGame, player: SplendorGamePlayer })

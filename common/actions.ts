@@ -1,58 +1,54 @@
-import * as v from 'valibot';
-import { BuyCard, Reserve, TakeTokens } from './model';
-import type { Extends } from './utils';
+import { t } from 'elysia';
 
-const buyCard = v.object({
-	type: v.literal('BUY_CARD'),
-	data: v.object({
-		row: v.union([v.literal('high'), v.literal('middle'), v.literal('low'), v.literal('reserve')]),
-		i: v.number(),
-		card: v.number(),
-		tokens: v.array(v.number([v.minValue(0)]), [v.length(6)]) as v.ArraySchema<
-			ReturnType<typeof v.number>,
-			BuyCard['data']['tokens']
-		>,
-		person: v.optional(
-			v.object({
-				i: v.number([v.minValue(0), v.maxValue(4)]) as v.NumberSchema<0 | 1 | 2 | 3 | 4>,
-				id: v.number(),
+type SixTuple<T> = [T, T, T, T, T, T];
+
+const sixTupleType = t.Tuple<SixTuple<ReturnType<typeof t.Number>>>([] as never);
+const sixTuple = t.Array(t.Number({ minimum: 0 }), {
+	minItems: 6,
+	maxItems: 6,
+}) as unknown as typeof sixTupleType;
+
+const buyCard = t.Object({
+	type: t.Literal('BUY_CARD'),
+	data: t.Object({
+		row: t.UnionEnum(['high', 'middle', 'low', 'reserve']),
+		i: t.Number(),
+		card: t.Number(),
+		tokens: sixTuple,
+		person: t.Optional(
+			t.Object({
+				i: t.UnionEnum([0, 1, 2, 3, 4]),
+				id: t.Number(),
 			})
 		),
 	}),
 });
 
-const takeTokens = v.object({
-	type: v.literal('TAKE_TOKENS'),
-	data: v.object({
-		tokens: v.array(v.number(), [v.minLength(1), v.maxLength(3)]) as v.ArraySchema<
-			ReturnType<typeof v.number>,
-			TakeTokens['data']['tokens']
-		>,
-		returned: v.optional(
-			v.array(v.number(), [v.minLength(1), v.maxLength(3)]) as v.ArraySchema<
-				ReturnType<typeof v.number>,
-				TakeTokens['data']['returned']
-			>
-		),
+const tokensType = t.Union([
+	t.Tuple([t.Number(), t.Number(), t.Number()]),
+	t.Tuple([t.Number(), t.Number()]),
+	t.Tuple([t.Number()]),
+]);
+const tokens = t.Array(t.Number(), { minItems: 1, maxItems: 3 }) as unknown as typeof tokensType;
+
+const takeTokens = t.Object({
+	type: t.Literal('TAKE_TOKENS'),
+	data: t.Object({
+		tokens: tokens,
+		returned: t.Optional(tokens),
 	}),
 });
 
-const reserve = v.object({
-	type: v.literal('RESERVE'),
-	data: v.object({
-		row: v.union([v.literal('high'), v.literal('middle'), v.literal('low')]),
-		i: v.number(),
-		card: v.number(),
-		returnToken: v.optional(v.number()),
+const reserve = t.Object({
+	type: t.Literal('RESERVE'),
+	data: t.Object({
+		row: t.UnionEnum(['high', 'middle', 'low']),
+		i: t.Number(),
+		card: t.Number(),
+		returnToken: t.Optional(t.Number()),
 	}),
 });
 
 // Type tests for asserting schemas match model
-const value_1_r: Extends<Reserve, v.Output<typeof reserve>> = true;
-const value_2_r: Extends<v.Output<typeof reserve>, Reserve> = true;
-const value_1_t: Extends<TakeTokens, v.Output<typeof takeTokens>> = true;
-const value_2_t: Extends<v.Output<typeof takeTokens>, TakeTokens> = true;
-const value_1_b: Extends<BuyCard, v.Output<typeof buyCard>> = true;
-const value_2_b: Extends<v.Output<typeof buyCard>, BuyCard> = true;
 
-export const actionSchema = v.variant('type', [buyCard, takeTokens, reserve]);
+export const actionSchema = t.Union([buyCard, takeTokens, reserve]);
