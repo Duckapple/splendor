@@ -5,6 +5,7 @@ import { FunctionError } from './common/httpGuarded';
 import { randomUUID } from 'crypto';
 import { AuthUser } from '../common/communication';
 import { alias } from 'drizzle-orm/pg-core';
+import { t } from 'elysia';
 
 const playerAgain = alias(SplendorGamePlayer, 'player2');
 
@@ -20,6 +21,7 @@ export async function post(user: AuthUser) {
 	return { message: 'Room created!', data: { ...room, players } };
 }
 
+put.params = { query: t.Object({ id: t.String() }) };
 export async function put(user: AuthUser, query: { id: string }) {
 	const { id } = query;
 
@@ -54,6 +56,7 @@ export async function put(user: AuthUser, query: { id: string }) {
 	return { message, data };
 }
 
+get.params = { query: t.Object({ id: t.Optional(t.String()) }) };
 export async function get(user: AuthUser, query: { id?: string }) {
 	const id = query.id;
 

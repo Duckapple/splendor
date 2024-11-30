@@ -1,22 +1,19 @@
-import { parse } from "valibot";
-import { hashSync } from "bcrypt";
-import { randomUUID } from "crypto";
-import { User } from "../db/schema";
-import { db } from "./common/db";
-import { httpGuarded } from "./common/httpGuarded";
-import { login, makeJwt } from "./common/auth";
+import Bun from 'bun';
+import type { Static } from 'elysia';
+import { User } from '../db/schema';
+import { db } from './common/db';
+import { loginSchema, authSchema } from './common/auth';
 
-httpGuarded("register", {
-  POST: async (req) => {
-    const id = randomUUID();
-    const { userName, password } = parse(login, req.body);
-    const bcryptPassword = hashSync(password, 12);
-    const insert = db
-      .insert(User)
-      .values({ id, userName, bcrypt: bcryptPassword });
+export async function post(
+	{ userName, password }: Static<typeof loginSchema>,
+	sign: (i: Static<typeof authSchema>) => Promise<string>
+) {
+	const id = crypto.randomUUID();
+	const bcryptPassword = Bun.password.hash(password, { algorithm: 'bcrypt', cost: 12 });
+	const [_, jwt] = await Promise.all([
+		bcryptPassword.then((bcrypt) => db.insert(User).values({ id, userName, bcrypt })),
+		sign({ id, userName }),
+	]);
 
-    const jwt = makeJwt({ id, userName });
-    await insert;
-    return { data: { jwt }, message: "Registered successfully!" };
-  },
-});
+	return { data: { jwt }, message: 'Registered successfully!' };
+}
