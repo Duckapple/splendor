@@ -1,7 +1,8 @@
 import type { NONE, Routes } from '../../../common/communication';
 import { writable, derived, get, type Writable } from 'svelte/store';
 
-export const BASE_URL = 'https://europe-west3-organic-folder-403021.cloudfunctions.net';
+// export const BASE_URL = 'https://europe-west3-organic-folder-403021.cloudfunctions.net';
+export const BASE_URL = 'http://localhost:3000';
 
 const BASE_HEADERS = {
 	Accept: 'application/json',

@@ -3,7 +3,6 @@ import type { Action, GameState } from './model';
 export type AuthUser = {
 	id: string;
 	userName: string;
-	iat: number;
 };
 
 const NONE = Symbol();

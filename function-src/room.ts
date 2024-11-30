@@ -1,19 +1,12 @@
 import { and, eq, SQL } from 'drizzle-orm';
 import { SplendorGamePlayer, SplendorRoom, User } from '../db/schema';
 import { db } from './common/db';
-import { FunctionError, Request, authedHandler, httpGuarded } from './common/httpGuarded';
+import { FunctionError } from './common/httpGuarded';
 import { randomUUID } from 'crypto';
-import { object, parse, safeParse, string, uuid } from 'valibot';
 import { AuthUser } from '../common/communication';
 import { alias } from 'drizzle-orm/pg-core';
 
 const playerAgain = alias(SplendorGamePlayer, 'player2');
-
-httpGuarded('room', {
-	POST: authedHandler(post),
-	PUT: authedHandler(put),
-	GET: authedHandler(get),
-});
 
 export async function post(user: AuthUser) {
 	const id = randomUUID();
@@ -27,9 +20,8 @@ export async function post(user: AuthUser) {
 	return { message: 'Room created!', data: { ...room, players } };
 }
 
-const getInput = object({ id: string([uuid()]) });
-export async function put(user: AuthUser, req: Request) {
-	const { id } = parse(getInput, req.query);
+export async function put(user: AuthUser, query: { id: string }) {
+	const { id } = query;
 
 	const roomAndPlayers = await getGame(eq(SplendorRoom.id, id));
 
@@ -62,16 +54,16 @@ export async function put(user: AuthUser, req: Request) {
 	return { message, data };
 }
 
-async function get(user: AuthUser, req: Request) {
-	const input = safeParse(getInput, req.query);
+export async function get(user: AuthUser, query: { id?: string }) {
+	const id = query.id;
 
-	if (!input.success) {
+	if (!id) {
 		let manyResult = await getGame(eq(playerAgain.userId, user.id));
 		return { message: 'Found rooms for user', data: manyResult };
 	}
 
 	const [data] = await getGame(
-		and(eq(SplendorRoom.id, input.output.id), eq(playerAgain.userId, user.id)) as SQL
+		and(eq(SplendorRoom.id, id), eq(playerAgain.userId, user.id)) as SQL
 	);
 
 	if (data == null) {

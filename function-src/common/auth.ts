@@ -1,8 +1,7 @@
-import type { Request } from "@google-cloud/functions-framework";
+import type { Request, Response } from "@google-cloud/functions-framework";
 import JWT from "jsonwebtoken";
 import { maxLength, minLength, object, string } from "valibot";
 import { AuthUser } from "../../common/communication";
-import { Response } from "./httpGuarded";
 
 export class AuthError extends Error {
   data: string | undefined;

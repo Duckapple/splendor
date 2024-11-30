@@ -4,5 +4,6 @@ function
 node_modules
 function.zip
 .env.yaml
+.env
 out
 VERSION

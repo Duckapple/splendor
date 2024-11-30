@@ -1,4 +1,5 @@
-import { HttpFunction, http } from '@google-cloud/functions-framework';
+import type { Request, Response, HttpFunction } from '@google-cloud/functions-framework';
+import { http } from '@google-cloud/functions-framework';
 import { ValiError, object, safeParse, string } from 'valibot';
 import { AuthError, ensureAuth } from './auth';
 import { AuthUser } from '../../common/communication';
@@ -29,9 +30,6 @@ function withHeaders(
 	return headers.reduce((res, hdr) => res.header(...hdr), res);
 }
 
-export type Request = Parameters<HttpFunction>[0];
-export type Response = Parameters<HttpFunction>[1];
-
 const methods = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'] as const;
 type Method = (typeof methods)[number];
 type HandlerResult = {
@@ -44,7 +42,7 @@ type Handlers = Partial<Record<Method, Handler>>;
 export function httpGuarded(functionName: string, handlers: Handlers) {
 	const acceptedMethods = Object.keys(handlers) as Method[];
 
-	const guardedHandler: HttpFunction = async (req, res) => {
+	const guardedHandler: HttpFunction = async (req: Request, res: Response) => {
 		try {
 			if (req.method === 'OPTIONS') {
 				return withHeaders(res, acceptedMethods).sendStatus(200);

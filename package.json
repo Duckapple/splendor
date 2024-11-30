@@ -1,34 +1,37 @@
 {
-	"scripts": {
-		"build:function": "bun ./build.ts",
-		"deploy:function": "bun ./build.ts deploy",
-		"db:generate": "bun drizzle-kit generate:pg --schema=./db/schema.ts",
-		"db:migrate-prod": "bun ./db/runMigrations.ts",
-		"frontend": "cd frontend && bun run",
-		"preview": "bun run frontend build && bun run frontend preview"
-	},
-	"devDependencies": {
-		"@google-cloud/functions-framework": "^3.4.0",
-		"@types/bcrypt": "^5.0.2",
-		"@types/jsonwebtoken": "^9.0.5",
-		"@types/web-push": "^3.6.2",
-		"bun-types": "^1.0.26",
-		"drizzle-kit": "^0.21.2",
-		"web-push": "^3.6.6"
-	},
-	"name": "splendor",
-	"module": "index.js",
-	"type": "module",
-	"peerDependencies": {
-		"typescript": "^5.0.0"
-	},
-	"dependencies": {
-		"@neondatabase/serverless": "^0.9.0",
-		"bcrypt": "^5.1.1",
-		"drizzle-orm": "^0.29.3",
-		"drizzle-valibot": "^0.1.1",
-		"jsonwebtoken": "^9.0.2",
-		"neverthrow": "^6.1.0",
-		"valibot": "^0.20.1"
-	}
+  "scripts": {
+    "build:function": "bun ./build.ts",
+    "deploy:function": "bun ./build.ts deploy",
+    "db:generate": "bun drizzle-kit generate:pg --schema=./db/schema.ts",
+    "db:migrate-prod": "bun ./db/runMigrations.ts",
+    "frontend": "cd frontend && bun run",
+    "preview": "bun run frontend build && bun run frontend preview"
+  },
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^3.4.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/web-push": "^3.6.2",
+    "bun-types": "^1.0.26",
+    "drizzle-kit": "^0.21.2",
+    "web-push": "^3.6.6"
+  },
+  "name": "splendor",
+  "module": "index.js",
+  "type": "module",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "1.1.1",
+    "@elysiajs/jwt": "^1.1.1",
+    "@neondatabase/serverless": "^0.9.0",
+    "bcrypt": "^5.1.1",
+    "drizzle-orm": "^0.29.3",
+    "drizzle-valibot": "^0.1.1",
+    "elysia": "1.1.25",
+    "jsonwebtoken": "^9.0.2",
+    "neverthrow": "^6.1.0",
+    "valibot": "^0.20.1"
+  }
 }
