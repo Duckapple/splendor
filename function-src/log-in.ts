@@ -2,7 +2,7 @@ import { Static } from 'elysia';
 import { eq } from 'drizzle-orm';
 import { User } from '../db/schema';
 import { db } from './common/db';
-import { FunctionError } from './common/httpGuarded';
+import { FunctionError } from './common/auth';
 import type { authSchema, loginSchema } from './common/auth';
 
 export async function post(

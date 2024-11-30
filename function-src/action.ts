@@ -1,6 +1,5 @@
-import * as v from 'valibot';
 import { AuthUser } from '../common/communication';
-import { FunctionError } from './common/httpGuarded';
+import { FunctionError } from './common/auth';
 import { and, eq, gt } from 'drizzle-orm';
 import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
 import { db } from './common/db';

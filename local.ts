@@ -1,6 +1,7 @@
-import { Elysia, type Static } from 'elysia';
+import { Elysia } from 'elysia';
 import cors from '@elysiajs/cors';
-import jwt from '@elysiajs/jwt';
+
+import { Auth, FunctionError, loginSchema } from './function-src/common/auth';
 
 import * as roomRoutes from './function-src/room';
 import * as gameRoutes from './function-src/game';
@@ -8,33 +9,6 @@ import * as actionRoutes from './function-src/action';
 import * as loginRoutes from './function-src/log-in';
 import * as registerRoutes from './function-src/register';
 import * as notificationsRoutes from './function-src/notifications';
-
-import { FunctionError } from './function-src/common/httpGuarded';
-import { authSchema, loginSchema } from './function-src/common/auth';
-
-const Auth = new Elysia({ name: 'Service.Auth' })
-	.use(
-		jwt({
-			secret: process.env.JWT_SECRET!,
-			name: 'jwt',
-			alg: 'HS512',
-			schema: authSchema,
-		})
-	)
-	.derive({ as: 'scoped' }, async ({ headers, jwt }) => {
-		const bearer = headers.authorization?.split(' ')[1];
-		return {
-			bearer,
-			user: (await jwt.verify(bearer)) as Static<typeof authSchema>,
-		};
-	})
-	.macro(({ onBeforeHandle }) => ({
-		auth(_: true) {
-			onBeforeHandle(async ({ user, error }) => {
-				if (!user) return error(401, { message: 'Unauthorized', data: 'Invalid JWT Token' });
-			});
-		},
-	}));
 
 export const App = new Elysia()
 	.use(cors())

@@ -1,7 +1,7 @@
 import { and, eq, SQL } from 'drizzle-orm';
 import { SplendorGamePlayer, SplendorRoom, User } from '../db/schema';
 import { db } from './common/db';
-import { FunctionError } from './common/httpGuarded';
+import { FunctionError } from './common/auth';
 import { randomUUID } from 'crypto';
 import { AuthUser } from '../common/communication';
 import { alias } from 'drizzle-orm/pg-core';
