@@ -40,13 +40,17 @@ export const App = new Elysia()
 	.use(cors())
 	.use(Auth)
 	.error({ FunctionError })
-	.onError(({ code, error }) => {
+	.onError(({ code, error, route }) => {
 		switch (code) {
 			case 'FunctionError':
+				console.warn(new Date(), '[warn] ', route, error.status);
 				return new Response(JSON.stringify(error.json), { status: error.status });
 		}
 	})
 	.get('/ping', 'Pong!')
+	.onAfterResponse(({ route }) => {
+		console.debug(new Date(), '[debug]', route);
+	})
 	.post('/register', ({ jwt, body }) => registerRoutes.post(body, jwt.sign), { body: loginSchema })
 	.post('/log-in', async ({ jwt, body }) => loginRoutes.post(body, jwt.sign), { body: loginSchema })
 	.group('/room', { auth: true }, (app) =>
@@ -78,4 +82,4 @@ export const App = new Elysia()
 	)
 	.listen(3000);
 
-console.info('live!', new Date());
+console.info(new Date(), '[info] ', 'live!');

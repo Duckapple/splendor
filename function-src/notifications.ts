@@ -16,7 +16,7 @@ const validSub = t.Object({
 });
 
 const validEnv = t.Object({
-	MAIL: t.String(),
+	NOTIFICATION_MAIL: t.String(),
 	PUBLIC_KEY: t.String(),
 	PRIVATE_KEY: t.String(),
 });
@@ -24,10 +24,15 @@ const validEnv = t.Object({
 const env = process.env;
 const envFits = Check(validEnv, env);
 if (!envFits) {
+	console.error({
+		NOTIFICATION_MAIL: !!process.env.NOTIFICATION_MAIL,
+		PUBLIC_KEY: !!process.env.PUBLIC_KEY,
+		PRIVATE_KEY: !!process.env.PRIVATE_KEY,
+	});
 	throw new Error('Env variables not set for notifications!');
 }
 
-webPush.setVapidDetails(env.MAIL, env.PUBLIC_KEY, env.PRIVATE_KEY);
+webPush.setVapidDetails(env.NOTIFICATION_MAIL, env.PUBLIC_KEY, env.PRIVATE_KEY);
 
 post.params = { body: validSub };
 export async function post(user: AuthUser, req: Infer<typeof post.params>) {
