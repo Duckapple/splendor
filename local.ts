@@ -1,8 +1,9 @@
-import { Elysia, t, Static } from 'elysia';
+import { Elysia, type Static } from 'elysia';
 import cors from '@elysiajs/cors';
 import jwt from '@elysiajs/jwt';
 
 import * as roomRoutes from './function-src/room';
+import * as gameRoutes from './function-src/game';
 import * as loginRoutes from './function-src/log-in';
 import * as registerRoutes from './function-src/register';
 
@@ -51,6 +52,11 @@ export const App = new Elysia()
 			.post('/', ({ user }) => roomRoutes.post(user))
 			.get('/', ({ user, query }) => roomRoutes.get(user, query), roomRoutes.get.params)
 			.put('/', ({ user, query }) => roomRoutes.put(user, query), roomRoutes.put.params)
+	)
+	.group('/game', { auth: true }, (app) =>
+		app
+			.get('/', ({ user, query }) => gameRoutes.get(user, { query }), gameRoutes.get.params)
+			.post('/', ({ user, query }) => gameRoutes.post(user, { query }), gameRoutes.post.params)
 	)
 	.listen(3000);
 

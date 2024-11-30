@@ -1,17 +1,15 @@
 import { and, eq } from 'drizzle-orm';
 import { SplendorGame, SplendorGamePlayer, SplendorRoom as Room, User } from '../db/schema';
 import { db } from './common/db';
-import { FunctionError, Request, authedHandler, httpGuarded } from './common/httpGuarded';
+import { FunctionError } from './common/httpGuarded';
 import { AuthUser } from '../common/communication';
 import { newGameState } from '../common/defaults';
 import { mapValues, omit } from '../common/utils';
+import { t } from 'elysia';
+import { Infer } from './common/type';
 
-httpGuarded('game', {
-	POST: authedHandler(post),
-	GET: authedHandler(get),
-});
-
-async function post(user: AuthUser, req: Request) {
+post.params = { query: t.Object({ id: t.String() }) };
+export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 	const id = req.query.id;
 	if (typeof id !== 'string') throw new FunctionError(400, { message: 'Bad room ID' });
 
@@ -36,7 +34,8 @@ async function post(user: AuthUser, req: Request) {
 	return { message: 'Game created!', data: game };
 }
 
-async function get(user: AuthUser, req: Request) {
+get.params = { query: t.Object({ id: t.String() }) };
+export async function get(user: AuthUser, req: Infer<typeof get.params>) {
 	const id = req.query.id;
 	if (typeof id !== 'string') throw new FunctionError(400, { message: 'Bad game ID' });
 
