@@ -10,6 +10,13 @@ import * as loginRoutes from './function-src/log-in';
 import * as registerRoutes from './function-src/register';
 import * as notificationsRoutes from './function-src/notifications';
 
+const PORT = process.env.PORT;
+
+if (!PORT) {
+	console.error(new Date(), '[fatal]', 'PORT was not defined in .env!');
+	throw new Error();
+}
+
 export const App = new Elysia()
 	.use(cors())
 	.use(Auth)
@@ -54,6 +61,6 @@ export const App = new Elysia()
 			notificationsRoutes.post.params
 		)
 	)
-	.listen(3000);
+	.listen(PORT);
 
-console.info(new Date(), '[info] ', 'live!');
+console.info(new Date(), '[info] ', 'Server is listening on port', PORT);
