@@ -7,9 +7,13 @@
 	import { cardFromId } from '../../../../common/defaults';
 	import { moveTo } from '$lib/move';
 
-	export let gameId: string;
-	let center: HTMLDivElement;
-	let target: HTMLElement | undefined;
+	interface Props {
+		gameId: string;
+	}
+
+	let { gameId }: Props = $props();
+	let center: HTMLDivElement = $state();
+	let target: HTMLElement | undefined = $state();
 	function setCurrent(newVal: HTMLElement | undefined) {
 		if (target) {
 			target.setAttribute('style', '');
@@ -33,9 +37,9 @@
 		initialData: $actionsCache,
 	});
 
-	$: orderedActions = [...($actionsCache ?? [])].reverse();
+	let orderedActions = $derived([...($actionsCache ?? [])].reverse());
 
-	$: cardClick = (card: EventTarget | null) => {
+	let cardClick = $derived((card: EventTarget | null) => {
 		if (!(card instanceof HTMLElement)) return;
 		if (target === card) {
 			setCurrent(undefined);
@@ -43,7 +47,7 @@
 		}
 		setCurrent(card);
 		moveTo(card, card);
-	};
+	});
 </script>
 
 <div class="absolute inset-0 flex items-center justify-center pointer-events-none">

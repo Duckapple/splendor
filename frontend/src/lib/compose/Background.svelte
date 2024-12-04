@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { cardFromId } from '../../../../common/defaults';
 
-	export let card = cardFromId(75);
+	let { card = cardFromId(75) } = $props();
 
 	function getBoundingTiles(toCos: number, toSin: number) {
 		const cos = Math.cos((Math.PI * 12) / 180) * toCos;
@@ -11,21 +11,21 @@
 		return cos + sin;
 	}
 
-	let cardSize = (globalThis.window?.innerWidth ?? 0) < 768 ? [54, 86] : [189, 285];
+	let cardSize = $state((globalThis.window?.innerWidth ?? 0) < 768 ? [54, 86] : [189, 285]);
 
-	$: x = globalThis.window?.innerWidth
+	let x = $derived(globalThis.window?.innerWidth
 		? Math.ceil(getBoundingTiles(window.innerWidth, window.innerHeight) / cardSize[0])
-		: 0;
-	$: y = globalThis.window?.innerHeight
+		: 0);
+	let y = $derived(globalThis.window?.innerHeight
 		? Math.ceil(getBoundingTiles(window.innerHeight, window.innerWidth) / cardSize[1])
-		: 0;
+		: 0);
 
-	$: dX = globalThis.window?.innerWidth
+	let dX = $derived(globalThis.window?.innerWidth
 		? Math.sin((Math.PI * 12) / 180) ** 2 * window.innerWidth
-		: 0;
-	$: dY = globalThis.window?.innerWidth
+		: 0);
+	let dY = $derived(globalThis.window?.innerWidth
 		? Math.sin((Math.PI * 12) / 180) * Math.cos((Math.PI * 12) / 180) * window.innerWidth
-		: 0;
+		: 0);
 
 	onMount(() => {
 		const cb = () => {
@@ -41,7 +41,7 @@
 <div class="fixed">
 	<div
 		class="absolute inset-0 z-20 w-screen bg-[radial-gradient(farthest-corner,_white,_lightgray)] opacity-50"
-	/>
+	></div>
 	<div
 		class="flex flex-col h-screen gap-2 overflow-hidden origin-top-left md:gap-4 bg-slate-50"
 		style="transform: translate({dX}px, -{dY}px) rotate(12deg) scale(1.5);"

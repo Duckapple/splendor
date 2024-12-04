@@ -7,29 +7,39 @@
 	import type { SplendorGamePlayer } from '../../../../db/schema';
 	import Person from '$lib/game/Person.svelte';
 
-	export let player: SplendorGamePlayer & { userName: string };
-	export let turn: number | undefined;
-	export let buyReserved: (e: MouseEvent | KeyboardEvent) => void;
-	export let targetCardId: number;
-	export let phase: GamePhase | undefined;
+	interface Props {
+		player: SplendorGamePlayer & { userName: string };
+		turn: number | undefined;
+		buyReserved: (e: MouseEvent | KeyboardEvent) => void;
+		targetCardId: number;
+		phase: GamePhase | undefined;
+	}
 
-	$: isUser = $user?.id === player.userId;
+	let {
+		player,
+		turn,
+		buyReserved,
+		targetCardId,
+		phase
+	}: Props = $props();
 
-	$: currentPlayer = isUser ? " - It's your turn!" : ' - Current player';
-	$: handleBuyReserved = isUser ? buyReserved : () => {};
+	let isUser = $derived($user?.id === player.userId);
 
-	$: sorted = (() => {
+	let currentPlayer = $derived(isUser ? " - It's your turn!" : ' - Current player');
+	let handleBuyReserved = $derived(isUser ? buyReserved : () => {});
+
+	let sorted = $derived((() => {
 		const sorted: CardType[][] = [[], [], [], [], [], []];
 		for (const cardId of player.cards) {
 			const card = cardFromId(cardId);
 			sorted[card.c].push(card);
 		}
 		return sorted;
-	})();
-	$: shownCards = sorted.slice(0, 5);
-	$: persons = sorted[Color.Y];
+	})());
+	let shownCards = $derived(sorted.slice(0, 5));
+	let persons = $derived(sorted[Color.Y]);
 
-	$: points = sorted.reduce((acc, cards) => acc + cards.reduce((acc, card) => acc + card.p, 0), 0);
+	let points = $derived(sorted.reduce((acc, cards) => acc + cards.reduce((acc, card) => acc + card.p, 0), 0));
 </script>
 
 <div class="p-2 space-y-1 border rounded">

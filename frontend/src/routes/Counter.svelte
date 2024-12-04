@@ -1,28 +1,42 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { textColorOf } from '$lib/color';
 	import { spring } from 'svelte/motion';
 	import type { Color } from '../../../common/model';
 
-	export let color: Color;
+	interface Props {
+		color: Color;
+		min?: number;
+		value?: number;
+		max?: number;
+		invalid?: boolean;
+		noButtons?: boolean;
+		decrement?: any;
+		increment?: any;
+	}
 
-	export let min = 0;
-	export let value = 0;
-	export let max = 5;
-
-	export let invalid = false;
-	export let noButtons = false;
-
-	export let decrement = (color: Color) => {};
-	export let increment = (color: Color) => {};
+	let {
+		color,
+		min = 0,
+		value = 0,
+		max = 5,
+		invalid = false,
+		noButtons = false,
+		decrement = (color: Color) => {},
+		increment = (color: Color) => {},
+	}: Props = $props();
 
 	const displayed_count = spring();
-	$: displayed_count.set(value);
-	$: offset = modulo($displayed_count, 1);
 
 	function modulo(n: number, m: number) {
 		// handle negative numbers
 		return ((n % m) + m) % m;
 	}
+	run(() => {
+		displayed_count.set(value);
+	});
+	let offset = $derived(modulo($displayed_count, 1));
 </script>
 
 <div
@@ -34,7 +48,7 @@
 			class="flex items-center justify-center h-6 p-0 bg-transparent border-0 md:h-8 rounded-t-md md:rounded-t-xl touch-manipulation"
 			class:cursor-not-allowed={value >= max}
 			class:hover:bg-slate-200={value < max}
-			on:click={() => value < max && increment(color)}
+			onclick={() => value < max && increment(color)}
 			aria-label="Increase the counter by one"
 		>
 			<svg aria-hidden="true" viewBox="0 0 1 1" class="w-1/2 h-1/2">
@@ -47,7 +61,7 @@
 			</svg>
 		</button>
 	{:else}
-		<div class="h-6 md:h-8" />
+		<div class="h-6 md:h-8"></div>
 	{/if}
 
 	<div
@@ -75,7 +89,7 @@
 			class="flex items-center justify-center h-6 p-0 bg-transparent border-0 md:h-8 rounded-b-md md:rounded-b-xl touch-manipulation"
 			class:cursor-not-allowed={value <= min}
 			class:hover:bg-slate-200={value !== min}
-			on:click={() => value > min && decrement(color)}
+			onclick={() => value > min && decrement(color)}
 			aria-label="Decrease the counter by one"
 		>
 			<svg aria-hidden="true" viewBox="0 0 1 1" class="w-1/2 h-1/2">
@@ -88,6 +102,6 @@
 			</svg>
 		</button>
 	{:else}
-		<div class="h-6 md:h-8" />
+		<div class="h-6 md:h-8"></div>
 	{/if}
 </div>

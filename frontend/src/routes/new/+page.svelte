@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { timeAgo } from '$lib/timeAgo';
 	import { client, isLoggedIn, user } from '$lib/main';
@@ -37,7 +39,9 @@
 		},
 	});
 
-	$: console.log($room);
+	run(() => {
+		console.log($room);
+	});
 </script>
 
 <svelte:head>

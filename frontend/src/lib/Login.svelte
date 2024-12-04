@@ -3,11 +3,18 @@
 	import { createMutation } from '@tanstack/svelte-query';
 	import Spinner from '$lib/Spinner.svelte';
 
-	export let onSuccess: () => void;
+	interface Props {
+		onSuccess: () => void;
+	}
 
-	$: userName = '';
-	$: password = '';
-	$: register = false;
+	let { onSuccess }: Props = $props();
+
+	let userName = $state('');
+
+	let password = $state('');
+
+	let register = $state(false);
+
 	const pw = 'password';
 
 	const loginMutation = createMutation({
@@ -19,7 +26,13 @@
 	});
 </script>
 
-<form on:submit|preventDefault={() => $loginMutation.mutate()} class="flex flex-col">
+<form
+	onsubmit={(e) => {
+		e.preventDefault();
+		$loginMutation.mutate();
+	}}
+	class="flex flex-col"
+>
 	<label for="userName">User name</label>
 	<input
 		class="p-1 border rounded border-slate-500"
@@ -44,7 +57,7 @@
 	<div class="flex gap-2">
 		<button
 			class="flex-grow p-1 mt-2 border rounded border-slate-500"
-			on:click={() => (register = true)}
+			onclick={() => (register = true)}
 			type="submit"
 		>
 			{#if $loginMutation.isPending && register}
@@ -54,7 +67,7 @@
 		</button>
 		<button
 			class="flex-grow p-1 mt-2 border rounded border-slate-500"
-			on:click={() => (register = false)}
+			onclick={() => (register = false)}
 			type="submit"
 		>
 			{#if $loginMutation.isPending && !register}

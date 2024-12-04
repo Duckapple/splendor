@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { Color, type Card, type Player, type GameState } from '../../../../common/model';
 	import {
 		cardFromId,
@@ -15,29 +17,43 @@
 	import InfoTooltip from '../InfoTooltip.svelte';
 	import Person from '$lib/game/Person.svelte';
 
-	export let closeModal: () => void;
-	export let open: boolean;
-	export let game: GameState | null | undefined;
-	export let cardId: number | undefined;
-	export let player: Player | undefined;
-	export let reserved: boolean;
-	export let target: HTMLElement | undefined;
+	interface Props {
+		closeModal: () => void;
+		open: boolean;
+		game: GameState | null | undefined;
+		cardId: number | undefined;
+		player: Player | undefined;
+		reserved: boolean;
+		target: HTMLElement | undefined;
+		center: HTMLDivElement;
+	}
 
-	export let center: HTMLDivElement;
+	let {
+		closeModal = $bindable(),
+		open = $bindable(),
+		game,
+		cardId,
+		player,
+		reserved,
+		target,
+		center = $bindable(),
+	}: Props = $props();
 
-	$: card = cardId != null ? cardFromId(cardId) : null;
-	$: bonus = player != null ? getBonusFromCards(player.cards) : null;
+	let card = $derived(cardId != null ? cardFromId(cardId) : null);
+	let bonus = $derived(player != null ? getBonusFromCards(player.cards) : null);
 
-	$: maxValues = bonus?.map((b, i) =>
-		i === Color.Y
-			? player?.tokens[i] ?? 0
-			: Math.min(player?.tokens[i] ?? 0, Math.max(0, (card?.cost[i] ?? 0) - b))
+	let maxValues = $derived(
+		bonus?.map((b, i) =>
+			i === Color.Y
+				? (player?.tokens[i] ?? 0)
+				: Math.min(player?.tokens[i] ?? 0, Math.max(0, (card?.cost[i] ?? 0) - b))
+		)
 	);
 
-	let values = [0, 0, 0, 0, 0, 0];
+	let values = $state([0, 0, 0, 0, 0, 0]);
 
-	let isFree = false;
-	let minValues = [0, 0, 0, 0, 0, 0];
+	let isFree = $state(false);
+	let minValues = $state([0, 0, 0, 0, 0, 0]);
 
 	function init() {
 		if (player != null && card != null) {
@@ -55,92 +71,99 @@
 		}
 	}
 
-	$: cardId == null ? ((values = [0, 0, 0, 0, 0, 0]), (isFree = false)) : init();
+	run(() => {
+		cardId == null ? ((values = [0, 0, 0, 0, 0, 0]), (isFree = false)) : init();
+	});
 
-	$: potentialPersons =
+	let potentialPersons = $derived(
 		player && card
 			? getEarnedPeople(game?.shown.persons ?? [], { ...player, cards: [...player.cards, card.id] })
-			: [];
+			: []
+	);
 
-	let selectedPerson: number | null;
+	let selectedPerson: number | null = $state(null);
 
-	$: decrement = (color: Color) => {
+	let decrement = $derived((color: Color) => {
 		values[color] -= 1;
 		if (color !== Color.Y && (maxValues?.[Color.Y] ?? 0) > values[Color.Y]) values[Color.Y] += 1;
-	};
+	});
 
-	$: increment = (color: Color) => {
+	let increment = $derived((color: Color) => {
 		values[color] += 1;
 		if (color !== Color.Y && minValues[Color.Y] < values[Color.Y]) values[Color.Y] -= 1;
-	};
-
-	$: buyMutation = createMutation({
-		mutationKey: ['action', 'BUY_CARD', cardId],
-		async mutationFn() {
-			if (!player || !game || cardId == null) {
-				throw { message: 'Invalid initial state. Retry the action, this time slowly' };
-			}
-			const position =
-				positionFromCardId(game.shown, cardId) ??
-				reservePositionFromCardId(player.reserved, cardId);
-			if (position == null || position[0] === 'persons') {
-				throw { message: 'Card is somehow not in play?' };
-			}
-			const [row, i] = position;
-
-			const personData =
-				potentialPersons.length === 1
-					? potentialPersons[0]
-					: potentialPersons.find((p) => p[0] === selectedPerson);
-			const person =
-				personData != null
-					? { id: personData[0], i: personData[1] as 0 | 1 | 2 | 3 | 4 }
-					: undefined;
-
-			const body = {
-				type: 'BUY_CARD',
-				data: { row, i, card: cardId, tokens: values as any, person },
-			} as const;
-
-			await client.action({ id: game.id }).post(body);
-
-			closeModal();
-		},
 	});
 
-	$: reserveMutation = createMutation({
-		mutationKey: ['action', 'RESERVE', cardId],
-		async mutationFn() {
-			if (!player || !game || cardId == null) {
-				throw { message: 'Invalid initial state. Retry the action, this time slowly' };
-			}
-			const position = positionFromCardId(game.shown, cardId);
-			if (position == null || position[0] === 'persons') {
-				throw { message: 'Card is somehow not in play?' };
-			}
-			const [row, i] = position;
+	let buyMutation = $derived(
+		createMutation({
+			mutationKey: ['action', 'BUY_CARD', cardId],
+			async mutationFn() {
+				if (!player || !game || cardId == null) {
+					throw { message: 'Invalid initial state. Retry the action, this time slowly' };
+				}
+				const position =
+					positionFromCardId(game.shown, cardId) ??
+					reservePositionFromCardId(player.reserved, cardId);
+				if (position == null || position[0] === 'persons') {
+					throw { message: 'Card is somehow not in play?' };
+				}
+				const [row, i] = position;
 
-			const body = {
-				type: 'RESERVE',
-				data: { row, i, card: cardId },
-			} as const;
+				const personData =
+					potentialPersons.length === 1
+						? potentialPersons[0]
+						: potentialPersons.find((p) => p[0] === selectedPerson);
+				const person =
+					personData != null
+						? { id: personData[0], i: personData[1] as 0 | 1 | 2 | 3 | 4 }
+						: undefined;
 
-			await client.action({ id: game.id }).post(body);
+				const body = {
+					type: 'BUY_CARD',
+					data: { row, i, card: cardId, tokens: values as any, person },
+				} as const;
 
-			closeModal();
-		},
-	});
+				await client.action({ id: game.id }).post(body);
 
-	$: reserveAction = {
+				closeModal();
+			},
+		})
+	);
+
+	let reserveMutation = $derived(
+		createMutation({
+			mutationKey: ['action', 'RESERVE', cardId],
+			async mutationFn() {
+				if (!player || !game || cardId == null) {
+					throw { message: 'Invalid initial state. Retry the action, this time slowly' };
+				}
+				const position = positionFromCardId(game.shown, cardId);
+				if (position == null || position[0] === 'persons') {
+					throw { message: 'Card is somehow not in play?' };
+				}
+				const [row, i] = position;
+
+				const body = {
+					type: 'RESERVE',
+					data: { row, i, card: cardId },
+				} as const;
+
+				await client.action({ id: game.id }).post(body);
+
+				closeModal();
+			},
+		})
+	);
+
+	let reserveAction = $derived({
 		colorClass: 'bg-amber-200',
 		text: 'Reserve',
 		handler: $reserveMutation.mutateAsync,
-	};
+	});
 </script>
 
 <Modal
-	bind:closeModal
-	bind:open
+	{closeModal}
+	{open}
 	actions={[
 		...(reserved ? [] : [reserveAction]),
 		{
@@ -154,11 +177,11 @@
 		<span>Buy/reserve card</span>
 		<InfoTooltip
 			size="xl"
-			on:pointerenter={() => {
+			onpointerenter={() => {
 				if (window.matchMedia('(min-width: 768px)').matches) return;
 				target && target.setAttribute('style', target.getAttribute('style') + '; opacity: 0');
 			}}
-			on:pointerleave={() =>
+			onpointerleave={() =>
 				target &&
 				target.setAttribute(
 					'style',
@@ -196,7 +219,7 @@
 		</InfoTooltip>
 	</h1>
 	<div class="w-56 h-56 md:w-[28rem] md:h-[28rem] flex justify-center items-center">
-		<div bind:this={center} class="w-0 h-0" />
+		<div bind:this={center} class="w-0 h-0"></div>
 	</div>
 	{#if isFree}
 		<div>
@@ -211,7 +234,7 @@
 		<div class="flex justify-center gap-2">
 			{#each Object.values(Color).filter(only('number')) as color}
 				<Counter
-					bind:color
+					{color}
 					{increment}
 					max={maxValues?.[color]}
 					value={values[color]}
@@ -231,7 +254,7 @@
 				<div class="rounded-md ring-4 ring-offset-4" class:ring-4={selectedPerson === personId}>
 					<Person
 						card={cardFromId(personId)}
-						on:click={() => (selectedPerson = selectedPerson === personId ? null : personId)}
+						onclick={() => (selectedPerson = selectedPerson === personId ? null : personId)}
 					/>
 				</div>
 			{/each}

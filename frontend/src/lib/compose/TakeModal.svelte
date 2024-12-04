@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { createMutation, QueryClient, useQueryClient } from '@tanstack/svelte-query';
+	import { run } from 'svelte/legacy';
+
+	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import Modal from '../Modal.svelte';
 	import type { Color, GameState, Player } from '../../../../common/model';
 	import { client } from '../main';
@@ -7,30 +9,46 @@
 	import { range } from '../../../../common/utils';
 	import InfoTooltip from '$lib/InfoTooltip.svelte';
 
-	export let closeModal: () => void;
-	export let open: boolean;
-	export let game: GameState | null | undefined;
-	export let player: Player | undefined;
-	export let initialCoinColor: Color | null;
+	interface Props {
+		closeModal: () => void;
+		open: boolean;
+		game: GameState | null | undefined;
+		player: Player | undefined;
+		initialCoinColor: Color | null;
+		center: HTMLDivElement;
+		targetCoin: HTMLElement | undefined;
+	}
 
-	export let center: HTMLDivElement;
-	export let targetCoin: HTMLElement | undefined;
+	let {
+		closeModal,
+		open = $bindable(),
+		game,
+		player,
+		initialCoinColor,
+		center = $bindable(),
+		targetCoin,
+	}: Props = $props();
 
 	const queryClient = useQueryClient();
 
-	$: error = '';
+	let error = $state('');
 
-	$: onClose = () => {
+	const onClose = $derived(() => {
 		targetCoin?.classList.remove('hidden');
 		closeModal();
-	};
+	});
 
-	$: tokens = initialCoinColor == null ? [] : [initialCoinColor];
+	let tokens = $state<Color[]>([]);
+	$effect.pre(() => {
+		tokens = initialCoinColor == null ? [] : [initialCoinColor];
+	});
 
-	$: takenOfEach = range(6).map((color) => tokens.filter((token) => token === color).length);
-	$: leftOverOfEach = game?.tokens.map((count, i) => count - takenOfEach[i]);
+	let takenOfEach = $derived(
+		range(6).map((color) => tokens.filter((token) => token === color).length)
+	);
+	let leftOverOfEach = $derived(game?.tokens.map((count, i) => count - takenOfEach[i]));
 
-	$: tryTake = (color: Color) => {
+	let tryTake = $derived((color: Color) => {
 		error = '';
 		const newTokens = [...tokens, color];
 
@@ -48,36 +66,38 @@
 		}
 
 		tokens = newTokens;
-	};
-
-	$: takeMutation = createMutation({
-		mutationKey: ['action', 'TAKE_TOKENS'],
-		async mutationFn() {
-			if (!player || !game) {
-				throw { message: 'Invalid initial state. Retry the action, this time slowly' };
-			}
-
-			const body = {
-				type: 'TAKE_TOKENS',
-				data: {
-					tokens: tokens as [number] | [number, number] | [number, number, number],
-					returned: undefined,
-				},
-			} as const;
-
-			const res = await client.action({ id: game.id }).post(body);
-			if (res.data) {
-				queryClient.setQueryData(['game', game.id], res);
-			}
-
-			onClose();
-		},
 	});
+
+	let takeMutation = $derived(
+		createMutation({
+			mutationKey: ['action', 'TAKE_TOKENS'],
+			async mutationFn() {
+				if (!player || !game) {
+					throw { message: 'Invalid initial state. Retry the action, this time slowly' };
+				}
+
+				const body = {
+					type: 'TAKE_TOKENS',
+					data: {
+						tokens: tokens as [number] | [number, number] | [number, number, number],
+						returned: undefined,
+					},
+				} as const;
+
+				const res = await client.action({ id: game.id }).post(body);
+				if (res.data) {
+					queryClient.setQueryData(['game', game.id], res);
+				}
+
+				onClose();
+			},
+		})
+	);
 </script>
 
 <Modal
-	bind:closeModal={onClose}
-	bind:open
+	closeModal={onClose}
+	{open}
 	actions={[
 		{
 			colorClass: 'bg-green-200',
@@ -112,7 +132,7 @@
 	<div class="flex flex-col-reverse gap-4 pt-4 pb-2 md:pt-6 md:gap-8">
 		<div class="flex gap-1.5 md:gap-4">
 			{#each leftOverOfEach ?? [] as stackSize, color}
-				<Coin {color} {stackSize} on:click={() => stackSize > 0 && tryTake(color)} />
+				<Coin {color} {stackSize} onclick={() => stackSize > 0 && tryTake(color)} />
 			{/each}
 		</div>
 		<div class="flex gap-1.5 md:gap-4">
@@ -120,7 +140,7 @@
 				<Coin
 					{color}
 					{stackSize}
-					on:click={() => {
+					onclick={() => {
 						error = '';
 						if (tokens.indexOf(color) !== -1) tokens = tokens.toSpliced(tokens.indexOf(color), 1);
 					}}

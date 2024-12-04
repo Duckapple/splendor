@@ -1,38 +1,55 @@
 <script lang="ts">
 	import { type Card } from '../../../../common/model';
 	import { bgColorOf, fadeTextBgColorOf, gradientOf } from '$lib/color';
+	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
 
-	export let stacked = false;
-	export let card: Card;
-	export let hideCost = false;
-	export let small = false;
-	export let rotated = false;
+	interface Props {
+		stacked?: boolean;
+		card: Card;
+		hideCost?: boolean;
+		small?: boolean;
+		rotated?: boolean;
+		onclick?: MouseEventHandler<HTMLButtonElement> | null;
+		onkeypress?: KeyboardEventHandler<HTMLButtonElement> | null;
+	}
 
-	$: filteredLength = card.cost.filter(Boolean).length;
+	let {
+		stacked = false,
+		card,
+		hideCost = false,
+		small = false,
+		rotated = false,
+		onclick,
+		onkeypress,
+	}: Props = $props();
+
+	let filteredLength = $derived(card.cost.filter(Boolean).length);
 	const cols = [
 		' grid-cols-1',
 		' grid-cols-1',
 		' grid-cols-2' + (!small ? ' md:grid-cols-1' : ''),
 		' grid-cols-2',
 	];
-	$: secondPos = (() => {
-		let x = -1;
-		for (let i = 0; i < card.cost.length; i++) {
-			if (card.cost[i]) {
-				if (x !== -1) {
+	let secondPos = $derived(
+		(() => {
+			let x = -1;
+			for (let i = 0; i < card.cost.length; i++) {
+				if (card.cost[i]) {
+					if (x !== -1) {
+						x = i;
+						break;
+					}
 					x = i;
-					break;
 				}
-				x = i;
 			}
-		}
-		return x;
-	})();
-	$: cardStyle = !small ? 'md:w-32 md:h-48 md:text-3xl' : '';
-	$: pointStyle = !small ? 'md:py-0.5 md:px-2 md:text-6xl' : '';
-	$: costStyle = !small ? 'md:text-2xl md:leading-5 md:pl-2 md:pb-2 md:w-20' : '';
+			return x;
+		})()
+	);
+	let cardStyle = $derived(!small ? 'md:w-32 md:h-48 md:text-3xl' : '');
+	let pointStyle = $derived(!small ? 'md:py-0.5 md:px-2 md:text-6xl' : '');
+	let costStyle = $derived(!small ? 'md:text-2xl md:leading-5 md:pl-2 md:pb-2 md:w-20' : '');
 
-	$: fadeText = card.p === 0;
+	let fadeText = $derived(card.p === 0);
 </script>
 
 <button
@@ -47,8 +64,8 @@
 	class:-rotate-90={rotated}
 	disabled={stacked}
 	data-card-id={card.id}
-	on:click
-	on:keypress
+	{onclick}
+	{onkeypress}
 >
 	<div
 		class="px-1 text-3xl rounded-t-lg text-left w-full {pointStyle} {fadeText
@@ -62,7 +79,7 @@
 	>
 		{#each card.cost as co, i}
 			{#if filteredLength === 3 && secondPos === i}
-				<div class:md:hidden={!small} />
+				<div class:md:hidden={!small}></div>
 			{/if}
 			{#if !hideCost && co}
 				<span

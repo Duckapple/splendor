@@ -17,10 +17,10 @@
 	import { moveTo } from '$lib/move';
 	import type { GameAndPlayers } from '../../../../common/communication';
 
-	let cardCenter = { value: undefined as unknown as HTMLDivElement };
-	let coinCenter = { value: undefined as unknown as HTMLDivElement };
-	let target: HTMLElement | undefined = undefined;
-	let reserved = false;
+	let cardCenter = $state({ value: undefined as unknown as HTMLDivElement });
+	let coinCenter = $state({ value: undefined as unknown as HTMLDivElement });
+	let target: HTMLElement | undefined = $state(undefined);
+	let reserved = $state(false);
 
 	const serviceWorker = new BroadcastChannel('service-worker');
 
@@ -95,32 +95,32 @@
 		<div class="space-y-3">
 			<div class="flex justify-center gap-2 md:gap-3">
 				{#each $gameCache?.shown.persons ?? [] as cardId}
-					<Person card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
+					<Person card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 				<div class="h-14 md:h-32"></div>
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$gameCache?.piles.high?.length} tier="high" />
 				{#each $gameCache?.shown.high ?? [] as cardId}
-					<Card card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
+					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$gameCache?.piles.middle?.length} tier="middle" />
 				{#each $gameCache?.shown.middle ?? [] as cardId}
-					<Card card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
+					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$gameCache?.piles.low?.length} tier="low" />
 				{#each $gameCache?.shown.low ?? [] as cardId}
-					<Card card={cardFromId(cardId)} on:click={handleBuyCard} on:keypress={handleBuyCard} />
+					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 		</div>
 		<div class="flex gap-3 py-6 pl-2 md:flex-col md:pt-12 md:pl-4 md:gap-6">
 			{#each $gameCache?.tokens ?? [] as stackSize, color}
-				<Coin {color} {stackSize} on:click={handleCoin} on:keypress={handleCoin} />
+				<Coin {color} {stackSize} onclick={handleCoin} onkeypress={handleCoin} />
 			{/each}
 		</div>
 	</div>
@@ -151,7 +151,7 @@
 		{#if $searchId != null}<Actions gameId={$searchId} />{/if}
 	</div>
 </details>
-<button class="absolute top-4 left-14" on:click={() => $notify.mutate()}>
+<button class="absolute top-4 left-14" onclick={() => $notify.mutate()}>
 	<!-- prettier-ignore -->
 	<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
 		<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />

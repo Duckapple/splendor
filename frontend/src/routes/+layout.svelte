@@ -1,9 +1,14 @@
-<script>
+<script lang="ts">
 	import './styles.css';
 	import '../app.css';
 	import '$lib/main';
 	import { browser } from '$app/environment';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
+
+	let { children }: Props = $props();
 
 	const queryClient = new QueryClient({
 		defaultOptions: {
@@ -16,6 +21,6 @@
 
 <main class="box-border flex flex-col flex-1 w-full min-h-screen mx-auto">
 	<QueryClientProvider client={queryClient}>
-		<slot />
+		{@render children?.()}
 	</QueryClientProvider>
 </main>

@@ -1,8 +1,12 @@
 <script lang="ts">
-	export let tier: 'low' | 'middle' | 'high';
-	export let count = 0;
+	interface Props {
+		tier: 'low' | 'middle' | 'high';
+		count?: number;
+	}
 
-	$: stackSize = Math.min(3, count);
+	let { tier, count = 0 }: Props = $props();
+
+	let stackSize = $derived(Math.min(3, count));
 </script>
 
 <div class="w-14 h-[5.5rem] md:w-32 md:h-48 select-none group">
