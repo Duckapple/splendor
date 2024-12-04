@@ -1,7 +1,16 @@
-import type { NONE, Routes } from '../../../common/communication';
 import { writable, derived, get, type Writable } from 'svelte/store';
+import { treaty } from '@elysiajs/eden';
+import type { App } from '../../../local.ts';
 
-export const BASE_URL = 'https://api-splendor.simon-green.dev';
+export const BASE_URL = import.meta.env.DEV
+	? 'http://localhost:3005'
+	: 'https://api-splendor.simon-green.dev';
+
+export const client = treaty<App>(BASE_URL, {
+	headers() {
+		return { Authorization: `Bearer ${get(jwt)}` };
+	},
+});
 
 const BASE_HEADERS = {
 	Accept: 'application/json',
@@ -51,62 +60,9 @@ export async function loginRegister(input: LoginInput, isRegister = false) {
 		throw error;
 	}
 
-	jwt.set((await data.json()).data.jwt);
+	jwt.set((await data.json()).jwt);
 }
 
 export function logout() {
 	jwt.set(null);
 }
-
-export type AuthInput<
-	Route extends keyof Routes,
-	Method extends keyof Routes[Route],
-	// @ts-expect-error ts(2344) It don't know NONE, but works
-	Params extends keyof Routes[Route][Method] = NONE,
-> = {
-	route: Route;
-	method: Method;
-	params?: Params extends NONE ? undefined : Record<Params | (string & {}), string>;
-	body?: Record<string, unknown>;
-	jwt?: string;
-};
-
-type Result<T> = {
-	message: string;
-	data: T;
-};
-
-export async function authed<
-	Route extends keyof Routes,
-	Method extends keyof Routes[Route],
-	// @ts-expect-error ts(2344) It don't know NONE, but works
-	Params extends keyof Routes[Route][Method] = NONE,
->({
-	route,
-	method,
-	params,
-	body,
-	jwt: jwtInput,
-}: AuthInput<Route, Method, Params>): Promise<Result<Routes[Route][Method][Params]>> {
-	const auth = jwtInput ?? get(jwt);
-	if (auth === null) throw { message: 'Unauthorized', origin: 'local' };
-
-	const endpoint = BASE_URL + route + '?' + new URLSearchParams(params);
-	const data = await fetch(endpoint, {
-		headers: { ...BASE_HEADERS, Authorization: `Bearer ${auth}` },
-		body: body ? JSON.stringify(body) : undefined,
-		// @ts-expect-error ts(2769) It doesn't understand the method is a `string`
-		method,
-	});
-
-	if (data.status !== 200) {
-		const error = await data.json();
-		console.error(error);
-		throw error;
-	}
-
-	return await data.json();
-}
-
-// @ts-expect-error ts(7017) It doesn't know
-globalThis.authed = authed;

@@ -2,15 +2,11 @@ import { and, eq } from 'drizzle-orm';
 import { SplendorGame, SplendorGamePlayer, SplendorRoom as Room, User } from '../db/schema';
 import { db } from './common/db';
 import { FunctionError } from './common/auth';
-import { AuthUser } from '../common/communication';
+import type { AuthUser, GameAndPlayers } from '../common/communication';
 import { newGameState } from '../common/defaults';
 import { mapValues, omit } from '../common/utils';
-import { t } from 'elysia';
-import { Infer } from './common/type';
 
-post.params = { query: t.Object({ id: t.String() }) };
-export async function post(user: AuthUser, req: Infer<typeof post.params>) {
-	const id = req.query.id;
+export async function post(user: AuthUser, id: string) {
 	if (typeof id !== 'string') throw new FunctionError(400, { message: 'Bad room ID' });
 
 	const [room, ...rest] = await db
@@ -31,12 +27,10 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 		db.update(Room).set({ started: true }).where(eq(Room.id, id)),
 	]);
 
-	return { message: 'Game created!', data: game };
+	return game;
 }
 
-get.params = { query: t.Object({ id: t.String() }) };
-export async function get(user: AuthUser, req: Infer<typeof get.params>) {
-	const id = req.query.id;
+export async function get(user: AuthUser, id: string) {
 	if (typeof id !== 'string') throw new FunctionError(400, { message: 'Bad game ID' });
 
 	const result = await db
@@ -52,16 +46,16 @@ export async function get(user: AuthUser, req: Infer<typeof get.params>) {
 	if (!result.some(({ player }) => player?.userId === user.id))
 		throw new FunctionError(403, { message: 'Forbidden' });
 
-	const piles = mapValues(result[0].game.piles, ({ length }) => ({ length }));
+	const piles = mapValues(result[0].game.piles, ({ length }) => ({ length } as number[]));
 
-	const game = {
+	const game: GameAndPlayers = {
 		...result[0].game,
 		piles,
 		players: result.map(({ player, userName }) => ({
-			...omit(player, 'gameId'),
+			...player,
 			userName,
 		})),
 	};
 
-	return { data: game };
+	return game;
 }

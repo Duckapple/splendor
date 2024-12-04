@@ -1,4 +1,4 @@
-import { Static } from 'elysia';
+import type { Static } from 'elysia';
 import { eq } from 'drizzle-orm';
 import { User } from '../db/schema';
 import { db } from './common/db';
@@ -19,5 +19,5 @@ export async function post(
 
 	const newJwt = await sign({ id: user.id, userName: user.userName });
 
-	return { data: { jwt: newJwt }, message: 'Logged in!', status: 'success' };
+	return { jwt: newJwt };
 }

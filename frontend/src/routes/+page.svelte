@@ -1,5 +1,5 @@
-<script>
-	import { authed, isLoggedIn, loginRegister, logout, user } from '$lib/main';
+<script lang="ts">
+	import { client, isLoggedIn, logout, user } from '$lib/main';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import { timeAgo } from '$lib/timeAgo';
 	import Spinner from '$lib/Spinner.svelte';
@@ -7,23 +7,20 @@
 	import Login from '$lib/Login.svelte';
 	import Button from '$lib/base/Button.svelte';
 
+	function tap<T>(t: T) {
+		console.log(t);
+		return t;
+	}
+
 	const rooms = createQuery({
 		queryKey: ['rooms'],
-		queryFn: () => {
-			return authed({
-				method: 'GET',
-				route: '/room',
-			});
-		},
+		queryFn: () => client.room.index.get(),
 	});
 
 	const createRoom = createMutation({
 		mutationKey: ['rooms'],
 		mutationFn: async () => {
-			const data = await authed({
-				method: 'POST',
-				route: '/room',
-			});
+			const data = await client.room.index.post();
 			if (!data.data?.id) throw { message: 'Failed to create room' };
 
 			window.location.href = `/new?id=${data.data.id}`;
@@ -48,7 +45,7 @@
 		{/if}
 		{#if $isLoggedIn && $rooms.isSuccess}
 			<div class="flex flex-col gap-4 pb-2 text-lg md:">
-				{#each $rooms.data.data as room}
+				{#each $rooms.data?.data ?? [] as room}
 					<a
 						class="relative block p-2 border rounded border-slate-500"
 						href={`/${room.started ? 'game' : 'new'}?id=${room.id}`}

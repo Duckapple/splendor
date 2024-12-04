@@ -2,10 +2,10 @@ import webPush from 'web-push';
 import { t } from 'elysia';
 import { Check, Convert, Value } from '@sinclair/typebox/value';
 
-import { AuthUser } from '../common/communication';
+import type { AuthUser } from '../common/communication';
 import { db } from './common/db';
 import { Push } from '../db/schema';
-import { Infer } from './common/type';
+import type { Infer } from './common/type';
 
 const validSub = t.Object({
 	endpoint: t.String(),
@@ -47,5 +47,5 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 		JSON.stringify({ nonce, message: 'This is a test!' })
 	);
 
-	return { message: 'Subscribed successfully!', data: { nonce } };
+	return { nonce };
 }

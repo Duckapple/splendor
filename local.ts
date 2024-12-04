@@ -1,9 +1,9 @@
 import { Elysia } from 'elysia';
 import cors from '@elysiajs/cors';
 
-import { Auth, FunctionError, loginSchema } from './function-src/common/auth';
+import { Auth, loginSchema } from './function-src/common/auth';
 
-import * as roomRoutes from './function-src/room';
+import { room } from './function-src/room';
 import * as gameRoutes from './function-src/game';
 import * as actionRoutes from './function-src/action';
 import * as loginRoutes from './function-src/log-in';
@@ -17,44 +17,36 @@ if (!PORT) {
 	throw new Error();
 }
 
-export const App = new Elysia()
+export const app = new Elysia()
 	.use(cors())
 	.use(Auth)
-	.error({ FunctionError })
-	.onError(({ code, error, route }) => {
-		switch (code) {
-			case 'FunctionError':
-				console.warn(new Date(), '[warn] ', route, error.status);
-				return new Response(JSON.stringify(error.json), { status: error.status });
-		}
-	})
 	.get('/ping', 'Pong!')
 	.onAfterResponse(({ route }) => {
 		console.debug(new Date(), '[debug]', route);
 	})
 	.post('/register', ({ jwt, body }) => registerRoutes.post(body, jwt.sign), { body: loginSchema })
 	.post('/log-in', async ({ jwt, body }) => loginRoutes.post(body, jwt.sign), { body: loginSchema })
-	.group('/room', { auth: true }, (app) =>
+	.guard({ auth: true })
+	.use(room)
+	.group('/game', (app) =>
 		app
-			.post('/', ({ user }) => roomRoutes.post(user))
-			.get('/', ({ user, query }) => roomRoutes.get(user, query), roomRoutes.get.params)
-			.put('/', ({ user, query }) => roomRoutes.put(user, query), roomRoutes.put.params)
+			.get('/:id', ({ user, params: { id } }) => gameRoutes.get(user, id))
+			.post('/:id', ({ user, params: { id } }) => gameRoutes.post(user, id))
 	)
-	.group('/game', { auth: true }, (app) =>
+	.group('/action', (app) =>
 		app
-			.get('/', ({ user, query }) => gameRoutes.get(user, { query }), gameRoutes.get.params)
-			.post('/', ({ user, query }) => gameRoutes.post(user, { query }), gameRoutes.post.params)
-	)
-	.group('/action', { auth: true }, (app) =>
-		app
-			.get('/', ({ user, query }) => actionRoutes.get(user, { query }), actionRoutes.get.params)
+			.get(
+				'/:id',
+				({ user, params, query }) => actionRoutes.get(user, { params, query }),
+				actionRoutes.get.params
+			)
 			.post(
-				'/',
-				({ user, query, body }) => actionRoutes.post(user, { query, body }),
+				'/:id',
+				({ user, params, body }) => actionRoutes.post(user, { params, body }),
 				actionRoutes.post.params
 			)
 	)
-	.group('/notifications', { auth: true }, (app) =>
+	.group('/notifications', (app) =>
 		app.post(
 			'/',
 			({ user, body }) => notificationsRoutes.post(user, { body }),
@@ -64,3 +56,5 @@ export const App = new Elysia()
 	.listen(PORT);
 
 console.info(new Date(), '[info] ', 'Server is listening on port', PORT);
+
+export type App = typeof app;

@@ -1,20 +1,22 @@
 <script lang="ts">
-	import { createMutation } from '@tanstack/svelte-query';
+	import { createMutation, QueryClient, useQueryClient } from '@tanstack/svelte-query';
 	import Modal from '../Modal.svelte';
 	import type { Color, GameState, Player } from '../../../../common/model';
-	import { authed } from '../main';
+	import { client } from '../main';
 	import Coin from '../game/Coin.svelte';
 	import { range } from '../../../../common/utils';
 	import InfoTooltip from '$lib/InfoTooltip.svelte';
 
 	export let closeModal: () => void;
 	export let open: boolean;
-	export let game: GameState | undefined;
+	export let game: GameState | null | undefined;
 	export let player: Player | undefined;
 	export let initialCoinColor: Color | null;
 
 	export let center: HTMLDivElement;
 	export let targetCoin: HTMLElement | undefined;
+
+	const queryClient = useQueryClient();
 
 	$: error = '';
 
@@ -57,15 +59,16 @@
 
 			const body = {
 				type: 'TAKE_TOKENS',
-				data: { tokens: tokens, returned: undefined },
-			};
+				data: {
+					tokens: tokens as [number] | [number, number] | [number, number, number],
+					returned: undefined,
+				},
+			} as const;
 
-			const res = await authed({
-				method: 'POST',
-				route: '/action',
-				params: { gameId: game.id },
-				body,
-			});
+			const res = await client.action({ id: game.id }).post(body);
+			if (res.data) {
+				queryClient.setQueryData(['game', game.id], res);
+			}
 
 			onClose();
 		},

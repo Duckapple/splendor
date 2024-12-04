@@ -3,4 +3,4 @@ import { drizzle } from 'drizzle-orm/neon-http';
 
 const connection = neon(process.env.DATABASE_URL!);
 
-export const db = drizzle(connection);
+export const db = drizzle(connection, { logger: { logQuery: console.log } });

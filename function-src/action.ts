@@ -1,4 +1,4 @@
-import { AuthUser } from '../common/communication';
+import type { AuthUser } from '../common/communication';
 import { FunctionError } from './common/auth';
 import { and, eq, gt } from 'drizzle-orm';
 import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
@@ -6,18 +6,19 @@ import { db } from './common/db';
 import { actionSchema } from '../common/actions';
 import { performAction } from '../common/logic';
 import { omit } from '../common/utils';
-import { GamePhase } from '../common/model';
+import { GamePhase, type Action, type GameState, type Player } from '../common/model';
 import { t } from 'elysia';
-import { Infer } from './common/type';
+import type { Infer } from './common/type';
 
-const getInput = t.Object({
-	gameId: t.String(),
-	since: t.Optional(t.Date()),
-});
-
-get.params = { query: getInput };
+get.params = {
+	params: t.Object({ id: t.String() }),
+	query: t.Object({
+		since: t.Optional(t.Date()),
+	}),
+};
 export async function get(user: AuthUser, req: Infer<typeof get.params>) {
-	const { gameId, since } = req.query;
+	const { since } = req.query;
+	const { id: gameId } = req.params;
 
 	const [game] = await db
 		.select({ id: SplendorGame.id })
@@ -40,15 +41,15 @@ export async function get(user: AuthUser, req: Infer<typeof get.params>) {
 		.where(and(...conditions))
 		.orderBy(SplendorAction.timestamp);
 
-	return { message: 'Got actions', data: actions };
+	return actions as Action[];
 }
 
 post.params = {
-	query: t.Object({ gameId: t.String() }),
 	body: actionSchema,
+	params: t.Object({ id: t.String() }),
 };
 export async function post(user: AuthUser, req: Infer<typeof post.params>) {
-	const { gameId } = req.query;
+	const { id: gameId } = req.params;
 	const action = req.body;
 
 	const [dbRes] = await db
@@ -88,10 +89,10 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 	]);
 
 	const data = {
-		game: omit({ ...dbRes.game, ...res.value.game }, 'piles'),
-		player: { ...dbRes.player, ...res.value.player },
-		action: dbAction,
+		game: omit({ ...dbRes.game, ...res.value.game } as GameState, 'piles'),
+		player: { ...dbRes.player, ...res.value.player } as Player,
+		action: dbAction as Action,
 	};
 
-	return { message: 'Action performed', data };
+	return data;
 }

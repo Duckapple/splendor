@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { timeAgo } from '$lib/timeAgo';
-	import Spinner from '$lib/Spinner.svelte';
-	import { authed, isLoggedIn, user } from '$lib/main';
+	import { client, isLoggedIn, user } from '$lib/main';
 	import { readable } from 'svelte/store';
 	import Background from '$lib/compose/Background.svelte';
 	import { cardFromId } from '../../../../common/defaults';
@@ -13,27 +12,17 @@
 
 	const room = createQuery({
 		queryKey: ['room', $searchId],
-		queryFn: () => {
+		queryFn: async () => {
 			if ($searchId == null) throw { message: 'ID undefined' };
-			return authed({
-				method: 'GET',
-				route: '/room',
-				params: { id: $searchId },
-			});
-		},
-		retry(failureCount, error) {
-			return !('data' in error && error.data === 'NOT_IN_ROOM' && failureCount < 2);
+			const res = await client.room({ id: $searchId }).get();
+			return res;
 		},
 	});
 
 	const joinRoom = createMutation({
 		mutationFn: async () => {
 			if ($searchId == null) throw { message: 'ID undefined' };
-			const result = await authed({
-				method: 'PUT',
-				route: '/room',
-				params: { id: $searchId },
-			});
+			const result = await client.room({ id: $searchId }).put();
 			useQueryClient().setQueryData(['room', $searchId], result);
 			return result;
 		},
@@ -42,15 +31,13 @@
 	const startGame = createMutation({
 		mutationFn: async () => {
 			if ($searchId == null) throw { message: 'ID undefined' };
-			const result = await authed({
-				method: 'POST',
-				route: '/game',
-				params: { id: $searchId },
-			});
-			window.location.href = `/game?id=${result.data.id}`;
+			const result = await client.game({ id: $searchId }).post();
+			window.location.href = `/game?id=${result.data?.id}`;
 			return result;
 		},
 	});
+
+	$: console.log($room);
 </script>
 
 <svelte:head>
@@ -65,17 +52,17 @@
 		{#if !$isLoggedIn}
 			<Login onSuccess={() => {}} />
 		{/if}
-		{#if $room.isError}
-			{#if 'data' in $room.error && $room.error.data === 'NOT_IN_ROOM'}
+		{#if $room.data?.error}
+			{@const err = $room.data.error.value}
+			{#if 'data' in err && err.data === 'NOT_IN_ROOM'}
 				<span class="text-2xl mb-2">You are not in this room!</span>
 				<Button loading={$joinRoom.isPending} onClick={() => $joinRoom.mutate()}>
 					Join the room
 				</Button>
-			{:else if $room.error?.message !== 'Unauthorized'}
-				<span class="text-red-500">{$room.error.message}</span>
+			{:else}
+				<span class="text-red-500">{err?.message}</span>
 			{/if}
-		{/if}
-		{#if $room.isSuccess && $room.data.data != null}
+		{:else if $room.isSuccess && $room.data.data != null}
 			{@const data = $room.data.data}
 			{@const ownerName = data.players.find(({ userId }) => data?.ownerId === userId)?.userName}
 			<div class="max-w-md p-2">
@@ -102,7 +89,7 @@
 			</div>
 		{:else if $room.isSuccess}
 			Game doesn't exist
-			<Button onClick={window.history.back} class="mt-2">Go back</Button>
+			<Button onClick={() => history.back()} class="mt-2">Go back</Button>
 		{/if}
 	</div>
 </div>

@@ -1,5 +1,5 @@
 // prettier-ignore
-export const enum Color { W, U, G, R, B, Y }
+export enum Color { W, U, G, R, B, Y }
 
 export interface Card {
 	id: number;

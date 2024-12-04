@@ -8,11 +8,8 @@
 		"preview": "bun run frontend build && bun run frontend preview"
 	},
 	"devDependencies": {
-		"@google-cloud/functions-framework": "^3.4.0",
-		"@types/bcrypt": "^5.0.2",
-		"@types/jsonwebtoken": "^9.0.5",
 		"@types/web-push": "^3.6.2",
-		"bun-types": "^1.0.26",
+		"bun-types": "1.1.38",
 		"drizzle-kit": "^0.21.2",
 		"web-push": "^3.6.6"
 	},
@@ -20,7 +17,7 @@
 	"module": "index.js",
 	"type": "module",
 	"peerDependencies": {
-		"typescript": "^5.0.0"
+		"typescript": "5.7.2"
 	},
 	"dependencies": {
 		"@elysiajs/cors": "1.1.1",

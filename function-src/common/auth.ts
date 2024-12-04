@@ -1,5 +1,5 @@
 import jwt from '@elysiajs/jwt';
-import Elysia, { Static, t } from 'elysia';
+import Elysia, { type Static, t } from 'elysia';
 
 export const authSchema = t.Object({ id: t.String(), userName: t.String() });
 

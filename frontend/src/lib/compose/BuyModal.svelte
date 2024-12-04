@@ -10,14 +10,14 @@
 
 	import Counter from '../../routes/Counter.svelte';
 	import Modal from '../Modal.svelte';
-	import { authed } from '../main';
+	import { client } from '../main';
 	import { createMutation } from '@tanstack/svelte-query';
 	import InfoTooltip from '../InfoTooltip.svelte';
 	import Person from '$lib/game/Person.svelte';
 
 	export let closeModal: () => void;
 	export let open: boolean;
-	export let game: GameState | undefined;
+	export let game: GameState | null | undefined;
 	export let cardId: number | undefined;
 	export let player: Player | undefined;
 	export let reserved: boolean;
@@ -48,7 +48,9 @@
 				isFree = true;
 				return;
 			}
-			values = [...(res.error as { cost: Card['cost'] }).cost, 0].map((i) => Math.max(0, i));
+			values = [...(res.error as { cost: Card['cost'] }).cost, 0].map((i) =>
+				Math.max(0, i)
+			) as typeof values;
 			minValues = values.map((i) => Math.max(0, i - p.tokens[Color.Y]));
 		}
 	}
@@ -90,19 +92,17 @@
 				potentialPersons.length === 1
 					? potentialPersons[0]
 					: potentialPersons.find((p) => p[0] === selectedPerson);
-			const person = personData != null ? { id: personData[0], i: personData[1] } : undefined;
+			const person =
+				personData != null
+					? { id: personData[0], i: personData[1] as 0 | 1 | 2 | 3 | 4 }
+					: undefined;
 
 			const body = {
 				type: 'BUY_CARD',
-				data: { row, i, card: cardId, tokens: values, person },
-			};
+				data: { row, i, card: cardId, tokens: values as any, person },
+			} as const;
 
-			await authed({
-				method: 'POST',
-				route: '/action',
-				params: { gameId: game.id },
-				body,
-			});
+			await client.action({ id: game.id }).post(body);
 
 			closeModal();
 		},
@@ -114,9 +114,7 @@
 			if (!player || !game || cardId == null) {
 				throw { message: 'Invalid initial state. Retry the action, this time slowly' };
 			}
-			const position =
-				positionFromCardId(game.shown, cardId) ??
-				reservePositionFromCardId(player.reserved, cardId);
+			const position = positionFromCardId(game.shown, cardId);
 			if (position == null || position[0] === 'persons') {
 				throw { message: 'Card is somehow not in play?' };
 			}
@@ -125,14 +123,9 @@
 			const body = {
 				type: 'RESERVE',
 				data: { row, i, card: cardId },
-			};
+			} as const;
 
-			await authed({
-				method: 'POST',
-				route: '/action',
-				params: { gameId: game.id },
-				body,
-			});
+			await client.action({ id: game.id }).post(body);
 
 			closeModal();
 		},

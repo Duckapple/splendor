@@ -15,5 +15,5 @@ export async function post(
 		sign({ id, userName }),
 	]);
 
-	return { data: { jwt }, message: 'Registered successfully!' };
+	return { jwt };
 }

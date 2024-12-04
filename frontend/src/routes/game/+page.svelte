@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authed, cachedWritable, jwt, user, userNames } from '$lib/main';
+	import { cachedWritable, client, jwt, user, userNames } from '$lib/main';
 	import { readable } from 'svelte/store';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
@@ -58,19 +58,15 @@
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
 
-	const gameCache = cachedWritable<GameAndPlayers>(`game-${$searchId}`);
+	let gameCache = cachedWritable<GameAndPlayers>(`game-${$searchId}`);
 
 	const game = createQuery({
 		queryKey: ['game', $searchId],
 		async queryFn() {
 			if ($searchId == null) throw { message: 'ID undefined' };
 			const params = { id: $searchId };
-			const result = await authed({
-				route: '/game',
-				method: 'GET',
-				params,
-			});
-			for (const { userName, userId } of result.data.players) {
+			const result = await client.game(params).get();
+			for (const { userName, userId } of result.data?.players ?? []) {
 				$userNames[userId] = userName;
 			}
 			gameCache.update(() => result.data);

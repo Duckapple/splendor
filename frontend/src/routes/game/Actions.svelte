@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authed, cachedWritable, userNames } from '$lib/main';
+	import { cachedWritable, client, userNames } from '$lib/main';
 	import { createQuery } from '@tanstack/svelte-query';
 	import type { Action } from '../../../../common/model';
 	import Coin from '$lib/game/Coin.svelte';
@@ -23,13 +23,10 @@
 		queryKey: ['actions', gameId],
 		async queryFn() {
 			const last = $actionsCache.at(-1);
-			const params: Record<string, string> = { gameId: gameId };
+			const params: Record<string, string> = {};
 			if (last != null) params['since'] = last.timestamp as unknown as string;
-			const data = await authed({
-				route: '/action',
-				method: 'GET',
-				params,
-			});
+			const data = await client.action({ id: gameId }).get({ query: params });
+			if (data.error) throw data.error;
 			actionsCache.update((cache) => cache.concat(data.data));
 			return $actionsCache;
 		},
