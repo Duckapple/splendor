@@ -5,7 +5,7 @@
 // @ts-check
 
 import { build, files, version } from '$service-worker';
-import { authed } from './lib/main';
+import { client } from './lib/main';
 
 const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
 
@@ -101,20 +101,14 @@ const publicKey = urlB64ToUint8Array(
 );
 
 const channel = new BroadcastChannel('service-worker');
-channel.addEventListener('message', async (event) => {
-	const data = JSON.parse(event.data);
+channel.addEventListener('message', async () => {
 	try {
 		const options = {
 			applicationServerKey: publicKey,
 			userVisibleOnly: true,
 		};
 		const subscription = /** @type {*} */ (await sw.registration.pushManager.subscribe(options));
-		const response = await authed({
-			route: '/notifications',
-			method: 'POST',
-			body: /** @type {Record<string, unknown>} */ (subscription),
-			jwt: data.jwt,
-		});
+		const response = await client.notifications.index.post(subscription);
 		console.log(response);
 	} catch (err) {
 		console.log('Error', err);
