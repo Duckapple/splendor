@@ -12,7 +12,6 @@
 	}
 
 	let { gameId }: Props = $props();
-	let center: HTMLDivElement = $state();
 	let target: HTMLElement | undefined = $state();
 	function setCurrent(newVal: HTMLElement | undefined) {
 		if (target) {
@@ -23,7 +22,7 @@
 
 	const actionsCache = cachedWritable<Action[]>(`actions-${gameId}`, []);
 
-	createQuery({
+	const query = createQuery({
 		queryKey: ['actions', gameId],
 		async queryFn() {
 			const last = $actionsCache.at(-1);
@@ -37,7 +36,14 @@
 		initialData: $actionsCache,
 	});
 
+	$effect(() => {
+		if (orderedActions.length === 0) {
+			$query.refetch();
+		}
+	});
+
 	let orderedActions = $derived([...($actionsCache ?? [])].reverse());
+	$inspect(orderedActions);
 
 	let cardClick = $derived((card: EventTarget | null) => {
 		if (!(card instanceof HTMLElement)) return;
@@ -50,51 +56,52 @@
 	});
 </script>
 
-<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-	<div class="w-0 h-0" bind:this={center}></div>
-</div>
-<div class="p-2 overflow-y-auto text-sm max-h-[calc(100svh-5rem)] divide-y">
-	{#each orderedActions as action}
-		<div class="grid items-center grid-cols-3 gap-x-2 min-h-16">
-			{#if action.type === 'TAKE_TOKENS'}
-				<span>{$userNames[action.userId]}</span>
-				<span class="justify-self-end">took</span>
-				<div class="flex gap-2 scale-50 justify-self-center">
-					{#each action.data.tokens as color}
-						<Coin {color} small hideNumber />
-					{/each}
-				</div>
-				{#if action.data.returned}
-					<span>returning</span>
-					<span></span>
+<div class="absolute top-0 left-0 flex items-center justify-center z-10">
+	<div
+		class="bg-white p-2 overflow-y-auto text-sm min-w-72 max-h-[calc(100svh-5rem)] divide-y grid grid-cols-3"
+	>
+		{#each orderedActions as action}
+			<div class="grid items-center col-span-3 grid-cols-subgrid gap-x-2 min-h-16">
+				{#if action.type === 'TAKE_TOKENS'}
+					<span>{$userNames[action.userId]}</span>
+					<span class="justify-self-end">took</span>
 					<div class="flex gap-2 scale-50 justify-self-center">
-						{#each action.data.returned as color}
+						{#each action.data.tokens as color}
 							<Coin {color} small hideNumber />
 						{/each}
 					</div>
+					{#if action.data.returned}
+						<span>returning</span>
+						<span></span>
+						<div class="flex gap-2 scale-50 justify-self-center">
+							{#each action.data.returned as color}
+								<Coin {color} small hideNumber />
+							{/each}
+						</div>
+					{/if}
+				{:else if action.type === 'BUY_CARD'}
+					<span>{$userNames[action.userId]}</span>
+					<span class="justify-self-end">bought</span>
+					<div class="scale-75 justify-self-center">
+						<Card
+							card={cardFromId(action.data.card)}
+							small
+							onclick={(e) => cardClick(e.currentTarget)}
+						/>
+					</div>
+				{:else}
+					<span>{$userNames[action.userId]}</span>
+					<span class="justify-self-end">reserved</span>
+					<div class="scale-75 justify-self-center">
+						<Card
+							card={cardFromId(action.data.card)}
+							rotated
+							small
+							onclick={(e) => cardClick(e.currentTarget)}
+						/>
+					</div>
 				{/if}
-			{:else if action.type === 'BUY_CARD'}
-				<span>{$userNames[action.userId]}</span>
-				<span class="justify-self-end">bought</span>
-				<div class="scale-75 justify-self-center">
-					<Card
-						card={cardFromId(action.data.card)}
-						small
-						on:click={(e) => cardClick(e.currentTarget)}
-					/>
-				</div>
-			{:else}
-				<span>{$userNames[action.userId]}</span>
-				<span class="justify-self-end">reserved</span>
-				<div class="scale-75 justify-self-center">
-					<Card
-						card={cardFromId(action.data.card)}
-						rotated
-						small
-						on:click={(e) => cardClick(e.currentTarget)}
-					/>
-				</div>
-			{/if}
-		</div>
-	{/each}
+			</div>
+		{/each}
+	</div>
 </div>

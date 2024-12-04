@@ -9,6 +9,8 @@ const x = await Bun.build({
 	target: 'bun',
 });
 
+await $`bun frontend build`;
+
 console.log('Build complete, transferring files...');
 
 await $`scp ./.env pi@pi.local:~/splendor/.env`;
