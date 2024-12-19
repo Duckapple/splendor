@@ -1,4 +1,5 @@
 import type { Color } from '../../../common/model';
+import type { iconSvgs } from './base/icons';
 
 export const bgColorOf = [
 	'bg-slate-100 text-slate-700',
@@ -44,3 +45,11 @@ export const ringColorOf = [
 	'ring-slate-600 outline-slate-600',
 	'ring-yellow-200 outline-yellow-200',
 ] satisfies Record<Color, string>;
+
+export const iconOf = [
+	'gem-diamond',
+	'gem-rhombus',
+	'gem-hexagon',
+	'gem-heart',
+	'gem-triangle',
+] satisfies (keyof typeof iconSvgs)[];

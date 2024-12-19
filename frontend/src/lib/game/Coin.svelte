@@ -2,9 +2,10 @@
 	import { createBubbler } from 'svelte/legacy';
 
 	const bubble = createBubbler();
-	import { bgColorOf, ringColorOf } from '$lib/color';
+	import { bgColorOf, iconOf, ringColorOf } from '$lib/color';
 	import type { Color } from '../../../../common/model';
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
+	import Icon from '$lib/base/Icon.svelte';
 
 	interface Props {
 		color: Color;
@@ -35,13 +36,20 @@
 	class="{!small && boxMd} flex flex-col w-10 h-10 transition-[transform,opacity] group"
 >
 	{#each Array(stackSize) as _, i}
+		{@const top = !hideNumber && i + 1 === stackSize}
 		<div
 			class="{!small &&
-				coinMd} h-10 w-10 select-none transition-transform flex justify-center items-center last:mb-0 -mb-11 last:group-hover:-translate-y-2 rounded-full aspect-square ring-2 {bgColorOf[
+				coinMd} relative h-10 w-10 select-none transition-transform flex justify-center items-center last:mb-0 -mb-11 last:group-hover:-translate-y-2 rounded-full aspect-square ring-2 {bgColorOf[
 				color
 			]} {ringColorOf[color]} z-[{i}]"
 		>
-			{!hideNumber && i + 1 === stackSize ? stackSize : ''}
+			{#if top && iconOf[color]}
+				<Icon
+					icon={iconOf[color]}
+					class="absolute {small ? 'inset-1' : 'inset-1 md:inset-2'} opacity-35 {bgColorOf[color]}"
+				/>
+			{/if}
+			{top ? stackSize : ''}
 		</div>
 	{/each}
 </button>

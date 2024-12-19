@@ -94,26 +94,26 @@
 	<div class="flex flex-col md:flex-row">
 		<div class="space-y-3">
 			<div class="flex justify-center gap-2 md:gap-3">
-				{#each $gameCache?.shown.persons ?? [] as cardId}
+				{#each $gameCache?.shown?.persons ?? [] as cardId}
 					<Person card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 				<div class="h-14 md:h-32"></div>
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$gameCache?.piles.high?.length} tier="high" />
-				{#each $gameCache?.shown.high ?? [] as cardId}
+				{#each $gameCache?.shown?.high ?? [] as cardId}
 					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$gameCache?.piles.middle?.length} tier="middle" />
-				{#each $gameCache?.shown.middle ?? [] as cardId}
+				{#each $gameCache?.shown?.middle ?? [] as cardId}
 					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
 				<CardStack count={$gameCache?.piles.low?.length} tier="low" />
-				{#each $gameCache?.shown.low ?? [] as cardId}
+				{#each $gameCache?.shown?.low ?? [] as cardId}
 					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>

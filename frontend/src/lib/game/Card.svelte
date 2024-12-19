@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { type Card } from '../../../../common/model';
-	import { bgColorOf, fadeTextBgColorOf, gradientOf } from '$lib/color';
+	import { bgColorOf, fadeTextBgColorOf, gradientOf, iconOf } from '$lib/color';
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
+	import Icon from '$lib/base/Icon.svelte';
 
 	interface Props {
 		stacked?: boolean;
@@ -68,11 +69,15 @@
 	{onkeypress}
 >
 	<div
-		class="px-1 text-3xl rounded-t-lg text-left w-full {pointStyle} {fadeText
+		class="px-1 text-3xl rounded-t-lg text-left w-full flex items-center justify-between {pointStyle} {fadeText
 			? fadeTextBgColorOf[card.c]
 			: bgColorOf[card.c]}"
 	>
 		<span>{card.p}</span>
+		<Icon
+			icon={iconOf[card.c]}
+			class="{bgColorOf[card.c]} {small ? 'size-6' : 'size-6 md:size-10'} rotate-12"
+		/>
 	</div>
 	<div
 		class="text-sm pl-1 pb-1 grid w-12 gap-1 leading-none {costStyle} {cols[filteredLength - 1]}"
