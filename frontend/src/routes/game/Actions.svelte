@@ -36,11 +36,11 @@
 		initialData: $actionsCache,
 	});
 
-	$effect(() => {
-		if (orderedActions.length === 0) {
-			$query.refetch();
-		}
-	});
+	// $effect(() => {
+	// 	if (orderedActions.length === 0) {
+	// 		$query.refetch();
+	// 	}
+	// });
 
 	let orderedActions = $derived([...($actionsCache ?? [])].reverse());
 	$inspect(orderedActions);

@@ -8,17 +8,11 @@
 		children?: import('svelte').Snippet;
 	}
 
-	let {
-		loading = false,
-		onClick,
-		class: className = '',
-		children
-	}: Props = $props();
-	
+	let { loading = false, onClick, class: className = '', children }: Props = $props();
 </script>
 
 <button
-	class="p-1 border border-slate-500 rounded md:px-2 md:text-lg {className}"
+	class="p-1 border border-slate-300 shadow-sm rounded transition-all md:px-2 hover:scale-105 hover:text-slate-600 {className}"
 	onclick={onClick}
 >
 	{#if loading}

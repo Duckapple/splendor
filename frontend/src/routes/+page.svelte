@@ -7,11 +7,6 @@
 	import Login from '$lib/Login.svelte';
 	import Button from '$lib/base/Button.svelte';
 
-	function tap<T>(t: T) {
-		console.log(t);
-		return t;
-	}
-
 	const rooms = createQuery({
 		queryKey: ['rooms'],
 		queryFn: () => client.room.index.get(),
@@ -36,7 +31,7 @@
 <Background />
 
 <section class="z-50 flex flex-col justify-center items-center flex-[0.6]">
-	<div class="p-2 m-2 rounded-md shadow md:p-4 bg-slate-50">
+	<div class="p-2 m-2 rounded-md shadow-md md:p-4 lg:px-8 lg:py-6 bg-slate-50">
 		<h1 class="pb-6 text-7xl md:text-8xl">Splendor</h1>
 		{#if $isLoggedIn && $rooms.isLoading}
 			<div class="p-8 flex justify-center">
@@ -44,17 +39,20 @@
 			</div>
 		{/if}
 		{#if $isLoggedIn && $rooms.isSuccess}
-			<div class="flex flex-col gap-4 pb-2 text-lg md:">
+			<div class="flex flex-col gap-4 pb-2">
 				{#each $rooms.data?.data ?? [] as room}
 					<a
-						class="relative block p-2 border rounded border-slate-500"
+						class="relative block p-2 rounded text-slate-600 hover:no-underline border border-slate-300 shadow hover:scale-105 transition-transform"
 						href={`/${room.started ? 'game' : 'new'}?id=${room.id}`}
 					>
 						{#if room.started}
-							<span class="absolute right-2 bottom-2">started</span>
+							<span class="absolute right-2 bottom-2 text-sm">in progress</span>
 						{/if}
 						<p title="Updated {timeAgo(room.updatedAt)} ({room.updatedAt.toString()})">
-							Created by {room.players.find(({ userId }) => room.ownerId === userId)?.userName}
+							Created by
+							<span class="text-slate-900"
+								>{room.players.find(({ userId }) => room.ownerId === userId)?.userName}</span
+							>
 							{timeAgo(room.createdAt)}
 						</p>
 						Players:
@@ -74,7 +72,7 @@
 		{#if !$isLoggedIn}
 			<Login onSuccess={() => void $rooms.refetch()} />
 		{:else}
-			<div class="flex justify-stretch gap-2 mt-2">
+			<div class="flex justify-stretch gap-4 mt-2">
 				<Button onClick={() => $createRoom.mutate()} loading={$createRoom.isPending}>
 					Create new room
 				</Button>

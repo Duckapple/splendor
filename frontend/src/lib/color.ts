@@ -1,7 +1,7 @@
 import type { Color } from '../../../common/model';
 
 export const bgColorOf = [
-	'bg-gray-100 text-gray-700',
+	'bg-slate-100 text-slate-700',
 	'bg-blue-700 text-white',
 	'bg-green-700 text-white',
 	'bg-rose-700 text-white',
@@ -9,9 +9,14 @@ export const bgColorOf = [
 	'bg-yellow-500 text-white',
 ] satisfies Record<Color, string>;
 
-export const fadeTextBgColorOf = bgColorOf.map((c) =>
-	c.replace('text-white', 'text-slate-400').replace('text-gray-700', 'text-gray-500')
-);
+export const fadeTextBgColorOf = [
+	'bg-slate-100 text-slate-300',
+	'bg-blue-700 text-blue-500',
+	'bg-green-700 text-green-500',
+	'bg-rose-700 text-rose-500',
+	'bg-slate-900 text-slate-500',
+	'bg-yellow-500 text-yellow-400',
+] satisfies Record<Color, string>;
 
 export const textColorOf = [
 	'text-slate-500',
@@ -32,7 +37,7 @@ export const gradientOf = [
 ] satisfies Record<Color, string>;
 
 export const ringColorOf = [
-	'ring-gray-300 outline-gray-300',
+	'ring-slate-300 outline-slate-300',
 	'ring-blue-400 outline-blue-400',
 	'ring-green-400 outline-green-400',
 	'ring-rose-400 outline-rose-400',

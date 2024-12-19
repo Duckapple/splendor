@@ -15,31 +15,29 @@
 		phase: GamePhase | undefined;
 	}
 
-	let {
-		player,
-		turn,
-		buyReserved,
-		targetCardId,
-		phase
-	}: Props = $props();
+	let { player, turn, buyReserved, targetCardId, phase }: Props = $props();
 
 	let isUser = $derived($user?.id === player.userId);
 
 	let currentPlayer = $derived(isUser ? " - It's your turn!" : ' - Current player');
 	let handleBuyReserved = $derived(isUser ? buyReserved : () => {});
 
-	let sorted = $derived((() => {
-		const sorted: CardType[][] = [[], [], [], [], [], []];
-		for (const cardId of player.cards) {
-			const card = cardFromId(cardId);
-			sorted[card.c].push(card);
-		}
-		return sorted;
-	})());
+	let sorted = $derived(
+		(() => {
+			const sorted: CardType[][] = [[], [], [], [], [], []];
+			for (const cardId of player.cards) {
+				const card = cardFromId(cardId);
+				sorted[card.c].push(card);
+			}
+			return sorted;
+		})()
+	);
 	let shownCards = $derived(sorted.slice(0, 5));
 	let persons = $derived(sorted[Color.Y]);
 
-	let points = $derived(sorted.reduce((acc, cards) => acc + cards.reduce((acc, card) => acc + card.p, 0), 0));
+	let points = $derived(
+		sorted.reduce((acc, cards) => acc + cards.reduce((acc, card) => acc + card.p, 0), 0)
+	);
 </script>
 
 <div class="p-2 space-y-1 border rounded">
@@ -63,7 +61,7 @@
 	<h2 class="text-sm">Cards</h2>
 	{#if player.cards.length === 0}
 		<div
-			class="flex items-center justify-center text-gray-500 border-2 border-gray-400 border-dashed rounded-md min-h-24"
+			class="flex items-center justify-center text-slate-500 border-2 border-slate-400 border-dashed rounded-md min-h-24"
 		>
 			No cards
 		</div>
@@ -88,7 +86,7 @@
 	<h2 class="text-sm">Reserved</h2>
 	{#if player.reserved.length === 0}
 		<div
-			class="flex items-center justify-center text-gray-500 border-2 border-gray-400 border-dashed rounded-md min-h-14"
+			class="flex items-center justify-center text-slate-500 border-2 border-slate-400 border-dashed rounded-md min-h-14"
 		>
 			No reserved cards
 		</div>
@@ -100,8 +98,8 @@
 					card={cardFromId(cardId)}
 					small={cardId !== targetCardId}
 					rotated
-					on:click={(e) => handleBuyReserved(e)}
-					on:keypress={(e) => handleBuyReserved(e)}
+					onclick={(e) => handleBuyReserved(e)}
+					onkeypress={(e) => handleBuyReserved(e)}
 				/>
 			{/each}
 		</div>

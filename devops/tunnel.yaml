@@ -1,7 +1,9 @@
 tunnel: 0793beef-f9e9-4187-b56f-c433acf64808
-credentials-file: .cloudflared/0793beef-f9e9-4187-b56f-c433acf64808.json
+credentials-file: /home/pi/.cloudflared/0793beef-f9e9-4187-b56f-c433acf64808.json
 
 ingress:
   - hostname: api-splendor.simon-green.dev
     service: http://localhost:3005
+  - hostname: mads-meme.simon-green.dev
+    service: http://localhost:3000
   - service: http_status:404
