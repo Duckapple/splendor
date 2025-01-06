@@ -51,3 +51,26 @@ export function mapValues<T extends object, U, K extends (string | number) & key
 }
 
 export type Extends<T1, T2> = T1 extends T2 ? true : false;
+
+const dict = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+export function encodeBase58(n: bigint, trunk = 11) {
+	let res = '';
+	while (n > 0) {
+		res = dict[Number(n % 58n)] + res;
+		n = n / 58n;
+	}
+	while (res.length < trunk) {
+		res = '1' + res;
+	}
+	return res;
+}
+
+export function randomId(type: string, time = new Date()) {
+	const value = crypto.getRandomValues(new BigUint64Array(1))[0];
+	return `${type}_${encodeBase58(BigInt(time.getTime()), 8)}_${encodeBase58(value)}`;
+}
+
+export function roomCode() {
+	const value = crypto.getRandomValues(new Uint16Array(1))[0];
+	return encodeBase58(BigInt(value), 3);
+}
