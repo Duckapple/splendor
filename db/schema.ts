@@ -1,22 +1,17 @@
 import {
 	IndexBuilder,
-	PgColumn,
-	boolean,
-	char,
-	timestamp,
+	SQLiteColumn as PgColumn,
 	index,
-	json,
-	pgEnum,
-	pgTable,
+	sqliteTable as pgTable,
+	// pgTable,
 	text,
-	smallint,
-	varchar,
-	uuid,
-} from 'drizzle-orm/pg-core';
+	integer,
+} from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 import { object, string } from 'valibot';
 import { createInsertSchema } from 'drizzle-valibot';
 import type { GamePhase, IdDecks, TokenHold } from '../common/model';
+import { randomId } from '../common/utils';
 
 function indicesOn<T extends string>(
 	...keys: T[]
@@ -27,10 +22,22 @@ function indicesOn<T extends string>(
 		};
 }
 
+const boolean = (name: string) => integer(name, { mode: 'boolean' });
+const smallint = integer;
+const uuid = text;
+const char = text;
+const varchar = text;
+const timestamp = (name: string, _: unknown) => integer(name, { mode: 'timestamp_ms' });
+const json = (name: string) => text(name, { mode: 'json' });
+const pgEnum =
+	<T extends readonly [string, ...string[]]>(_: string, enumerate: T) =>
+	(name: string) =>
+		text(name, { enum: enumerate });
+
 export const User = pgTable(
 	'User',
 	{
-		id: uuid('id').primaryKey().defaultRandom(),
+		id: uuid('id').primaryKey(),
 		bcrypt: char('bcrypt', { length: 60 }).notNull(),
 		userName: varchar('userName', { length: 64 }).notNull().unique(),
 	},
@@ -57,7 +64,9 @@ export const pushSchema = createInsertSchema(Push, {
 });
 
 export const SplendorRoom = pgTable('SplendorRoom', {
-	id: uuid('id').primaryKey().defaultRandom(),
+	id: uuid('id')
+		.primaryKey()
+		.$defaultFn(() => randomId('sr')),
 	ownerId: uuid('ownerId').notNull(),
 	started: boolean('started').default(false),
 	createdAt: timestamp('createdAt', { precision: 0 }).notNull().defaultNow(),

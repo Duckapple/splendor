@@ -1,19 +1,12 @@
 {
-  "version": "5",
-  "dialect": "pg",
+  "version": "6",
+  "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1710196457529,
-      "tag": "0000_curly_gideon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1715423325058,
-      "tag": "0001_furry_major_mapleleaf",
+      "version": "6",
+      "when": 1735417660627,
+      "tag": "0000_hot_sharon_carter",
       "breakpoints": true
     }
   ]

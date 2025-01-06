@@ -1,6 +1,6 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { drizzle as bunDrizzle } from 'drizzle-orm/bun-sqlite';
+import { Database } from 'bun:sqlite';
 
-const connection = neon(process.env.DATABASE_URL!);
+const database = new Database(process.env.DATABASE_FILE, { strict: true, create: true });
 
-export const db = drizzle(connection);
+export const db = bunDrizzle(database);

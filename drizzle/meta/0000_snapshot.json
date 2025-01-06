@@ -1,30 +1,32 @@
 {
-  "id": "003c1b5e-e62b-46f8-9907-cd457dfca4e1",
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "d0b70a4a-dacb-489d-a568-42bde5c62965",
   "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "5",
-  "dialect": "pg",
   "tables": {
     "Push": {
       "name": "Push",
-      "schema": "",
       "columns": {
         "userId": {
           "name": "userId",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "keys": {
           "name": "keys",
-          "type": "json",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "endpoint": {
           "name": "endpoint",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -42,38 +44,42 @@
     },
     "SplendorAction": {
       "name": "SplendorAction",
-      "schema": "",
       "columns": {
         "gameId": {
           "name": "gameId",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "userId": {
           "name": "userId",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "timestamp": {
           "name": "timestamp",
-          "type": "timestamp (0)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "default": "now()"
+          "autoincrement": false,
+          "default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
         },
         "type": {
           "name": "type",
-          "type": "SplendorActionType",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "data": {
           "name": "data",
-          "type": "json",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -83,47 +89,60 @@
     },
     "SplendorGame": {
       "name": "SplendorGame",
-      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "shown": {
           "name": "shown",
-          "type": "json",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false,
           "default": "('{\"high\":[],\"middle\":[],\"low\":[],\"persons\":[]}')"
         },
         "piles": {
           "name": "piles",
-          "type": "json",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false,
           "default": "('{\"high\":[],\"middle\":[],\"low\":[],\"persons\":[]}')"
         },
         "tokens": {
           "name": "tokens",
-          "type": "json",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false,
           "default": "('[0,0,0,0,0,0]')"
         },
         "turn": {
           "name": "turn",
-          "type": "smallint",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false,
           "default": 0
         },
         "playerCount": {
           "name": "playerCount",
-          "type": "smallint",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
+        },
+        "phase": {
+          "name": "phase",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -133,45 +152,50 @@
     },
     "SplendorGamePlayer": {
       "name": "SplendorGamePlayer",
-      "schema": "",
       "columns": {
         "userId": {
           "name": "userId",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "gameId": {
           "name": "gameId",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "position": {
           "name": "position",
-          "type": "smallint",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "reserved": {
           "name": "reserved",
-          "type": "json",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false,
           "default": "('[]')"
         },
         "cards": {
           "name": "cards",
-          "type": "json",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false,
           "default": "('[]')"
         },
         "tokens": {
           "name": "tokens",
-          "type": "json",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false,
           "default": "('[0,0,0,0,0,0]')"
         }
       },
@@ -182,41 +206,44 @@
     },
     "SplendorRoom": {
       "name": "SplendorRoom",
-      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "default": "gen_random_uuid()"
+          "autoincrement": false
         },
         "ownerId": {
           "name": "ownerId",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "started": {
           "name": "started",
-          "type": "boolean",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
+          "autoincrement": false,
           "default": false
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "timestamp (0)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "default": "now()"
+          "autoincrement": false,
+          "default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
         },
         "updatedAt": {
           "name": "updatedAt",
-          "type": "timestamp (0)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "default": "now()"
+          "autoincrement": false,
+          "default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
         }
       },
       "indexes": {},
@@ -226,29 +253,37 @@
     },
     "User": {
       "name": "User",
-      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "default": "gen_random_uuid()"
+          "autoincrement": false
         },
         "bcrypt": {
           "name": "bcrypt",
-          "type": "char(60)",
+          "type": "text(60)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         },
         "userName": {
           "name": "userName",
-          "type": "varchar(64)",
+          "type": "text(64)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {
+        "User_userName_unique": {
+          "name": "User_userName_unique",
+          "columns": [
+            "userName"
+          ],
+          "isUnique": true
+        },
         "idIndex": {
           "name": "idIndex",
           "columns": [
@@ -259,32 +294,13 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "User_userName_unique": {
-          "name": "User_userName_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "userName"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     }
   },
-  "enums": {
-    "SplendorActionType": {
-      "name": "SplendorActionType",
-      "values": {
-        "BUY_CARD": "BUY_CARD",
-        "TAKE_PERSON": "TAKE_PERSON",
-        "TAKE_TOKENS": "TAKE_TOKENS",
-        "RESERVE": "RESERVE"
-      }
-    }
-  },
-  "schemas": {},
+  "enums": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
+    "tables": {},
+    "columns": {}
   }
 }

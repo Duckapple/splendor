@@ -2,7 +2,7 @@
 	"scripts": {
 		"build:function": "bun ./build.ts",
 		"deploy:function": "bun ./build.ts deploy",
-		"db:generate": "bun drizzle-kit generate:pg --schema=./db/schema.ts",
+		"db:generate": "bun drizzle-kit generate:sqlite --schema=./db/schema.ts",
 		"db:migrate-prod": "bun ./db/runMigrations.ts",
 		"frontend": "cd frontend && bun run",
 		"preview": "bun run frontend build && bun run frontend preview"
@@ -14,7 +14,7 @@
 		"web-push": "^3.6.6"
 	},
 	"name": "splendor",
-	"module": "index.js",
+	"module": "local.ts",
 	"type": "module",
 	"peerDependencies": {
 		"typescript": "5.7.2"

@@ -1,1 +1,0 @@
-ALTER TABLE "SplendorGame" ADD COLUMN "phase" smallint DEFAULT 0 NOT NULL;
