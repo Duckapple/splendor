@@ -1,0 +1,14 @@
+[Unit]
+Description=splendor-frontend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+TimeoutStartSec=3
+Type=simple
+ExecStart=/home/pi/.bun/bin/bun --watch --env-file=/home/pi/splendor/frontend/.env /home/pi/splendor/frontend/index.js
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

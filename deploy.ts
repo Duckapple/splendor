@@ -13,7 +13,12 @@ await $`bun frontend build`;
 
 console.log('Build complete, transferring files...');
 
-await $`scp ./.env pi@pi.local:~/splendor/.env`;
-await $`scp ./function/index.js pi@pi.local:~/splendor/index.js`;
+await Promise.all([
+	$`scp ./.env pi@pi.local:~/splendor/.env`,
+	$`scp ./function/index.js pi@pi.local:~/splendor/index.js`,
+	$`scp -r ./frontend/build pi@pi.local:~/splendor/frontend`,
+]);
+
+$`ssh pi@pi.local "cd ~/splendor/frontend && bun i; sudo systemctl restart splendor-frontend"`;
 
 console.log('Done!');
