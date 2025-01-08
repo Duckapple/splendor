@@ -84,7 +84,7 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 		db
 			.update(SplendorGamePlayer)
 			.set(res.value.player)
-			.where(eq(SplendorGamePlayer.userId, user.id)),
+			.where(and(eq(SplendorGamePlayer.userId, user.id), eq(SplendorGamePlayer.gameId, gameId))),
 		db.insert(SplendorAction).values(dbAction),
 	]);
 

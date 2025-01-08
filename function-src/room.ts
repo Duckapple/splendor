@@ -11,7 +11,9 @@ const playerAgain = alias(SplendorGamePlayer, 'player2');
 export const room = new Elysia({ prefix: '/room' })
 	.use(Auth)
 	.guard({ auth: true })
-	.get('/', async ({ user }) => await getGame(eq(playerAgain.userId, user.id), true))
+	.get('/', async ({ user }) => {
+		return await getGame(eq(playerAgain.userId, user.id), true);
+	})
 	.get('/:id', async ({ user, params: { id }, error }) => {
 		const [data] = await getGame(eq(SplendorRoom.id, id) as SQL);
 

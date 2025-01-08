@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cachedWritable, client, jwt, user, userNames } from '$lib/main';
+	import { client, jwt, user, userNames } from '$lib/main';
 	import { readable } from 'svelte/store';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
@@ -58,7 +58,7 @@
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
 
-	let gameCache = cachedWritable<GameAndPlayers>(`game-${$searchId}`);
+	let gameCache = $state<GameAndPlayers>();
 
 	const game = createQuery({
 		queryKey: ['game', $searchId],
@@ -69,7 +69,7 @@
 			for (const { userName, userId } of result.data?.players ?? []) {
 				$userNames[userId] = userName;
 			}
-			gameCache.update(() => result.data);
+			gameCache = result.data;
 			return result;
 		},
 	});
@@ -94,47 +94,47 @@
 	<div class="flex flex-col md:flex-row">
 		<div class="space-y-3">
 			<div class="flex justify-center gap-2 md:gap-3">
-				{#each $gameCache?.shown?.persons ?? [] as cardId}
+				{#each gameCache?.shown?.persons ?? [] as cardId}
 					<Person card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 				<div class="h-14 md:h-32"></div>
 			</div>
 			<div class="flex gap-2 md:gap-3">
-				<CardStack count={$gameCache?.piles.high?.length} tier="high" />
-				{#each $gameCache?.shown?.high ?? [] as cardId}
+				<CardStack count={gameCache?.piles.high?.length} tier="high" />
+				{#each gameCache?.shown?.high ?? [] as cardId}
 					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
-				<CardStack count={$gameCache?.piles.middle?.length} tier="middle" />
-				{#each $gameCache?.shown?.middle ?? [] as cardId}
+				<CardStack count={gameCache?.piles.middle?.length} tier="middle" />
+				{#each gameCache?.shown?.middle ?? [] as cardId}
 					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
-				<CardStack count={$gameCache?.piles.low?.length} tier="low" />
-				{#each $gameCache?.shown?.low ?? [] as cardId}
+				<CardStack count={gameCache?.piles.low?.length} tier="low" />
+				{#each gameCache?.shown?.low ?? [] as cardId}
 					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 		</div>
 		<div class="flex gap-3 py-6 pl-2 md:flex-col md:pt-12 md:pl-4 md:gap-6">
-			{#each $gameCache?.tokens ?? [] as stackSize, color}
+			{#each gameCache?.tokens ?? [] as stackSize, color}
 				<Coin {color} {stackSize} onclick={handleCoin} onkeypress={handleCoin} />
 			{/each}
 		</div>
 	</div>
 	<div class="grid w-full gap-4 md:pl-4 md:grid-cols-2">
-		{#each $gameCache?.players ?? [] as player}
+		{#each gameCache?.players ?? [] as player}
 			<Hand
 				{player}
-				turn={$gameCache?.turn}
+				turn={gameCache?.turn}
 				buyReserved={handleReserveCard}
 				targetCardId={Number(target?.dataset.cardId)}
-				phase={$gameCache?.phase}
+				phase={gameCache?.phase}
 			/>
 		{/each}
-		{#each range(4 - ($gameCache?.players.length ?? 0)) as _}
+		{#each range(4 - (gameCache?.players.length ?? 0)) as _}
 			<div class=""></div>
 		{/each}
 	</div>
@@ -164,7 +164,7 @@
 	game={$game.data?.data}
 	{target}
 	cardId={target?.dataset.cardId ? Number(target.dataset.cardId) : undefined}
-	player={$gameCache?.players.find(({ userId }) => userId === $user?.id)}
+	player={gameCache?.players.find(({ userId }) => userId === $user?.id)}
 	bind:center={cardCenter.value}
 	{reserved}
 />
@@ -175,6 +175,6 @@
 	game={$game.data?.data}
 	targetCoin={target}
 	initialCoinColor={target == null ? null : Number(target.dataset.coinColor)}
-	player={$gameCache?.players.find(({ userId }) => userId === $user?.id)}
+	player={gameCache?.players.find(({ userId }) => userId === $user?.id)}
 	bind:center={coinCenter.value}
 />

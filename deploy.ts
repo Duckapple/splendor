@@ -19,6 +19,6 @@ await Promise.all([
 	$`scp -r ./frontend/build pi@pi.local:~/splendor/frontend`,
 ]);
 
-$`ssh pi@pi.local "cd ~/splendor/frontend && bun i; sudo systemctl restart splendor-frontend"`;
+$`ssh pi@pi.local "cd ~/splendor/frontend && bun i && sudo systemctl restart splendor-frontend"`;
 
 console.log('Done!');
