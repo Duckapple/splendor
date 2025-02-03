@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { createBubbler } from 'svelte/legacy';
-
-	const bubble = createBubbler();
 	import { bgColorOf, fadeTextBgColorOf, iconOf, ringColorOf } from '$lib/color';
 	import type { Color } from '../../../../common/model';
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
@@ -14,6 +11,7 @@
 		small?: boolean;
 		onclick?: MouseEventHandler<HTMLButtonElement> | null;
 		onkeypress?: KeyboardEventHandler<HTMLButtonElement> | null;
+		class?: string;
 	}
 
 	let {
@@ -23,6 +21,7 @@
 		small = false,
 		onclick,
 		onkeypress,
+		class: cn,
 	}: Props = $props();
 
 	const coinMd = 'md:text-4xl md:h-24 md:w-24 md:-mb-[6.5rem] md:ring-4';
@@ -33,7 +32,7 @@
 	data-coin-color={color}
 	{onclick}
 	{onkeypress}
-	class="{!small && boxMd} flex flex-col w-10 h-10 transition-[transform,opacity] group"
+	class="{!small && boxMd} flex flex-col w-10 h-10 transition-[transform,opacity] group {cn}"
 >
 	{#each Array(stackSize) as _, i}
 		{@const top = !hideNumber && i + 1 === stackSize}
@@ -41,7 +40,7 @@
 			class="{!small &&
 				coinMd} relative h-10 w-10 select-none transition-transform flex justify-center items-center last:mb-0 -mb-11 last:group-hover:-translate-y-2 rounded-full aspect-square ring-2 {bgColorOf[
 				color
-			]} {ringColorOf[color]} z-[{i}]"
+			]} {ringColorOf[color]}"
 		>
 			{#if top && iconOf[color]}
 				<Icon

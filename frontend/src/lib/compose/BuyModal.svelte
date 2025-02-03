@@ -223,12 +223,12 @@
 	</div>
 	{#if isFree}
 		<div>
-			You can buy it for free! <span class="text-red-600"
+			You can buy it for free! <span class="text-red-700"
 				>{$buyMutation.error?.message ?? $reserveMutation.error?.message ?? ''}</span
 			>
 		</div>
 	{:else}
-		Want to buy this card? <span class="text-red-600"
+		Want to buy this card? <span class="text-red-700"
 			>{$buyMutation.error?.message ?? $reserveMutation.error?.message ?? ''}</span
 		>
 		<div class="flex justify-center gap-2">

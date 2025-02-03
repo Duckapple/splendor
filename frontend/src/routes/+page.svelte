@@ -67,7 +67,7 @@
 				{/each}
 			</div>
 		{:else if $rooms.isError && $rooms.error.message !== 'Unauthorized'}
-			<span class="text-red-500">{$rooms.error.message}</span>
+			<span class="text-red-700">{$rooms.error.message}</span>
 		{/if}
 		{#if !$isLoggedIn}
 			<Login onSuccess={() => void $rooms.refetch()} />

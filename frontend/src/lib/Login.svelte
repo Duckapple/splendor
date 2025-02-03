@@ -52,7 +52,7 @@
 		autocomplete="current-password"
 	/>
 	{#if $loginMutation.error}
-		<span class="text-red-500">{$loginMutation.error?.message}</span>
+		<span class="text-red-700">{$loginMutation.error?.message}</span>
 	{/if}
 	<div class="flex gap-2">
 		<button

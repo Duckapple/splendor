@@ -5,7 +5,7 @@ export function moveTo(target: HTMLElement, transform: HTMLElement | Record<'x' 
 			transform instanceof HTMLElement ? transform.getBoundingClientRect() : transform;
 
 		const scale = target.dataset.coinColor ? 1 : 2;
-		const opacity = target.dataset.coinColor ? 0 : 1;
+		const opacity = target.dataset.coinColor ? 0.5 : 1;
 		const zIndex = target.dataset.coinColor ? '' : 'z-index: 30;';
 
 		target.setAttribute(

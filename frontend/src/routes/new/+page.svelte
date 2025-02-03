@@ -64,7 +64,7 @@
 					Join the room
 				</Button>
 			{:else}
-				<span class="text-red-500">{err?.message}</span>
+				<span class="text-red-700">{err?.message}</span>
 			{/if}
 		{:else if $room.isSuccess && $room.data.data != null}
 			{@const data = $room.data.data}
