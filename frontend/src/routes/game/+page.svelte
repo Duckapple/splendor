@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { client, jwt, user, userNames } from '$lib/main';
 	import { readable } from 'svelte/store';
-	import { createMutation, createQuery } from '@tanstack/svelte-query';
+	import { createMutation, createQuery, queryOptions } from '@tanstack/svelte-query';
 
 	import BuyModal from '$lib/compose/BuyModal.svelte';
 	import TakeModal from '$lib/compose/TakeModal.svelte';
@@ -58,21 +58,27 @@
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
 
-	let gameCache = $state<GameAndPlayers>();
+	// let gameCache = $state<GameAndPlayers>();
 
-	const game = createQuery({
-		queryKey: ['game', $searchId],
-		async queryFn() {
-			if ($searchId == null) throw { message: 'ID undefined' };
-			const params = { id: $searchId };
-			const result = await client.game(params).get();
-			for (const { userName, userId } of result.data?.players ?? []) {
-				$userNames[userId] = userName;
-			}
-			gameCache = result.data;
-			return result;
-		},
-	});
+	const gameQueryOptions = $derived(
+		queryOptions({
+			queryKey: ['game', $searchId],
+			async queryFn() {
+				if ($searchId == null) throw { message: 'ID undefined' };
+				const params = { id: $searchId };
+				const result = await client.game(params).get();
+				for (const { userName, userId } of result.data?.players ?? []) {
+					$userNames[userId] = userName;
+				}
+				// gameCache = result.data;
+				return result;
+			},
+		})
+	);
+
+	const game = $derived(createQuery(gameQueryOptions));
+
+	const gameCache = $derived($game.data?.data as GameAndPlayers | undefined);
 
 	const notify = createMutation({
 		mutationKey: ['notifications', $user?.id],
@@ -100,19 +106,19 @@
 				<div class="h-14 md:h-32"></div>
 			</div>
 			<div class="flex gap-2 md:gap-3">
-				<CardStack count={gameCache?.piles.high?.length} tier="high" />
+				<CardStack count={gameCache?.piles?.high?.length} tier="high" />
 				{#each gameCache?.shown?.high ?? [] as cardId}
 					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
-				<CardStack count={gameCache?.piles.middle?.length} tier="middle" />
+				<CardStack count={gameCache?.piles?.middle?.length} tier="middle" />
 				{#each gameCache?.shown?.middle ?? [] as cardId}
 					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}
 			</div>
 			<div class="flex gap-2 md:gap-3">
-				<CardStack count={gameCache?.piles.low?.length} tier="low" />
+				<CardStack count={gameCache?.piles?.low?.length} tier="low" />
 				{#each gameCache?.shown?.low ?? [] as cardId}
 					<Card card={cardFromId(cardId)} onclick={handleBuyCard} onkeypress={handleBuyCard} />
 				{/each}

@@ -13,9 +13,10 @@
 	import Counter from '../../routes/Counter.svelte';
 	import Modal from '../Modal.svelte';
 	import { client } from '../main';
-	import { createMutation } from '@tanstack/svelte-query';
+	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import InfoTooltip from '../InfoTooltip.svelte';
 	import Person from '$lib/game/Person.svelte';
+	import { useUpdateGameState } from '$lib/state/update-game';
 
 	interface Props {
 		closeModal: () => void;
@@ -38,6 +39,9 @@
 		target,
 		center = $bindable(),
 	}: Props = $props();
+
+	const queryClient = useQueryClient();
+	const { updateGameState } = useUpdateGameState(queryClient);
 
 	let card = $derived(cardId != null ? cardFromId(cardId) : null);
 	let bonus = $derived(player != null ? getBonusFromCards(player.cards) : null);
@@ -122,7 +126,10 @@
 					data: { row, i, card: cardId, tokens: values as any, person },
 				} as const;
 
-				await client.action({ id: game.id }).post(body);
+				const res = await client.action({ id: game.id }).post(body);
+				if (res.data) {
+					updateGameState(game.id, res);
+				}
 
 				closeModal();
 			},
@@ -147,7 +154,10 @@
 					data: { row, i, card: cardId },
 				} as const;
 
-				await client.action({ id: game.id }).post(body);
+				const res = await client.action({ id: game.id }).post(body);
+				if (res.data) {
+					updateGameState(game.id, res);
+				}
 
 				closeModal();
 			},

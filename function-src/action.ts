@@ -1,7 +1,7 @@
 import type { AuthUser } from '../common/communication';
 import { FunctionError } from './common/auth';
 import { and, eq, gt } from 'drizzle-orm';
-import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
+import { SplendorAction, SplendorGame, SplendorGamePlayer, User } from '../db/schema';
 import { db } from './common/db';
 import { actionSchema } from '../common/actions';
 import { performAction } from '../common/logic';
@@ -89,10 +89,25 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 	]);
 
 	const data = {
-		game: omit({ ...dbRes.game, ...res.value.game } as GameState, 'piles'),
-		player: { ...dbRes.player, ...res.value.player } as Player,
+		game: {
+			...dbRes.game,
+			...res.value.game,
+			piles: mergeKeyLengths(res.value.game.piles, dbRes.game.piles),
+		} as GameState,
+		player: { ...dbRes.player, ...res.value.player } as SplendorGamePlayer,
 		action: dbAction as Action,
 	};
 
 	return data;
+}
+
+function mergeKeyLengths<T extends Record<string, Array<unknown>>>(
+	obj: NoInfer<Partial<T> | undefined>,
+	fallback: T
+) {
+	const res = {} as { [K in keyof T]: { length: number } };
+	for (const key of Object.keys(fallback)) {
+		res[key as keyof T] = { length: (obj?.[key] ?? fallback[key]).length };
+	}
+	return res;
 }

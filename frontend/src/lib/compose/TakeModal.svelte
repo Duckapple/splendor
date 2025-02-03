@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import Modal from '../Modal.svelte';
 	import { Color, type GameState, type Player } from '../../../../common/model';
@@ -8,7 +6,7 @@
 	import Coin from '../game/Coin.svelte';
 	import { range } from '../../../../common/utils';
 	import InfoTooltip from '$lib/InfoTooltip.svelte';
-	import { moveTo } from '$lib/move';
+	import { useUpdateGameState } from '$lib/state/update-game';
 
 	interface Props {
 		closeModal: () => void;
@@ -31,6 +29,7 @@
 	}: Props = $props();
 
 	const queryClient = useQueryClient();
+	const { updateGameState } = useUpdateGameState(queryClient);
 
 	let error = $state('');
 
@@ -108,7 +107,7 @@
 
 				const res = await client.action({ id: game.id }).post(body);
 				if (res.data) {
-					queryClient.setQueryData(['game', game.id], res);
+					updateGameState(game.id, res);
 				}
 
 				onClose();
