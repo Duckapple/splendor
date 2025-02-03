@@ -6,7 +6,7 @@
 		"db:migrate-prod": "bun ./db/runMigrations.ts",
 		"frontend": "cd frontend && bun run",
 		"preview": "bun run frontend build && bun run frontend preview",
-		"dev": "bun local.ts"
+		"dev": "bun local.ts --watch"
 	},
 	"devDependencies": {
 		"@types/web-push": "3.6.4",
@@ -26,7 +26,7 @@
 		"@neondatabase/serverless": "^0.10.4",
 		"drizzle-orm": "0.38.3",
 		"drizzle-valibot": "0.3.1",
-		"elysia": "1.1.25",
+		"elysia": "1.2.10",
 		"neverthrow": "8.1.1",
 		"valibot": "0.42.1"
 	}

@@ -2,7 +2,7 @@
 	import { createBubbler } from 'svelte/legacy';
 
 	const bubble = createBubbler();
-	import { bgColorOf, iconOf, ringColorOf } from '$lib/color';
+	import { bgColorOf, fadeTextBgColorOf, iconOf, ringColorOf } from '$lib/color';
 	import type { Color } from '../../../../common/model';
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
 	import Icon from '$lib/base/Icon.svelte';
@@ -46,10 +46,12 @@
 			{#if top && iconOf[color]}
 				<Icon
 					icon={iconOf[color]}
-					class="absolute {small ? 'inset-1' : 'inset-1 md:inset-2'} opacity-35 {bgColorOf[color]}"
+					class="absolute {small ? 'inset-1' : 'inset-1 md:inset-2'} {fadeTextBgColorOf[color]}"
 				/>
 			{/if}
-			{top ? stackSize : ''}
+			{#if top}
+				<span class="z-10">{stackSize}</span>
+			{/if}
 		</div>
 	{/each}
 </button>
