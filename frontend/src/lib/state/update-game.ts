@@ -1,30 +1,28 @@
 import { QueryClient } from '@tanstack/svelte-query';
-import type { Action, GameState } from '../../../../common/model';
 import type { Treaty } from '@elysiajs/eden';
 import type { GameAndPlayers } from '../../../../common/communication';
-import type { SplendorGamePlayer } from '../../../../db/schema';
+import type { StateUpdate } from '../../../../common/schema/game';
 
-type TreatyGame = Treaty.TreatyResponse<{ 200: GameAndPlayers }>;
+type PartialRes<T> = Omit<Treaty.TreatyResponse<{ 200: T }>, 'headers' | 'response'>;
+
+type TreatyGame = PartialRes<GameAndPlayers>;
 
 export function useUpdateGameState(queryClient: QueryClient) {
-	function updateGameState(
-		gameId: string,
-		actionResult: Treaty.TreatyResponse<{
-			200: { game: GameState; player: SplendorGamePlayer; action: Action };
-		}>
-	) {
-		if (!actionResult.data) return;
+	function updateGameState(gameId: string, actionResult: PartialRes<StateUpdate[string]>) {
+		const newData = actionResult.data;
+		if (!newData) return;
 
 		queryClient.setQueryData<TreatyGame>(['game', gameId], (prev?: TreatyGame) => {
 			const players = structuredClone(prev?.data?.players ?? []);
-			const index = players.findIndex(({ userId }) => userId === actionResult.data.player.userId);
-			players[index] = { ...actionResult.data.player, userName: players[index].userName };
+			const index = players.findIndex(({ userId }) => userId === newData.player.userId);
+			players[index] = { ...newData.player, userName: players[index].userName };
 
 			return {
+				...prev,
 				...actionResult,
 				data: {
 					...prev?.data,
-					...actionResult.data.game,
+					...newData.game,
 					players,
 				},
 			};

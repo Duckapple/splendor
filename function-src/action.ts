@@ -1,12 +1,11 @@
 import type { AuthUser } from '../common/communication';
 import { FunctionError } from './common/auth';
 import { and, eq, gt } from 'drizzle-orm';
-import { SplendorAction, SplendorGame, SplendorGamePlayer, User } from '../db/schema';
+import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
 import { db } from './common/db';
-import { actionSchema } from '../common/actions';
+import { actionSchema } from '../common/schema/actions';
 import { performAction } from '../common/logic';
-import { omit } from '../common/utils';
-import { GamePhase, type Action, type GameState, type Player } from '../common/model';
+import { GamePhase, type Action, type GameState } from '../common/model';
 import { t } from 'elysia';
 import type { Infer } from './common/type';
 

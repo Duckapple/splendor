@@ -1,5 +1,5 @@
 import type { Card, CardDecks, GameState, IdDecks, TokenHold } from './model';
-import { Color as c } from './model';
+import { Color as c, GamePhase } from './model';
 import { shuffled } from './utils';
 
 export const cards = {
@@ -144,7 +144,7 @@ export function newGameState(id: string, playerCount: 1 | 2 | 3 | 4): GameState 
 		shown.high.push(piles.high.pop()!);
 	}
 
-	return { id, shown, tokens, piles, turn: 0, playerCount };
+	return { id, shown, tokens, piles, turn: 0, playerCount, phase: GamePhase.PLAYING };
 }
 
 export function positionFromCardId(shown: GameState['shown'], cardId: number) {

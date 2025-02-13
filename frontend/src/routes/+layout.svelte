@@ -4,8 +4,10 @@
 	import '$lib/main';
 	import { browser } from '$app/environment';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import type { Snippet } from 'svelte';
+
 	interface Props {
-		children?: import('svelte').Snippet;
+		children?: Snippet;
 	}
 
 	let { children }: Props = $props();

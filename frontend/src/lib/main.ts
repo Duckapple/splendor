@@ -1,6 +1,6 @@
 import { writable, derived, get, type Writable } from 'svelte/store';
 import { treaty } from '@elysiajs/eden';
-import type { App } from '../../../local.ts';
+import type { App } from '../../../local';
 
 export const BASE_URL = import.meta.env.DEV
 	? 'http://localhost:3005'
@@ -60,7 +60,10 @@ export async function loginRegister(input: LoginInput, isRegister = false) {
 		throw error;
 	}
 
-	jwt.set((await data.json()).jwt);
+	const newJwt = (await data.json()).jwt;
+	jwt.set(newJwt);
+
+	return newJwt;
 }
 
 export function logout() {
