@@ -167,7 +167,7 @@
 <BuyModal
 	closeModal={() => setCurrent(undefined)}
 	open={target != null && !target.dataset.coinColor}
-	game={$game.data?.data}
+	game={gameCache}
 	{target}
 	cardId={target?.dataset.cardId ? Number(target.dataset.cardId) : undefined}
 	player={gameCache?.players.find(({ userId }) => userId === $user?.id)}
@@ -178,7 +178,7 @@
 <TakeModal
 	closeModal={() => setCurrent(undefined)}
 	open={target != null && !!target.dataset.coinColor}
-	game={$game.data?.data}
+	game={gameCache}
 	targetCoin={target}
 	initialCoinColor={target == null ? null : Number(target.dataset.coinColor)}
 	player={gameCache?.players.find(({ userId }) => userId === $user?.id)}

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { Color, type Card, type Player, type GameState } from '../../../../common/model';
 	import {
 		cardFromId,
@@ -17,6 +15,7 @@
 	import InfoTooltip from '../InfoTooltip.svelte';
 	import Person from '$lib/game/Person.svelte';
 	import { useUpdateGameState } from '$lib/state/update-game';
+	import { untrack } from 'svelte';
 
 	interface Props {
 		closeModal: () => void;
@@ -30,7 +29,7 @@
 	}
 
 	let {
-		closeModal = $bindable(),
+		closeModal,
 		open = $bindable(),
 		game,
 		cardId,
@@ -43,61 +42,67 @@
 	const queryClient = useQueryClient();
 	const { updateGameState } = useUpdateGameState(queryClient);
 
-	let card = $derived(cardId != null ? cardFromId(cardId) : null);
-	let bonus = $derived(player != null ? getBonusFromCards(player.cards) : null);
+	let selectedPerson = $state<number>();
 
-	let maxValues = $derived(
+	let values = $state([0, 0, 0, 0, 0, 0]);
+
+	let isFree = $state(false);
+
+	const card = $derived(cardId != null ? cardFromId(cardId) : null);
+	const bonus = $derived(player != null ? getBonusFromCards(player.cards) : null);
+
+	const maxValues = $derived(
 		bonus?.map((b, i) =>
 			i === Color.Y
 				? (player?.tokens[i] ?? 0)
 				: Math.min(player?.tokens[i] ?? 0, Math.max(0, (card?.cost[i] ?? 0) - b))
 		)
 	);
+	const minValues = $derived(
+		values.map((i) => Math.max(0, i - (player ? player.tokens[Color.Y] - values[Color.Y] : 0)))
+	);
 
-	let values = $state([0, 0, 0, 0, 0, 0]);
-
-	let isFree = $state(false);
-	let minValues = $state([0, 0, 0, 0, 0, 0]);
-
-	function init() {
-		if (player != null && card != null) {
-			const p = player;
-			const res = canAfford(card, player, [0, 0, 0, 0, 0, 0]);
-
-			if (res.isOk()) {
-				isFree = true;
-				return;
-			}
-			values = [...(res.error as { cost: Card['cost'] }).cost, 0].map((i) =>
-				Math.max(0, i)
-			) as typeof values;
-			minValues = values.map((i) => Math.max(0, i - p.tokens[Color.Y]));
+	$effect(() => {
+		if (cardId == null) {
+			values = [0, 0, 0, 0, 0, 0];
+			isFree = false;
+			return;
 		}
-	}
 
-	run(() => {
-		cardId == null ? ((values = [0, 0, 0, 0, 0, 0]), (isFree = false)) : init();
+		if (player == null || card == null) {
+			return;
+		}
+
+		const res = canAfford(card, player, [0, 0, 0, 0, 0, 0]);
+
+		if (res.isOk()) {
+			isFree = true;
+			return;
+		}
+		values = [...(res.error as { cost: Card['cost'] }).cost, 0].map((i) => Math.max(0, i));
 	});
 
-	let potentialPersons = $derived(
+	const potentialPersons = $derived(
 		player && card
 			? getEarnedPeople(game?.shown.persons ?? [], { ...player, cards: [...player.cards, card.id] })
 			: []
 	);
 
-	let selectedPerson: number | null = $state(null);
-
-	let decrement = $derived((color: Color) => {
+	function decrement(color: Color) {
 		values[color] -= 1;
-		if (color !== Color.Y && (maxValues?.[Color.Y] ?? 0) > values[Color.Y]) values[Color.Y] += 1;
-	});
+		if (color !== Color.Y && (maxValues?.[Color.Y] ?? 0) > values[Color.Y]) {
+			values[Color.Y] += 1;
+		}
+	}
 
-	let increment = $derived((color: Color) => {
+	function increment(color: Color) {
 		values[color] += 1;
-		if (color !== Color.Y && minValues[Color.Y] < values[Color.Y]) values[Color.Y] -= 1;
-	});
+		if (color !== Color.Y && minValues[Color.Y] < values[Color.Y]) {
+			values[Color.Y] -= 1;
+		}
+	}
 
-	let buyMutation = $derived(
+	const buyMutation = $derived(
 		createMutation({
 			mutationKey: ['action', 'BUY_CARD', cardId],
 			async mutationFn() {
@@ -136,7 +141,7 @@
 		})
 	);
 
-	let reserveMutation = $derived(
+	const reserveMutation = $derived(
 		createMutation({
 			mutationKey: ['action', 'RESERVE', cardId],
 			async mutationFn() {
@@ -164,7 +169,7 @@
 		})
 	);
 
-	let reserveAction = $derived({
+	const reserveAction = $derived({
 		colorClass: 'bg-amber-200',
 		text: 'Reserve',
 		handler: $reserveMutation.mutateAsync,
@@ -264,7 +269,7 @@
 				<div class="rounded-md ring-4 ring-offset-4" class:ring-4={selectedPerson === personId}>
 					<Person
 						card={cardFromId(personId)}
-						onclick={() => (selectedPerson = selectedPerson === personId ? null : personId)}
+						onclick={() => (selectedPerson = selectedPerson === personId ? undefined : personId)}
 					/>
 				</div>
 			{/each}

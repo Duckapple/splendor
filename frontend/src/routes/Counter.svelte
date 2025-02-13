@@ -2,7 +2,7 @@
 	import { run } from 'svelte/legacy';
 
 	import { textColorOf } from '$lib/color';
-	import { spring } from 'svelte/motion';
+	import { Spring } from 'svelte/motion';
 	import type { Color } from '../../../common/model';
 
 	interface Props {
@@ -27,7 +27,7 @@
 		increment = (color: Color) => {},
 	}: Props = $props();
 
-	const displayed_count = spring();
+	const displayed_count = Spring.of(() => value);
 
 	function modulo(n: number, m: number) {
 		// handle negative numbers
@@ -36,7 +36,7 @@
 	run(() => {
 		displayed_count.set(value);
 	});
-	let offset = $derived(modulo($displayed_count, 1));
+	let offset = $derived(modulo(displayed_count.current, 1));
 </script>
 
 <div
@@ -76,10 +76,10 @@
 		>
 			<span
 				class="absolute flex items-center justify-center w-full h-full select-none -top-full"
-				aria-hidden="true">{Math.floor($displayed_count + 1)}</span
+				aria-hidden="true">{Math.floor(displayed_count.current + 1)}</span
 			>
 			<span class="absolute flex items-center justify-center w-full h-full"
-				>{Math.floor($displayed_count)}</span
+				>{Math.floor(displayed_count.current)}</span
 			>
 		</div>
 	</div>

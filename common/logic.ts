@@ -267,8 +267,8 @@ type CanAfford =
 	| Err<never, { cost: Card['cost'] } | { playerTokens: [number, ...Card['cost']] }>;
 
 export function canAfford(card: Card, player: Player, tokens: Record<Color, number>): CanAfford {
-	const cost = [...card.cost] as Card['cost'];
-	const playerTokens = [...player.tokens] as TokenHold;
+	const cost = structuredClone(card.cost);
+	const playerTokens = structuredClone(player.tokens);
 
 	for (let i = 0; i < 6; i++) {
 		const i2 = i as Color;
@@ -314,9 +314,7 @@ export function getEarnedPeople(
 		.map((personId, index) => [personId, index] as const)
 		.filter(([personId]) => {
 			const person = cardFromId(personId);
-			console.log('person', person);
 			const x = canAfford(person, player, extraCards);
-			console.log('x', x);
 			return x.isOk();
 		});
 }
