@@ -12,6 +12,7 @@
 		rotated?: boolean;
 		onclick?: MouseEventHandler<HTMLButtonElement> | null;
 		onkeypress?: KeyboardEventHandler<HTMLButtonElement> | null;
+		style?: string;
 	}
 
 	let {
@@ -22,6 +23,7 @@
 		rotated = false,
 		onclick,
 		onkeypress,
+		style,
 	}: Props = $props();
 
 	let filteredLength = $derived(card.cost.filter(Boolean).length);
@@ -54,7 +56,7 @@
 </script>
 
 <button
-	class="flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-transform rounded-lg border border-black select-none {cardStyle} shadow-lg aspect-square bg-gradient-to-bl outline-offset-4 focus:outline outline-blue-500 {gradientOf[
+	class="flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-[transform,opacity] rounded-lg border border-black select-none {cardStyle} shadow-lg aspect-square bg-gradient-to-bl outline-offset-4 focus:outline outline-blue-500 {gradientOf[
 		card.c
 	]}"
 	class:md:-mt-32={stacked && !small}
@@ -67,6 +69,7 @@
 	data-card-id={card.id}
 	{onclick}
 	{onkeypress}
+	{style}
 >
 	<div
 		class="px-1 text-3xl rounded-t-lg text-left w-full flex items-center justify-between {pointStyle} {fadeText

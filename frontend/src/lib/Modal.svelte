@@ -1,12 +1,19 @@
 <script lang="ts">
+	import { onMount, type Snippet } from 'svelte';
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
+	import InfoTooltip from './InfoTooltip.svelte';
+	import { on } from 'svelte/events';
+	import { stopPropagation } from 'svelte/legacy';
 
 	interface Props {
 		closeModal: () => void;
 		open: boolean;
+		title: string;
+		info?: Snippet;
+		target?: HTMLElement;
 		class?: string;
 		actions?: { colorClass: string; text: string; handler: () => void }[];
-		children?: import('svelte').Snippet;
+		children?: Snippet;
 		onclick?: MouseEventHandler<HTMLDivElement> | null;
 		onkeypress?: KeyboardEventHandler<HTMLDivElement> | null;
 	}
@@ -14,6 +21,9 @@
 	let {
 		closeModal,
 		open,
+		title,
+		info,
+		target = $bindable(),
 		class: cn = '',
 		actions = [],
 		children,
@@ -24,6 +34,24 @@
 	let allActions = $derived([{ colorClass: '', text: 'Cancel', handler: closeModal }, ...actions]);
 
 	let element = $state<HTMLDivElement>();
+
+	let modalOffset = $state({ x: 0, y: 0 });
+	let dragOrigin = $state<{ x: number; y: number }>();
+	let drag = $state<{ x: number; y: number }>();
+
+	$inspect(drag);
+
+	onMount(() => {
+		on(window, 'mousemove', (e) => {
+			if (!dragOrigin) return;
+			drag = { x: e.screenX - dragOrigin.x, y: e.screenY - dragOrigin.y };
+		});
+		on(window, 'mouseup', () => {
+			dragOrigin = undefined;
+			modalOffset = { x: modalOffset.x + (drag?.x ?? 0), y: modalOffset.y + (drag?.y ?? 0) };
+			drag = undefined;
+		});
+	});
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -45,7 +73,36 @@
 			e.stopPropagation();
 			onkeypress?.(e);
 		}}
+		style="transform: translate({modalOffset.x + (drag?.x ?? 0)}px, {modalOffset.y +
+			(drag?.y ?? 0)}px)"
 	>
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<h1
+			class="flex justify-between text-xl cursor-grab"
+			onmousedown={(e) => {
+				e.stopPropagation();
+				dragOrigin = { x: e.screenX, y: e.screenY };
+			}}
+		>
+			<span class="select-none">{title}</span>
+			{#if info}
+				<InfoTooltip
+					size="xl"
+					onpointerenter={() => {
+						if (window.matchMedia('(min-width: 768px)').matches) return;
+						target && target.setAttribute('style', target.getAttribute('style') + '; opacity: 0');
+					}}
+					onpointerleave={() =>
+						target &&
+						target.setAttribute(
+							'style',
+							target.getAttribute('style')?.replace('; opacity: 0', '') ?? ''
+						)}
+				>
+					{@render info()}
+				</InfoTooltip>
+			{/if}
+		</h1>
 		{@render children?.()}
 		<div class="flex justify-end gap-2 pt-2">
 			{#each allActions as action}

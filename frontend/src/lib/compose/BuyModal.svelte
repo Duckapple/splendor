@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { Color, type Card, type Player, type GameState } from '../../../../common/model';
+	import {
+		Color,
+		type Card as CardType,
+		type Player,
+		type GameState,
+	} from '../../../../common/model';
 	import {
 		cardFromId,
 		positionFromCardId,
@@ -12,10 +17,9 @@
 	import Modal from '../Modal.svelte';
 	import { client } from '../main';
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
-	import InfoTooltip from '../InfoTooltip.svelte';
 	import Person from '$lib/game/Person.svelte';
 	import { useUpdateGameState } from '$lib/state/update-game';
-	import { untrack } from 'svelte';
+	import Card from '$lib/game/Card.svelte';
 
 	interface Props {
 		closeModal: () => void;
@@ -35,7 +39,7 @@
 		cardId,
 		player,
 		reserved,
-		target,
+		target = $bindable(),
 		center = $bindable(),
 	}: Props = $props();
 
@@ -79,7 +83,7 @@
 			isFree = true;
 			return;
 		}
-		values = [...(res.error as { cost: Card['cost'] }).cost, 0].map((i) => Math.max(0, i));
+		values = [...(res.error as { cost: CardType['cost'] }).cost, 0].map((i) => Math.max(0, i));
 	});
 
 	const potentialPersons = $derived(
@@ -187,54 +191,44 @@
 			handler: $buyMutation.mutateAsync,
 		},
 	]}
+	title="Buy/reserve card"
+	bind:target
 >
-	<h1 class="flex justify-between text-xl">
-		<span>Buy/reserve card</span>
-		<InfoTooltip
-			size="xl"
-			onpointerenter={() => {
-				if (window.matchMedia('(min-width: 768px)').matches) return;
-				target && target.setAttribute('style', target.getAttribute('style') + '; opacity: 0');
-			}}
-			onpointerleave={() =>
-				target &&
-				target.setAttribute(
-					'style',
-					target.getAttribute('style')?.replace('; opacity: 0', '') ?? ''
-				)}
-		>
-			<div class="space-y-1">
-				<p>To buy a card, you need to afford it through bonuses and tokens.</p>
-				<p>
-					The cost can be seen in the bottom left corner of the card, where each circle shows the
-					cost along with what color is needed.
-				</p>
-				<p>
-					Each card you possess counts towards paying the cost, and you can spend tokens to make up
-					any difference.
-				</p>
-				<p>
-					Additionally, the yellow tokens are "wild", and can act as any other color when buying a
-					card.
-				</p>
+	{#snippet info()}
+		<div class="space-y-1">
+			<p>To buy a card, you need to afford it through bonuses and tokens.</p>
+			<p>
+				The cost can be seen in the bottom left corner of the card, where each circle shows the cost
+				along with what color is needed.
+			</p>
+			<p>
+				Each card you possess counts towards paying the cost, and you can spend tokens to make up
+				any difference.
+			</p>
+			<p>
+				Additionally, the yellow tokens are "wild", and can act as any other color when buying a
+				card.
+			</p>
+			<br />
+			<p>
+				To buy a card, make sure you can afford it, and press the "buy" button. You know you can
+				afford it by the counters under the card, where a red underline means you don't have the
+				required amount of tokens.
+			</p>
+			{#if !reserved}
 				<br />
 				<p>
-					To buy a card, make sure you can afford it, and press the "buy" button. You know you can
-					afford it by the counters under the card, where a red underline means you don't have the
-					required amount of tokens.
+					Alternatively, you can reserve the card so you can buy it on a later turn. If you choose
+					to do so, you also get a yellow token to go with it.
 				</p>
-				{#if !reserved}
-					<br />
-					<p>
-						Alternatively, you can reserve the card so you can buy it on a later turn. If you choose
-						to do so, you also get a yellow token to go with it.
-					</p>
-				{/if}
-			</div>
-		</InfoTooltip>
-	</h1>
-	<div class="w-56 h-56 md:w-[28rem] md:h-[28rem] flex justify-center items-center">
-		<div bind:this={center} class="w-0 h-0"></div>
+			{/if}
+		</div>
+	{/snippet}
+	<div class="w-56 h-56 md:w-[28rem] md:h-[28rem] flex justify-center items-center relative">
+		{#if cardId}
+			<Card card={cardFromId(cardId)} style="transform: scale(2)" />
+		{/if}
+		<div bind:this={center} class="absolute size-0"></div>
 	</div>
 	{#if isFree}
 		<div>

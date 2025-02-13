@@ -25,7 +25,7 @@
 		player,
 		initialCoinColor,
 		center = $bindable(),
-		targetCoin,
+		targetCoin = $bindable(),
 	}: Props = $props();
 
 	const queryClient = useQueryClient();
@@ -127,30 +127,29 @@
 		},
 	]}
 	class="max-w-72 md:max-w-3xl"
+	title="Take tokens"
+	bind:target={targetCoin}
 >
-	<h1 class="flex justify-between text-xl">
-		<span>Take tokens</span>
-		<InfoTooltip size="xl">
-			<div class="space-y-1">
-				<p>On your turn, you can take up to three tokens. The following has to be satisfied:</p>
-				<ul class="pl-4 list-disc">
-					<li class="pb-1">You may take three different tokens</li>
-					<li>You may take two of a kind, but:</li>
-					<ul class="pb-1 pl-4 list-disc">
-						<li>There have to be four or more tokens of that kind available</li>
-						<li>You may not take a third token</li>
-					</ul>
-					<li>You can only have a max of 10 tokens</li>
-					<ul class="pl-4 list-disc">
-						<li>
-							If your total comes over 10 by taking tokens, you can return some to get below or at
-							10 (WIP)
-						</li>
-					</ul>
+	{#snippet info()}
+		<div class="space-y-1">
+			<p>On your turn, you can take up to three tokens. The following has to be satisfied:</p>
+			<ul class="pl-4 list-disc">
+				<li class="pb-1">You may take three different tokens</li>
+				<li>You may take two of a kind, but:</li>
+				<ul class="pb-1 pl-4 list-disc">
+					<li>There have to be four or more tokens of that kind available</li>
+					<li>You may not take a third token</li>
 				</ul>
-			</div>
-		</InfoTooltip>
-	</h1>
+				<li>You can only have a max of 10 tokens</li>
+				<ul class="pl-4 list-disc">
+					<li>
+						If your total comes over 10 by taking tokens, you can return some to get below or at 10
+						(WIP)
+					</li>
+				</ul>
+			</ul>
+		</div>
+	{/snippet}
 	<div class="flex flex-col-reverse gap-4 pt-4 pb-2 md:pt-6 md:gap-8">
 		<div class="relative flex gap-1.5 md:gap-4">
 			<div
