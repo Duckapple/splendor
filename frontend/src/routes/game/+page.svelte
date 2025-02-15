@@ -24,6 +24,10 @@
 
 	const serviceWorker = new BroadcastChannel('service-worker');
 
+	serviceWorker.addEventListener('message', (e) => {
+		console.log('Notification response:', e);
+	});
+
 	function setCurrent(newVal: HTMLElement | undefined) {
 		if (target) {
 			target.setAttribute('style', '');
@@ -86,7 +90,7 @@
 			let allowed = window.Notification.permission;
 			if (allowed === 'default') {
 				allowed = await window.Notification.requestPermission();
-				serviceWorker.postMessage(JSON.stringify({ type: 'notifications', jwt: $jwt }));
+				serviceWorker.postMessage({ type: 'notifications', jwt: $jwt });
 			}
 		},
 	});

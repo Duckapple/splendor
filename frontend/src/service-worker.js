@@ -102,19 +102,30 @@ const publicKey = urlB64ToUint8Array(
 );
 
 const channel = new BroadcastChannel('service-worker');
-channel.addEventListener('message', async () => {
-	try {
-		const options = {
-			applicationServerKey: publicKey,
-			userVisibleOnly: true,
-		};
-		const subscription = /** @type {*} */ (await sw.registration.pushManager.subscribe(options));
-		const response = await client.notifications.index.post(subscription, {
-			headers: { Authorization: `Bearer ${get(jwt)}` },
-		});
-		console.log(response);
-	} catch (err) {
-		console.log('Error', err);
+channel.addEventListener('message', async (e) => {
+	const { type, ...data } = e.data;
+	switch (type) {
+		case 'notifications': {
+			try {
+				const options = {
+					applicationServerKey: publicKey,
+					userVisibleOnly: true,
+				};
+				const subscription = /** @type {*} */ (
+					await sw.registration.pushManager.subscribe(options)
+				);
+				const response = await client.notifications.index.post(subscription, {
+					headers: { Authorization: `Bearer ${data.jwt}` },
+				});
+				channel.postMessage({
+					type: 'ok',
+					response: response.data ?? response.error,
+					status: response.status,
+				});
+			} catch (error) {
+				channel.postMessage({ type: 'error', response: error });
+			}
+		}
 	}
 });
 
