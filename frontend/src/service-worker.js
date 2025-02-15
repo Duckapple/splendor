@@ -5,7 +5,8 @@
 // @ts-check
 
 import { build, files, version } from '$service-worker';
-import { client } from './lib/main';
+import { get } from 'svelte/store';
+import { client, jwt } from './lib/main';
 
 const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
 
@@ -108,7 +109,9 @@ channel.addEventListener('message', async () => {
 			userVisibleOnly: true,
 		};
 		const subscription = /** @type {*} */ (await sw.registration.pushManager.subscribe(options));
-		const response = await client.notifications.index.post(subscription);
+		const response = await client.notifications.index.post(subscription, {
+			headers: { Authorization: `Bearer ${get(jwt)}` },
+		});
 		console.log(response);
 	} catch (err) {
 		console.log('Error', err);
