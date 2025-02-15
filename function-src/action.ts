@@ -1,13 +1,14 @@
 import type { AuthUser } from '../common/communication';
 import { FunctionError } from './common/auth';
 import { and, eq, gt } from 'drizzle-orm';
-import { SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
+import { Push, SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
 import { db } from './common/db';
 import { actionSchema } from '../common/schema/actions';
 import { performAction } from '../common/logic';
 import { GamePhase, type Action, type GameState } from '../common/model';
 import { t } from 'elysia';
 import type { Infer } from './common/type';
+import { push } from './common/notifications';
 
 get.params = {
 	params: t.Object({ id: t.String() }),
@@ -78,7 +79,14 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 
 	const dbAction: SplendorAction = { ...action, gameId, userId: user.id, timestamp: new Date() };
 
-	await Promise.all([
+	const nextTurn = res.value.game.turn!;
+
+	const [pushes] = await Promise.all([
+		db
+			.select({ Push })
+			.from(SplendorGamePlayer)
+			.innerJoin(Push, eq(Push.userId, SplendorGamePlayer.userId))
+			.where(and(eq(SplendorGamePlayer.gameId, gameId), eq(SplendorGamePlayer.position, nextTurn))),
 		db.update(SplendorGame).set(res.value.game).where(eq(SplendorGame.id, gameId)),
 		db
 			.update(SplendorGamePlayer)
@@ -96,6 +104,12 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 		player: { ...dbRes.player, ...res.value.player } as SplendorGamePlayer,
 		action: dbAction as Action,
 	};
+
+	await Promise.all(
+		pushes.map(({ Push: { userId, ...sub } }) =>
+			push(sub, { message: "It's your turn!", gameId, data })
+		)
+	);
 
 	return data;
 }

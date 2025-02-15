@@ -43,7 +43,7 @@ export const Push = pgTable(
 	'Push',
 	{
 		userId: uuid('userId').notNull(),
-		keys: json('keys').notNull(),
+		keys: json('keys').notNull().$type<{ p256dh: string; auth: string }>(),
 		endpoint: text('endpoint').notNull(),
 	},
 	indicesOn('userId')
