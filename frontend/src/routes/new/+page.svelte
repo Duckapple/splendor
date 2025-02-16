@@ -16,7 +16,7 @@
 		queryKey: ['room', $searchId],
 		queryFn: async () => {
 			if ($searchId == null) throw { message: 'ID undefined' };
-			const res = await client.room({ id: $searchId }).get();
+			const res = await client.api.room({ id: $searchId }).get();
 			return res;
 		},
 	});
@@ -24,7 +24,7 @@
 	const joinRoom = createMutation({
 		mutationFn: async () => {
 			if ($searchId == null) throw { message: 'ID undefined' };
-			const result = await client.room({ id: $searchId }).put();
+			const result = await client.api.room({ id: $searchId }).put();
 			useQueryClient().setQueryData(['room', $searchId], result);
 			return result;
 		},
@@ -33,7 +33,7 @@
 	const startGame = createMutation({
 		mutationFn: async () => {
 			if ($searchId == null) throw { message: 'ID undefined' };
-			const result = await client.game({ id: $searchId }).post();
+			const result = await client.api.game({ id: $searchId }).post();
 			window.location.href = `/game?id=${result.data?.id}`;
 			return result;
 		},

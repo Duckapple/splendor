@@ -3,8 +3,8 @@ import { treaty } from '@elysiajs/eden';
 import type { App } from '../../../local';
 
 export const BASE_URL = import.meta.env.DEV
-	? 'http://localhost:3005'
-	: 'https://api-splendor.simon-green.dev';
+	? 'http://localhost:5173'
+	: 'https://splendor.simon-green.dev';
 
 export const client = treaty<App>(BASE_URL, {
 	headers() {

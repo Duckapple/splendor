@@ -28,7 +28,7 @@
 			const last = $actionsCache.at(-1);
 			const params: Record<string, string> = {};
 			if (last != null) params['since'] = last.timestamp as unknown as string;
-			const data = await client.action({ id: gameId }).get({ query: params });
+			const data = await client.api.action({ id: gameId }).get({ query: params });
 			if (data.error) throw data.error;
 			actionsCache.update((cache) => cache.concat(data.data));
 			return $actionsCache;

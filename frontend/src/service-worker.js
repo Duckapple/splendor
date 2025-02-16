@@ -104,7 +104,7 @@ channel.addEventListener('message', async (e) => {
 				const subscription = /** @type {*} */ (
 					await sw.registration.pushManager.subscribe(options)
 				);
-				const response = await client.notifications.index.post(subscription, {
+				const response = await client.api.notifications.index.post(subscription, {
 					headers: { Authorization: `Bearer ${data.jwt}` },
 				});
 				channel.postMessage({

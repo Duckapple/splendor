@@ -9,13 +9,13 @@
 
 	const rooms = createQuery({
 		queryKey: ['rooms'],
-		queryFn: () => client.room.index.get(),
+		queryFn: () => client.api.room.index.get(),
 	});
 
 	const createRoom = createMutation({
 		mutationKey: ['rooms'],
 		mutationFn: async () => {
-			const data = await client.room.index.post();
+			const data = await client.api.room.index.post();
 			if (!data.data?.id) throw { message: 'Failed to create room' };
 
 			window.location.href = `/new?id=${data.data.id}`;
@@ -50,9 +50,9 @@
 						{/if}
 						<p title="Updated {timeAgo(room.updatedAt)} ({room.updatedAt.toString()})">
 							Created by
-							<span class="text-slate-900"
-								>{room.players.find(({ userId }) => room.ownerId === userId)?.userName}</span
-							>
+							<span class="text-slate-900">
+								{room.players.find(({ userId }) => room.ownerId === userId)?.userName}
+							</span>
 							{timeAgo(room.createdAt)}
 						</p>
 						Players:

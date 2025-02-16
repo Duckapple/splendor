@@ -17,8 +17,8 @@ if (!PORT) {
 	throw new Error();
 }
 
-export const app = new Elysia()
-	.use(cors())
+export const app = new Elysia({ prefix: '/api' })
+	// .use(cors())
 	.use(Auth)
 	.get('/ping', 'Pong!')
 	.onAfterResponse(({ route }) => {
@@ -52,9 +52,6 @@ export const app = new Elysia()
 			({ user, body }) => notificationsRoutes.post(user, { body }),
 			notificationsRoutes.post.params
 		)
-	)
-	.listen(PORT);
-
-console.info(new Date(), '[info] ', 'Server is listening on port', PORT);
+	);
 
 export type App = typeof app;

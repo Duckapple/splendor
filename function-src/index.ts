@@ -10,6 +10,8 @@ import { randomUUID } from 'crypto';
 import { newGameState } from '../common/defaults';
 import { Push, User } from '../db/schema';
 
+import process from '$env/dynamic/private';
+
 function safeParse<TSchema extends BaseSchema>(schema: TSchema) {
 	return function (data: unknown) {
 		const val = _safeParse(schema, data);
@@ -20,8 +22,8 @@ function safeParse<TSchema extends BaseSchema>(schema: TSchema) {
 const requiredEnv = ['MAIL', 'PUBLIC_KEY', 'PRIVATE_KEY'] as const;
 
 const env: Record<(typeof requiredEnv)[number], string> = Object.fromEntries(
-	requiredEnv.map((env) => {
-		const value = process.env[env];
+	requiredEnv.map((e) => {
+		const value = process.env[e];
 		if (!value) throw new Error(`Environment variable '${env}' not set`);
 		return [env, value];
 	})

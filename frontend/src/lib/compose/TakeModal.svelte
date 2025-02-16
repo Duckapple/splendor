@@ -105,7 +105,7 @@
 					},
 				} as const;
 
-				const res = await client.action({ id: game.id }).post(body);
+				const res = await client.api.action({ id: game.id }).post(body);
 				if (res.data) {
 					updateGameState(game.id, res);
 				}

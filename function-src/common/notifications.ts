@@ -1,25 +1,25 @@
-import { Static, t } from 'elysia';
+import { type Static, t } from 'elysia';
 import webPush from 'web-push';
 import { Check } from '@sinclair/typebox/value';
+import { env } from '$env/dynamic/private';
 
 const validEnv = t.Object({
 	NOTIFICATION_MAIL: t.String(),
-	PUBLIC_KEY: t.String(),
+	NOTI_PUBLIC_KEY: t.String(),
 	PRIVATE_KEY: t.String(),
 });
 
-const env = process.env;
 const envFits = Check(validEnv, env);
 if (!envFits) {
 	console.error({
-		NOTIFICATION_MAIL: !!process.env.NOTIFICATION_MAIL,
-		PUBLIC_KEY: !!process.env.PUBLIC_KEY,
-		PRIVATE_KEY: !!process.env.PRIVATE_KEY,
+		NOTIFICATION_MAIL: !!env.NOTIFICATION_MAIL,
+		PUBLIC_KEY: !!env.NOTI_PUBLIC_KEY,
+		PRIVATE_KEY: !!env.PRIVATE_KEY,
 	});
 	throw new Error('Env variables not set for notifications!');
 }
 
-webPush.setVapidDetails(env.NOTIFICATION_MAIL, env.PUBLIC_KEY, env.PRIVATE_KEY);
+webPush.setVapidDetails(env.NOTIFICATION_MAIL, env.NOTI_PUBLIC_KEY, env.PRIVATE_KEY);
 
 export const subscription = t.Object({
 	endpoint: t.String(),

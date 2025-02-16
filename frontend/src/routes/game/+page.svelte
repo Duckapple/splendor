@@ -87,7 +87,7 @@
 			async queryFn() {
 				if ($searchId == null) throw { message: 'ID undefined' };
 				const params = { id: $searchId };
-				const result = await client.game(params).get();
+				const result = await client.api.game(params).get();
 				for (const { userName, userId } of result.data?.players ?? []) {
 					$userNames[userId] = userName;
 				}
