@@ -42,7 +42,8 @@
 
 <div class="p-2 space-y-1 border rounded min-w-96">
 	<h1 title="User ID: {player.userId}">
-		'<span class:underline={isUser}>{player.userName}</span>'{turn === player.position
+		'<span class:underline={isUser}>{player.userName}</span>'{turn === player.position &&
+		phase !== GamePhase.FINISHED
 			? currentPlayer
 			: ''}
 		<span class="text-sm text-nowrap">({points} points)</span>

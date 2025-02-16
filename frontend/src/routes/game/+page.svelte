@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { client, jwt, user, userNames } from '$lib/main';
 	import { readable } from 'svelte/store';
+	import { fade } from 'svelte/transition';
 	import {
 		createMutation,
 		createQuery,
@@ -23,6 +24,7 @@
 	import type { GameAndPlayers } from '../../../../common/communication';
 	import { useUpdateGameState } from '$lib/state/update-game';
 	import Icon from '$lib/base/Icon.svelte';
+	import { GamePhase } from '../../../../common/model';
 
 	const qc = useQueryClient();
 	const { updateGameState } = useUpdateGameState(qc);
@@ -184,6 +186,25 @@
 		<Icon icon="bell" class="size-8 [stroke-width:1.5]" />
 	</button>
 </div>
+
+{#if gameCache?.phase === GamePhase.FINISHED}
+	<div
+		transition:fade={{ duration: 500 }}
+		class="fixed inset-0 flex items-center justify-center bg-slate-950 bg-opacity-50 z-10"
+	>
+		<div class="bg-white p-4 rounded-md">
+			<h2 class="text-2xl">Game Over</h2>
+			{#each gameCache?.players ?? [] as player, i}
+				{#if gameCache?.phase === GamePhase.FINISHED}
+					<div class="flex items-center gap-2" transition:fade={{ duration: 500, delay: i * 1000 }}>
+						<span>{$userNames[player.userId]}</span>
+						<span>{player.cards.reduce((acc, card) => acc + cardFromId(card).p, 0)} points</span>
+					</div>
+				{/if}
+			{/each}
+		</div>
+	</div>
+{/if}
 
 <BuyModal
 	closeModal={() => setCurrent(undefined)}

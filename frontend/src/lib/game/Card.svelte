@@ -3,6 +3,7 @@
 	import { bgColorOf, fadeTextBgColorOf, gradientOf, iconOf } from '$lib/color';
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
 	import Icon from '$lib/base/Icon.svelte';
+	import { onMount } from 'svelte';
 
 	interface Props {
 		stacked?: boolean;
@@ -13,6 +14,7 @@
 		onclick?: MouseEventHandler<HTMLButtonElement> | null;
 		onkeypress?: KeyboardEventHandler<HTMLButtonElement> | null;
 		style?: string;
+		autofocus?: boolean;
 	}
 
 	let {
@@ -24,6 +26,7 @@
 		onclick,
 		onkeypress,
 		style,
+		autofocus,
 	}: Props = $props();
 
 	let filteredLength = $derived(card.cost.filter(Boolean).length);
@@ -53,9 +56,17 @@
 	let costStyle = $derived(!small ? 'md:text-2xl md:leading-5 md:pl-2 md:pb-2 md:w-20' : '');
 
 	let fadeText = $derived(card.p === 0);
+
+	let ref = $state<HTMLButtonElement>();
+	onMount(() => {
+		if (autofocus) {
+			ref?.focus();
+		}
+	});
 </script>
 
 <button
+	bind:this={ref}
 	class="flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-[transform,opacity] rounded-lg border border-black select-none {cardStyle} shadow-lg aspect-square bg-gradient-to-bl outline-offset-4 focus:outline outline-blue-500 {gradientOf[
 		card.c
 	]}"

@@ -223,7 +223,7 @@
 	{/snippet}
 	<div class="w-56 h-56 md:w-[28rem] md:h-[28rem] flex justify-center items-center relative">
 		{#if cardId}
-			<Card card={cardFromId(cardId)} style="transform: scale(2)" />
+			<Card card={cardFromId(cardId)} style="transform: scale(2)" autofocus />
 		{/if}
 		<div bind:this={center} class="absolute size-0"></div>
 	</div>
