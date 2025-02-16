@@ -12,7 +12,7 @@ export function useUpdateGameState(queryClient: QueryClient) {
 		const newData = actionResult.data;
 		if (!newData) return;
 
-		queryclient.setQueryData<TreatyGame>(['game', gameId], (prev?: TreatyGame) => {
+		queryClient.setQueryData<TreatyGame>(['game', gameId], (prev?: TreatyGame) => {
 			const players = structuredClone(prev?.data?.players ?? []);
 			const index = players.findIndex(({ userId }) => userId === newData.player.userId);
 			players[index] = { ...newData.player, userName: players[index].userName };
