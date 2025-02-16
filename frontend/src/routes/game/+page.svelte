@@ -40,7 +40,7 @@
 				break;
 			case 'your-turn':
 				console.log('Your turn!', e.data);
-				updateGameState(e.data.gameId, e.data.data);
+				updateGameState(e.data.gameId, { data: e.data.data, error: null, status: 200 });
 				break;
 		}
 	});
