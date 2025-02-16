@@ -17,7 +17,6 @@ const buyCard = t.Object({
 		tokens: sixTuple,
 		person: t.Optional(
 			t.Object({
-				i: t.UnionEnum([0, 1, 2, 3, 4]),
 				id: t.Number(),
 			})
 		),

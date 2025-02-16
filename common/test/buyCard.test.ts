@@ -15,7 +15,7 @@ describe('performAction.buyCard', () => {
 		tokens: [0, 0, 0, 0, 0, 0],
 		turn: 0,
 		playerCount: 4,
-	};
+	} as GameState;
 	const player: Player = {
 		tokens: [...cardFromId(0).cost, 0],
 		cards: [],
@@ -203,7 +203,7 @@ describe('performAction.buyCard', () => {
 				{ ...player, cards },
 				{
 					...action,
-					data: { ...action.data, person: { i: 4, id: game.shown.persons[4] } },
+					data: { ...action.data, person: { id: game.shown.persons[4] } },
 				}
 			);
 			if (res.isErr()) expect(res.error).toBeUndefined();

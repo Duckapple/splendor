@@ -125,10 +125,7 @@
 					potentialPersons.length === 1
 						? potentialPersons[0]
 						: potentialPersons.find((p) => p[0] === selectedPerson);
-				const person =
-					personData != null
-						? { id: personData[0], i: personData[1] as 0 | 1 | 2 | 3 | 4 }
-						: undefined;
+				const person = personData != null ? { id: personData[0] } : undefined;
 
 				const body = {
 					type: 'BUY_CARD',
