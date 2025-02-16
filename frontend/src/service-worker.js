@@ -87,16 +87,6 @@ sw.addEventListener('fetch', (event) => {
 	fetchEvent.respondWith(respond());
 });
 
-sw.addEventListener('push', async (e) => {
-	const canNotify = await sw.navigator.permissions.query({ name: 'notifications' });
-
-	if (canNotify.state === 'granted') {
-		sw.registration.showNotification(e.data?.text() ?? 'no text lol', {});
-	} else {
-		console.error('Received push when disallowed', e.data?.text());
-	}
-});
-
 const publicKey = urlB64ToUint8Array(
 	'BNRsMC5kgbxxk77s+DIigDX4+4PQZSEIaR4mCXXWkH5aNfyrqEGPUKwaglZNBPHAk+JB0O+RB6w/bHrMbv5XxSY='
 );
@@ -118,14 +108,29 @@ channel.addEventListener('message', async (e) => {
 					headers: { Authorization: `Bearer ${data.jwt}` },
 				});
 				channel.postMessage({
-					type: 'ok',
+					type: 'notifications',
 					response: response.data ?? response.error,
 					status: response.status,
 				});
 			} catch (error) {
-				channel.postMessage({ type: 'error', response: error });
+				channel.postMessage({ type: 'notifications', response: error, status: 500 });
 			}
 		}
+	}
+});
+
+sw.addEventListener('push', async (e) => {
+	const canNotify = await sw.navigator.permissions.query({ name: 'notifications' });
+
+	/** @type {{ message?: string }} */
+	const { message, ...rest } = e.data?.json() ?? {};
+
+	if (rest) channel.postMessage(rest);
+
+	if (canNotify.state === 'granted') {
+		sw.registration.showNotification(message ?? 'Updates are available!', { icon: '/favicon.png' });
+	} else {
+		console.error('Received push when disallowed', message);
 	}
 });
 

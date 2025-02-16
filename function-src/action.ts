@@ -107,7 +107,7 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 
 	await Promise.all(
 		pushes.map(({ Push: { userId, ...sub } }) =>
-			push(sub, { message: "It's your turn!", gameId, data })
+			push(sub, { message: "It's your turn!", type: 'your-turn', gameId, data })
 		)
 	);
 

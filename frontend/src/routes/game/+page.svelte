@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { client, jwt, user, userNames } from '$lib/main';
 	import { readable } from 'svelte/store';
-	import { createMutation, createQuery, queryOptions } from '@tanstack/svelte-query';
+	import {
+		createMutation,
+		createQuery,
+		queryOptions,
+		useQueryClient,
+	} from '@tanstack/svelte-query';
 
 	import BuyModal from '$lib/compose/BuyModal.svelte';
 	import TakeModal from '$lib/compose/TakeModal.svelte';
@@ -16,6 +21,10 @@
 	import { range } from '../../../../common/utils';
 	import { moveTo } from '$lib/move';
 	import type { GameAndPlayers } from '../../../../common/communication';
+	import { useUpdateGameState } from '$lib/state/update-game';
+
+	const qc = useQueryClient();
+	const { updateGameState } = useUpdateGameState(qc);
 
 	let cardCenter = $state({ value: undefined as unknown as HTMLDivElement });
 	let coinCenter = $state({ value: undefined as unknown as HTMLDivElement });
@@ -25,7 +34,15 @@
 	const serviceWorker = new BroadcastChannel('service-worker');
 
 	serviceWorker.addEventListener('message', (e) => {
-		console.log('Notification response:', e);
+		switch (e.data.type) {
+			case 'notifications':
+				console.log('Notification:', e.data);
+				break;
+			case 'your-turn':
+				console.log('Your turn!', e.data);
+				updateGameState(e.data.gameId, e.data.data);
+				break;
+		}
 	});
 
 	function setCurrent(newVal: HTMLElement | undefined) {

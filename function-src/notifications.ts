@@ -10,7 +10,10 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 
 	await db.insert(Push).values({ userId: user.id, ...subscriptionInput });
 
-	const nonce = push(subscriptionInput, { message: "You've turned on notifications!" });
+	const nonce = push(subscriptionInput, {
+		message: "You've turned on notifications!",
+		type: 'notifications',
+	});
 
 	return { nonce };
 }
