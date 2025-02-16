@@ -59,7 +59,7 @@ export type BuyCard = {
 		i: number;
 		card: number;
 		tokens: TokenHold;
-		person?: { i: 0 | 1 | 2 | 3 | 4; id: number };
+		person?: { id: number };
 	};
 };
 

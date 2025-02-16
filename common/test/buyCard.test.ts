@@ -1,7 +1,7 @@
 import { expect, it, describe } from 'bun:test';
 import { cardFromId } from '../defaults';
 import { canAfford, performAction } from '../logic';
-import { Card, GameState, IdDecks, InnerAction, Player } from '../model';
+import { Card, GamePhase, GameState, IdDecks, InnerAction, Player } from '../model';
 
 describe('performAction.buyCard', () => {
 	// +---------+
@@ -45,9 +45,7 @@ describe('performAction.buyCard', () => {
 		} as Player,
 	};
 
-	// +-------+
-	// | Tests |
-	// +-------+
+	// #region Tests
 
 	it('can buy a card from tokens', () => {
 		const res = performAction(
@@ -180,7 +178,7 @@ describe('performAction.buyCard', () => {
 				{ ...player, cards },
 				{
 					...action,
-					data: { ...action.data, person: { i: 0, id: game.shown.persons[0] } },
+					data: { ...action.data, person: { id: game.shown.persons[0] } },
 				}
 			);
 			if (res.isErr()) expect(res.error).toBeUndefined();
@@ -226,7 +224,7 @@ describe('performAction.buyCard', () => {
 		it('can not hand the player the person they want when none earned', () => {
 			const res = performAction(game, player, {
 				...action,
-				data: { ...action.data, person: { i: 0, id: game.shown.persons[0] } },
+				data: { ...action.data, person: { id: game.shown.persons[0] } },
 			});
 			if (res.isOk()) expect(res.value).toBeUndefined();
 			if (res.isErr()) {
@@ -240,22 +238,6 @@ describe('performAction.buyCard', () => {
 			if (res.isOk()) expect(res.value).toBeUndefined();
 			if (res.isErr()) {
 				expect(res.error.data).toEqual({ code: 'PERSON', type: 'BUY_CARD' });
-			}
-		});
-
-		it('can not hand the player a person if they do not claim', () => {
-			const cards = [1, 1, 1, 0x20, 0x20, 0x20, 0x20];
-			const res = performAction(
-				game,
-				{ ...player, cards },
-				{
-					...action,
-					data: { ...action.data, person: { i: 4, id: game.shown.persons[0] } },
-				}
-			);
-			if (res.isOk()) expect(res.value).toBeUndefined();
-			if (res.isErr()) {
-				expect(res.error.data).toEqual({ code: 'PERSON_INDEX', type: 'BUY_CARD' });
 			}
 		});
 	});

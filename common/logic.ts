@@ -121,19 +121,17 @@ function buyAction(
 		});
 	}
 
-	const chosen = earnedPeople.find(
-		([personId, i]) => action.data.person?.i === i && action.data.person?.id === personId
-	);
+	const chosen = game.shown.persons.findIndex((personId) => action.data.person?.id === personId);
 
-	if (chosen == null && action.data.person != null)
+	if (earnedPeople.length && chosen === -1 && action.data.person != null)
 		return err({
 			message: 'Did not choose an earned person',
 			data: { type: 'BUY_CARD', code: 'PERSON_INDEX' },
 		});
 
-	if (chosen != null) {
-		game.shown.persons.splice(chosen[1], 1);
-		player.cards.push(chosen[0]);
+	if (chosen !== -1) {
+		player.cards.push(game.shown.persons[chosen]);
+		game.shown.persons.splice(chosen, 1);
 	}
 
 	const points = player.cards.reduce((acc, card) => acc + cardFromId(card).p, 0);
