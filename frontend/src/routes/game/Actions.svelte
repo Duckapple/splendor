@@ -31,7 +31,7 @@
 			const data = await client.api.action({ id: gameId }).get({ query: params });
 			if (data.error) throw data.error;
 			actionsCache.update((cache) => cache.concat(data.data));
-			return $actionsCache;
+			return data.data;
 		},
 		initialData: $actionsCache,
 	});
@@ -42,8 +42,7 @@
 	// 	}
 	// });
 
-	let orderedActions = $derived([...($actionsCache ?? [])].reverse());
-	$inspect(orderedActions);
+	let orderedActions = $derived([...($query.data ?? [])].reverse());
 
 	let cardClick = $derived((card: EventTarget | null) => {
 		if (!(card instanceof HTMLElement)) return;
@@ -60,6 +59,9 @@
 	<div
 		class="bg-white p-2 overflow-y-auto text-sm min-w-72 max-h-[calc(100svh-5rem)] divide-y grid grid-cols-3"
 	>
+		{#if $query.error}
+			{JSON.stringify($query.error)}
+		{/if}
 		{#each orderedActions as action}
 			<div class="grid items-center col-span-3 grid-cols-subgrid gap-x-2 min-h-16">
 				{#if action.type === 'TAKE_TOKENS'}

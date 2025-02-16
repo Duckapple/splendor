@@ -1,7 +1,8 @@
 import { expect, it, describe } from 'bun:test';
 import { cardFromId } from '../defaults';
 import { canAfford, performAction } from '../logic';
-import { Card, GamePhase, GameState, IdDecks, InnerAction, Player } from '../model';
+import { Action, Card, GamePhase, GameState, IdDecks, InnerAction, Player } from '../model';
+import winSnapshotTest from './win.snapshot.test';
 
 describe('performAction.buyCard', () => {
 	// +---------+
@@ -121,6 +122,8 @@ describe('performAction.buyCard', () => {
 			});
 	});
 
+	// #region edges
+
 	it('can not buy a card from too few tokens', () => {
 		const localAction = { ...action, data: { ...action.data } };
 		localAction.data.tokens = [0, 0, 1, 0, 0, 0];
@@ -171,6 +174,7 @@ describe('performAction.buyCard', () => {
 	});
 
 	describe('person', () => {
+		// #region person
 		it('hands the player the person they want when earned', () => {
 			const cards = [1, 1, 1, 0x20, 0x20, 0x20, 0x20];
 			const res = performAction(
@@ -240,6 +244,37 @@ describe('performAction.buyCard', () => {
 				expect(res.error.data).toEqual({ code: 'PERSON', type: 'BUY_CARD' });
 			}
 		});
+	});
+
+	// #region Win
+	it('can win the game', () => {
+		let { game: localGame, players: localPlayers } = structuredClone(winSnapshotTest);
+		let localAction: Action = {
+			type: 'BUY_CARD',
+			gameId: localGame.id,
+			userId: localPlayers[0].userId,
+			timestamp: new Date(),
+			data: { row: 'middle', tokens: [0, 0, 0, 0, 0, 0], i: 3, card: 0x43 },
+		};
+		const res = performAction(localGame, localPlayers[0], localAction);
+		if (res.isErr()) expect(res.error).toBeUndefined();
+		if (res.isOk()) {
+			expect(res.value.player.cards?.reduce((acc, card) => acc + cardFromId(card).p, 0)).toBe(15);
+			expect(res.value.game.phase).toBe(GamePhase.ENDING);
+			localGame = { ...localGame, ...res.value.game };
+			localPlayers[0] = { ...localPlayers[0], ...res.value.player };
+			localAction = {
+				...localAction,
+				userId: localPlayers[1].userId,
+				data: { card: 0x45, tokens: [0, 0, 0, 0, 0, 0], row: 'middle', i: 2 },
+			};
+			const res2 = performAction(localGame, localPlayers[1], localAction);
+			if (res2.isErr()) expect(res2.error).toBeUndefined();
+			if (res2.isOk()) {
+				expect(res2.value.player.cards?.reduce((acc, card) => acc + cardFromId(card).p, 0)).toBe(5);
+				expect(res2.value.game.phase).toBe(GamePhase.FINISHED);
+			}
+		}
 	});
 });
 

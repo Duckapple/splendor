@@ -3,7 +3,6 @@
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
 	import InfoTooltip from './InfoTooltip.svelte';
 	import { on } from 'svelte/events';
-	import { stopPropagation } from 'svelte/legacy';
 
 	interface Props {
 		closeModal: () => void;

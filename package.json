@@ -4,7 +4,7 @@
 		"deploy:function": "bun ./build.ts deploy",
 		"db:generate": "bun drizzle-kit generate:pg --schema=./db/schema.ts",
 		"db:migrate-prod": "bun ./db/runMigrations.ts",
-		"frontend": "cd frontend && bun run",
+		"frontend": "cd frontend && bun --bun run",
 		"preview": "bun run frontend build && bun run frontend preview",
 		"dev": "bun local.ts --watch"
 	},

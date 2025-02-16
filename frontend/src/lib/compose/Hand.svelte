@@ -45,9 +45,9 @@
 		'<span class:underline={isUser}>{player.userName}</span>'{turn === player.position
 			? currentPlayer
 			: ''}
-		<span class="text-sm">({points} points)</span>
-		{#if phase === GamePhase.ENDING}
-			<span class="text-sm capitalize">final turn</span>
+		<span class="text-sm text-nowrap">({points} points)</span>
+		{#if phase === GamePhase.ENDING && turn === player.position}
+			<span class="text-sm uppercase text-red-700 text-nowrap">final turn</span>
 		{/if}
 	</h1>
 	{#if persons.length}
