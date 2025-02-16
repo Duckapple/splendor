@@ -117,7 +117,7 @@
 	<title>Game</title>
 </svelte:head>
 
-<div class="flex flex-col p-2 lg:flex-row md:p-4">
+<div class="flex flex-col gap-4 p-2 lg:flex-row md:p-4">
 	<div class="flex flex-col md:flex-row">
 		<div class="space-y-3">
 			<div class="flex justify-center gap-2 md:gap-3">
@@ -151,7 +151,7 @@
 			{/each}
 		</div>
 	</div>
-	<div class="grid w-full gap-4 md:pl-4 md:grid-cols-2">
+	<div class="flex flex-wrap w-full gap-4">
 		{#each gameCache?.players ?? [] as player}
 			<Hand
 				{player}
