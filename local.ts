@@ -18,7 +18,7 @@ if (!PORT) {
 }
 
 export const app = new Elysia()
-	.use(cors())
+	.use(cors({ origin: true }))
 	.use(Auth)
 	.get('/ping', 'Pong!')
 	.onAfterResponse(({ route }) => {
