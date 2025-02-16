@@ -1,15 +1,15 @@
 import { $ } from 'bun';
 
-const naming = '[dir]/index.[ext]';
-const x = await Bun.build({
-	entrypoints: [`./local.ts`],
-	outdir: `./function`,
-	naming,
-	minify: true,
-	target: 'bun',
-});
+// const naming = '[dir]/index.[ext]';
+// const x = await Bun.build({
+// 	entrypoints: [`./local.ts`],
+// 	outdir: `./function`,
+// 	naming,
+// 	minify: true,
+// 	target: 'bun',
+// });
 
-await $`bun frontend build`;
+await $`bun --bun frontend build`;
 
 console.log('Build complete, transferring files...');
 
