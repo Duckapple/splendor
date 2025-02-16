@@ -5,8 +5,7 @@
 // @ts-check
 
 import { build, files, version } from '$service-worker';
-import { get } from 'svelte/store';
-import { client, jwt } from './lib/main';
+import { client } from './lib/main';
 
 const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
 

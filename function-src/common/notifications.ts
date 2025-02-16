@@ -29,13 +29,17 @@ export const subscription = t.Object({
 	}),
 });
 
-export async function push<T extends Record<'message' | (string & {}), any>>(
+export async function push<T extends Record<'message' | 'type' | (string & {}), any>>(
 	sub: Static<typeof subscription>,
 	data: T
 ) {
 	const nonce = crypto.randomUUID();
 
-	await webPush.sendNotification(sub, JSON.stringify({ nonce, ...data }));
+	try {
+		await webPush.sendNotification(sub, JSON.stringify({ nonce, ...data }));
+	} catch (error) {
+		console.error(new Date(), '[error]', 'Failed to send notification:', error);
+	}
 
 	return nonce;
 }
