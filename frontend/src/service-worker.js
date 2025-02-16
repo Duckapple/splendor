@@ -122,13 +122,20 @@ channel.addEventListener('message', async (e) => {
 sw.addEventListener('push', async (e) => {
 	const canNotify = await sw.navigator.permissions.query({ name: 'notifications' });
 
-	/** @type {{ message?: string }} */
+	/** @type {{ message?: string, type: string, gameId?: string }} */
 	const { message, ...rest } = e.data?.json() ?? {};
 
 	if (rest) channel.postMessage(rest);
 
 	if (canNotify.state === 'granted') {
-		sw.registration.showNotification(message ?? 'Updates are available!', { icon: '/favicon.png' });
+		const oldNotis = await sw.registration.getNotifications();
+		oldNotis.forEach((noti) => noti.close());
+
+		sw.registration.showNotification(message ?? 'Updates are available!', {
+			icon: '/favicon.png',
+			badge: '/favicon.png',
+			tag: rest.type + (rest.gameId ?? ''),
+		});
 	} else {
 		console.error('Received push when disallowed', message);
 	}
