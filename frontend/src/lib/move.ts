@@ -12,5 +12,9 @@ export function moveTo(target: HTMLElement, transform: HTMLElement | Record<'x' 
 				y - top - target.clientHeight / 2
 			}px) scale(${scale}); z-index: 30; opacity: 0%`
 		);
+
+		setTimeout(() => {
+			target.setAttribute('style', target.getAttribute('style')!.replace('z-index: 30;', ''));
+		}, 150);
 	});
 }

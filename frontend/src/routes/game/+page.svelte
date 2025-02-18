@@ -25,6 +25,8 @@
 	import { useUpdateGameState } from '$lib/state/update-game';
 	import Icon from '$lib/base/Icon.svelte';
 	import { GamePhase } from '../../../../common/model';
+	import { tick } from 'svelte';
+	import Button from '$lib/base/Button.svelte';
 
 	const qc = useQueryClient();
 	const { updateGameState } = useUpdateGameState(qc);
@@ -114,6 +116,28 @@
 			}
 		},
 	});
+
+	const playersWithPoints = $derived.by(() => {
+		if (gameCache?.phase === GamePhase.FINISHED) {
+			return [...(gameCache?.players ?? []), ...(gameCache?.players ?? [])]
+				.map((player) => ({
+					...player,
+					points: player.cards.reduce((acc, card) => acc + cardFromId(card).p, 0),
+				}))
+				.sort((a, b) => b.points - a.points);
+		}
+		return gameCache?.players;
+	});
+
+	let hideOverlay = $state(false);
+	let showWinners = $state(false);
+	$effect(() => {
+		if (gameCache?.phase === GamePhase.FINISHED) {
+			tick().then(() => {
+				showWinners = true;
+			});
+		}
+	});
 </script>
 
 <svelte:head>
@@ -185,23 +209,52 @@
 	<button onclick={() => $notify.mutate()}>
 		<Icon icon="bell" class="size-8 [stroke-width:1.5]" />
 	</button>
+	{#if gameCache?.phase === GamePhase.FINISHED}
+		<button onclick={() => (hideOverlay = !hideOverlay)}>
+			<Icon icon="trophy" class="size-8 [stroke-width:1.5] {hideOverlay ? 'animate-bounce' : ''}" />
+		</button>
+	{/if}
 </div>
 
-{#if gameCache?.phase === GamePhase.FINISHED}
+{#if gameCache?.phase === GamePhase.FINISHED && !hideOverlay}
 	<div
 		transition:fade={{ duration: 500 }}
-		class="fixed inset-0 flex items-center justify-center bg-slate-950 bg-opacity-50 z-10"
+		class="fixed inset-0 flex items-center justify-center bg-slate-950 bg-opacity-75 z-10 select-none"
 	>
-		<div class="bg-white p-4 rounded-md">
-			<h2 class="text-2xl">Game Over</h2>
-			{#each gameCache?.players ?? [] as player, i}
-				{#if gameCache?.phase === GamePhase.FINISHED}
-					<div class="flex items-center gap-2" transition:fade={{ duration: 500, delay: i * 1000 }}>
-						<span>{$userNames[player.userId]}</span>
-						<span>{player.cards.reduce((acc, card) => acc + cardFromId(card).p, 0)} points</span>
-					</div>
-				{/if}
-			{/each}
+		<div class="text-white flex flex-col items-center gap-y-6 mb-64 sm:mb-0">
+			<h2 class="text-4xl text-center">Game Over</h2>
+			<div class="flex flex-col gap-y-4 gap-x-8 lg:grid grid-cols-2">
+				{#each playersWithPoints ?? [] as player, i}
+					{@const delayIndex = (playersWithPoints?.length ?? 0) - i}
+					{#if showWinners}
+						<div
+							class="flex flex-col justify-center items-center {i === 0
+								? 'lg:items-end row-span-3'
+								: 'lg:items-start'} gap-1"
+							transition:fade={{ duration: 500, delay: 1000 + delayIndex * 2000 }}
+						>
+							<span class={i === 0 ? 'text-6xl lg:text-7xl' : i === 1 ? 'text-4xl' : 'text-xl'}>
+								{$userNames[player.userId]}
+							</span>
+							<span>{player.cards.reduce((acc, card) => acc + cardFromId(card).p, 0)} points</span>
+						</div>
+					{/if}
+				{/each}
+			</div>
+			{#if showWinners}
+				<div
+					class="flex gap-2"
+					transition:fade={{ duration: 500, delay: 3000 + (playersWithPoints?.length ?? 0) * 2000 }}
+				>
+					<Button
+						onClick={() => (hideOverlay = !hideOverlay)}
+						class="bg-slate-800 border-slate-500"
+					>
+						Hide overlay
+					</Button>
+					<Button class="bg-slate-800 border-slate-500" href="/">Back to game list</Button>
+				</div>
+			{/if}
 		</div>
 	</div>
 {/if}

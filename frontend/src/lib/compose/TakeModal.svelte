@@ -7,6 +7,7 @@
 	import { range } from '../../../../common/utils';
 	import InfoTooltip from '$lib/InfoTooltip.svelte';
 	import { useUpdateGameState } from '$lib/state/update-game';
+	import SelectTokens from './SelectTokens.svelte';
 
 	interface Props {
 		closeModal: () => void;
@@ -89,6 +90,9 @@
 		tokens = newTokens;
 	});
 
+	let returns = $state<Color[]>([]);
+	let showReturns = $state(false);
+
 	let takeMutation = $derived(
 		createMutation({
 			mutationKey: ['action', 'TAKE_TOKENS'],
@@ -121,6 +125,11 @@
 	{open}
 	actions={[
 		{
+			colorClass: 'bg-yellow-200',
+			text: `${showReturns ? 'Hide' : 'Show'} returns`,
+			handler: () => (showReturns = !showReturns),
+		},
+		{
 			colorClass: 'bg-green-200',
 			text: 'Take',
 			handler: $takeMutation.mutateAsync,
@@ -150,31 +159,14 @@
 			</ul>
 		</div>
 	{/snippet}
-	<div class="flex flex-col-reverse gap-4 pt-4 pb-2 md:pt-6 md:gap-8">
-		<div class="relative flex gap-1.5 md:gap-4">
-			<div
-				class="absolute size-10 md:size-24 flex justify-center items-center"
-				style="left: calc({initialCoinColor ?? 0} * var(--coin-with-gap))"
-			>
-				<div bind:this={center}></div>
-			</div>
-			{#each leftOverOfEach ?? [] as stackSize, color}
-				<Coin {color} {stackSize} onclick={() => stackSize > 0 && tryTake(color)} />
-			{/each}
-		</div>
-		<div class="relative flex gap-1.5 md:gap-4">
-			{#each takenOfEach as stackSize, color}
-				<Coin
-					{color}
-					{stackSize}
-					onclick={() => {
-						error = '';
-						if (tokens.indexOf(color) !== -1) tokens = tokens.toSpliced(tokens.indexOf(color), 1);
-					}}
-				/>
-			{/each}
-		</div>
-	</div>
+	<SelectTokens
+		{initialCoinColor}
+		holdTokens={game?.tokens}
+		bind:tokens
+		bind:error
+		{tryTake}
+		bind:center
+	/>
 	<span class="text-red-700">{error || ($takeMutation.error?.message ?? '')}&nbsp;</span>
 </Modal>
 
