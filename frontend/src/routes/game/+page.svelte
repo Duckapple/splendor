@@ -119,7 +119,7 @@
 
 	const playersWithPoints = $derived.by(() => {
 		if (gameCache?.phase === GamePhase.FINISHED) {
-			return [...(gameCache?.players ?? []), ...(gameCache?.players ?? [])]
+			return (gameCache?.players ?? [])
 				.map((player) => ({
 					...player,
 					points: player.cards.reduce((acc, card) => acc + cardFromId(card).p, 0),
