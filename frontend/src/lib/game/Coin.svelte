@@ -30,9 +30,14 @@
 
 <button
 	data-coin-color={color}
-	{onclick}
+	onclick={onclick && ((e) => stackSize && onclick(e))}
 	{onkeypress}
-	class="{!small && boxMd} flex flex-col w-10 h-10 transition-[transform,opacity] group {cn}"
+	class={[
+		'flex flex-col w-10 h-10 transition-[transform,opacity] group',
+		!small && boxMd,
+		cn,
+		onclick && stackSize ? 'cursor-pointer' : 'cursor-default',
+	]}
 >
 	{#each Array(stackSize) as _, i}
 		{@const top = !hideNumber && i + 1 === stackSize}

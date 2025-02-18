@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Coin from '$lib/game/Coin.svelte';
+	import { slide } from 'svelte/transition';
 	import type { Color } from '../../../../common/model';
 	import { range } from '../../../../common/utils';
 
@@ -9,6 +10,7 @@
 		tokens: number[];
 		error?: string;
 		tryTake: (color: Color) => void;
+		tryReturn: (color: Color) => void;
 		center?: HTMLDivElement;
 	}
 	let {
@@ -18,6 +20,7 @@
 		holdTokens,
 		initialCoinColor,
 		tryTake,
+		tryReturn,
 	}: Props = $props();
 
 	let takenOfEach = $derived(
@@ -26,7 +29,12 @@
 	let leftOverOfEach = $derived((holdTokens ?? []).map((count, i) => count - takenOfEach[i]));
 </script>
 
-<div class="flex flex-col-reverse gap-4 pt-4 pb-2 md:pt-6 md:gap-8">
+<div class="flex flex-col-reverse gap-4 pt-4 md:pt-2 pb-2 md:gap-8">
+	{#if error}
+		<span transition:slide={{ axis: 'y', duration: 150 }} class="text-sm md:text-base text-red-700"
+			>{error}</span
+		>
+	{/if}
 	<div class="relative flex gap-1.5 md:gap-4">
 		<div
 			class="absolute size-10 md:size-24 flex justify-center items-center"
@@ -40,14 +48,7 @@
 	</div>
 	<div class="relative flex gap-1.5 md:gap-4">
 		{#each takenOfEach as stackSize, color}
-			<Coin
-				{color}
-				{stackSize}
-				onclick={() => {
-					error = '';
-					if (tokens.indexOf(color) !== -1) tokens = tokens.toSpliced(tokens.indexOf(color), 1);
-				}}
-			/>
+			<Coin {color} {stackSize} onclick={() => tryReturn(color)} />
 		{/each}
 	</div>
 </div>

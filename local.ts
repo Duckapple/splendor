@@ -1,7 +1,7 @@
 import { Elysia } from 'elysia';
 import cors from '@elysiajs/cors';
 
-import { Auth, loginSchema } from './function-src/common/auth';
+import { Auth, FunctionError, loginSchema } from './function-src/common/auth';
 
 import { room } from './function-src/room';
 import * as gameRoutes from './function-src/game';
@@ -21,6 +21,7 @@ export const app = new Elysia({ prefix: '/api' })
 	// .use(cors())
 	.use(Auth)
 	.get('/ping', 'Pong!')
+	.error('FunctionError', FunctionError)
 	.onAfterResponse(({ route }) => {
 		console.debug(new Date(), '[debug]', route);
 	})

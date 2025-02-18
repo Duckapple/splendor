@@ -3,11 +3,10 @@
 	import Modal from '../Modal.svelte';
 	import { Color, type GameState, type Player } from '../../../../common/model';
 	import { client } from '../main';
-	import Coin from '../game/Coin.svelte';
 	import { range } from '../../../../common/utils';
-	import InfoTooltip from '$lib/InfoTooltip.svelte';
 	import { useUpdateGameState } from '$lib/state/update-game';
 	import SelectTokens from './SelectTokens.svelte';
+	import { slide } from 'svelte/transition';
 
 	interface Props {
 		closeModal: () => void;
@@ -91,27 +90,40 @@
 	});
 
 	let returns = $state<Color[]>([]);
-	let showReturns = $state(false);
+	let shouldReturn = $derived(
+		Math.max((player?.tokens.reduce((x, a) => x + a) ?? 0) + tokens.length, 10) - 10
+	);
+	let returnError = $state('');
 
 	let takeMutation = $derived(
 		createMutation({
 			mutationKey: ['action', 'TAKE_TOKENS'],
 			async mutationFn() {
 				if (!player || !game) {
-					throw { message: 'Invalid initial state. Retry the action, this time slowly' };
+					error = 'Invalid initial state. Retry the action, this time slowly';
+					throw new Error();
 				}
 
+				if (returns.length !== shouldReturn) {
+					returnError = 'You have to return the required amount of tokens, or take fewer tokens';
+					throw new Error();
+				}
+
+				type Tokens = [number] | [number, number] | [number, number, number];
 				const body = {
 					type: 'TAKE_TOKENS',
 					data: {
-						tokens: tokens as [number] | [number, number] | [number, number, number],
-						returned: undefined,
+						tokens: tokens as Tokens,
+						returned: returns.length ? (returns as Tokens) : undefined,
 					},
 				} as const;
 
 				const res = await client.api.action({ id: game.id }).post(body);
 				if (res.data) {
 					updateGameState(game.id, res);
+				} else {
+					error = 'Invalid action. Retry the action, perhaps reloading the page first';
+					throw res.error;
 				}
 
 				onClose();
@@ -125,17 +137,12 @@
 	{open}
 	actions={[
 		{
-			colorClass: 'bg-yellow-200',
-			text: `${showReturns ? 'Hide' : 'Show'} returns`,
-			handler: () => (showReturns = !showReturns),
-		},
-		{
 			colorClass: 'bg-green-200',
 			text: 'Take',
 			handler: $takeMutation.mutateAsync,
 		},
 	]}
-	class="max-w-72 md:max-w-3xl"
+	class="max-w-80 md:max-w-3xl"
 	title="Take tokens"
 	bind:target={targetCoin}
 >
@@ -165,9 +172,37 @@
 		bind:tokens
 		bind:error
 		{tryTake}
+		tryReturn={(color) => {
+			error = '';
+			if (tokens.indexOf(color) !== -1) {
+				tokens = tokens.toSpliced(tokens.indexOf(color), 1);
+				returns.pop();
+			}
+		}}
 		bind:center
 	/>
-	<span class="text-red-700">{error || ($takeMutation.error?.message ?? '')}&nbsp;</span>
+	{#if shouldReturn}
+		<div transition:slide={{ axis: 'y' }}>
+			<h2 class="text-lg border-t mt-4 pt-4">
+				Return {shouldReturn} token{shouldReturn !== 1 ? 's' : ''}
+			</h2>
+			<SelectTokens
+				{initialCoinColor}
+				holdTokens={player?.tokens}
+				bind:tokens={returns}
+				bind:error={returnError}
+				tryTake={(color) => {
+					returnError = '';
+					if (returns.length < shouldReturn) returns.push(color);
+					else returnError = 'You have already selected the required amount of tokens to return';
+				}}
+				tryReturn={(color) => {
+					returnError = '';
+					if (returns.indexOf(color) !== -1) returns = returns.toSpliced(returns.indexOf(color), 1);
+				}}
+			/>
+		</div>
+	{/if}
 </Modal>
 
 <style>

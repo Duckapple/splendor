@@ -38,7 +38,13 @@
 	let dragOrigin = $state<{ x: number; y: number }>();
 	let drag = $state<{ x: number; y: number }>();
 
-	$inspect(drag);
+	$effect(() => {
+		if (!open) {
+			modalOffset = { x: 0, y: 0 };
+			dragOrigin = undefined;
+			drag = undefined;
+		}
+	});
 
 	onMount(() => {
 		on(window, 'mousemove', (e) => {
@@ -63,7 +69,7 @@
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		class={['p-2 md:p-4 bg-white rounded-lg md:rounded-2xl shadow', cn]}
+		class={['p-4 md:p-6 bg-white rounded-lg md:rounded-2xl shadow', cn]}
 		onclick={(e) => {
 			e.stopPropagation();
 			onclick?.(e);
