@@ -94,7 +94,9 @@
 		/>
 	</div>
 	<div
-		class="text-sm pl-1 pb-1 grid w-12 gap-1 leading-none {costStyle} {cols[filteredLength - 1]}"
+		class="text-sm pl-1 pb-1 grid w-12 gap-1 md:gap-2 leading-none {costStyle} {cols[
+			filteredLength - 1
+		]}"
 	>
 		{#each card.cost as co, i}
 			{#if filteredLength === 3 && secondPos === i}
@@ -102,13 +104,17 @@
 			{/if}
 			{#if !hideCost && co}
 				<span
-					class="p-0.5 w-5 flex justify-center items-center rounded-full aspect-square {bgColorOf[
+					class="relative p-0.5 w-5 flex justify-center items-center rounded-full aspect-square {bgColorOf[
 						i
 					]}"
 					class:md:p-1={!small}
 					class:md:w-8={!small}
 				>
 					{co}
+					<Icon
+						icon={iconOf[i]}
+						class="absolute -right-1 top-0.5 size-3 rotate-12 md:-right-3 md:top-0 md:size-6"
+					/>
 				</span>
 			{/if}
 		{/each}
