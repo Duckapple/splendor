@@ -111,16 +111,22 @@
 			{#if !hideCost && co}
 				{@const bg = bgColorOf[i]}
 				<span
-					class="relative z-0 p-0.5 w-5 flex justify-center items-center rounded-full aspect-square {bg}"
-					class:md:p-1={!small}
-					class:md:w-8={!small}
+					class={[
+						'relative z-0 p-0.5 w-5 flex justify-center items-center rounded-full aspect-square',
+						bg,
+						!small && 'md:w-8 md:p-1',
+					]}
 				>
 					{co}
 					{#if colorBlind.value}
 						<div
-							class="absolute -z-10 -right-1 top-0 flex justify-end items-center w-5 md:w-9 md:pr-px md:h-6 rounded-full md:-right-3 {bg}"
+							class={[
+								'absolute -z-10 -right-1 top-0 flex justify-end items-center w-5 rounded-full',
+								bg,
+								!small && 'md:w-10 md:pr-px md:h-6 md:-right-3',
+							]}
 						>
-							<Icon icon={iconOf[i]} class="size-3 md:size-5 rotate-12" />
+							<Icon icon={iconOf[i]} class={['size-3 rotate-12', !small && 'md:size-5']} />
 						</div>
 					{/if}
 				</span>

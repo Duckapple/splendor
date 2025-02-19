@@ -52,4 +52,5 @@ export const iconOf = [
 	'gem-hexagon',
 	'gem-heart',
 	'gem-triangle',
+	'trophy',
 ] satisfies (keyof typeof iconSvgs)[];
