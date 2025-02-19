@@ -16,7 +16,6 @@
 	import Coin from '$lib/game/Coin.svelte';
 	import Person from '$lib/game/Person.svelte';
 
-	import Actions from './Actions.svelte';
 	import { cardFromId } from '../../../../common/defaults';
 	import Hand from '$lib/compose/Hand.svelte';
 	import { range } from '../../../../common/utils';

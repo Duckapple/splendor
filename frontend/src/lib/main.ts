@@ -48,7 +48,7 @@ export const userNames = cachedWritable<Record<string, string>>('user-name-cache
 
 type LoginInput = Record<'userName' | 'password', string>;
 export async function loginRegister(input: LoginInput, isRegister = false) {
-	const endpoint = isRegister ? '/register' : '/log-in';
+	const endpoint = isRegister ? '/api/register' : '/api/log-in';
 	const data = await fetch(BASE_URL + endpoint, {
 		headers: BASE_HEADERS,
 		body: JSON.stringify(input),
