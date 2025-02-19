@@ -5,7 +5,7 @@
 	import { browser } from '$app/environment';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import type { Snippet } from 'svelte';
-	import { useRuneContext } from '$lib/state/contextRune.svelte';
+	import { useRuneContext } from '$lib/state/context-rune.svelte';
 
 	interface Props {
 		children?: Snippet;
@@ -21,7 +21,15 @@
 		},
 	});
 
-	useRuneContext('colorblind', false);
+	const colorblind = useRuneContext(
+		'colorblind',
+		browser && localStorage.getItem('colorblind') === 'true'
+	);
+	$effect(() => {
+		if (browser) {
+			localStorage.setItem('colorblind', colorblind.value.toString());
+		}
+	});
 </script>
 
 <main class="box-border flex flex-col flex-1 w-full min-h-screen mx-auto">

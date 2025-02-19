@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '$lib/base/Icon.svelte';
-	import { useRuneContext } from '$lib/state/contextRune.svelte';
+	import { useRuneContext } from '$lib/state/context-rune.svelte';
 
 	const colorblind = useRuneContext('colorblind');
 	let hovering = $state(false);

@@ -4,7 +4,7 @@
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
 	import Icon from '$lib/base/Icon.svelte';
 	import { getContext, onMount } from 'svelte';
-	import { useRuneContext } from '$lib/state/contextRune.svelte';
+	import { useRuneContext } from '$lib/state/context-rune.svelte';
 
 	interface Props {
 		stacked?: boolean;

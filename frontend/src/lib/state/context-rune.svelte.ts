@@ -11,6 +11,7 @@ export function useRuneContext<T extends keyof Runes>(key: T, def?: Runes[T]): {
 	if (def === undefined) {
 		throw new Error(`No context found for ${key}`);
 	}
+
 	const value = $state({ value: def });
 	return setContext(key, value);
 }

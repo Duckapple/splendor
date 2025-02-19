@@ -4,7 +4,7 @@
 	import { iconOf, textColorOf } from '$lib/color';
 	import { Spring } from 'svelte/motion';
 	import type { Color } from '../../../common/model';
-	import { useRuneContext } from '$lib/state/contextRune.svelte';
+	import { useRuneContext } from '$lib/state/context-rune.svelte';
 	import Icon from '$lib/base/Icon.svelte';
 
 	interface Props {
