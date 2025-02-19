@@ -3,7 +3,8 @@
 	import { bgColorOf, fadeTextBgColorOf, gradientOf, iconOf } from '$lib/color';
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
 	import Icon from '$lib/base/Icon.svelte';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
+	import { useRuneContext } from '$lib/state/contextRune.svelte';
 
 	interface Props {
 		stacked?: boolean;
@@ -28,6 +29,8 @@
 		style,
 		autofocus,
 	}: Props = $props();
+
+	const colorBlind = useRuneContext('colorblind');
 
 	let filteredLength = $derived(card.cost.filter(Boolean).length);
 	const cols = [
@@ -94,27 +97,32 @@
 		/>
 	</div>
 	<div
-		class="text-sm pl-1 pb-1 grid w-12 gap-1 md:gap-2 leading-none {costStyle} {cols[
-			filteredLength - 1
-		]}"
+		class={[
+			'text-sm pl-1 pb-1 grid w-12 gap-1 leading-none',
+			costStyle,
+			cols[filteredLength - 1],
+			colorBlind.value && 'md:gap-y-2 md:gap-x-6',
+		]}
 	>
 		{#each card.cost as co, i}
 			{#if filteredLength === 3 && secondPos === i}
 				<div class:md:hidden={!small}></div>
 			{/if}
 			{#if !hideCost && co}
+				{@const bg = bgColorOf[i]}
 				<span
-					class="relative p-0.5 w-5 flex justify-center items-center rounded-full aspect-square {bgColorOf[
-						i
-					]}"
+					class="relative z-0 p-0.5 w-5 flex justify-center items-center rounded-full aspect-square {bg}"
 					class:md:p-1={!small}
 					class:md:w-8={!small}
 				>
 					{co}
-					<Icon
-						icon={iconOf[i]}
-						class="absolute -right-1 top-0.5 size-3 rotate-12 md:-right-3 md:top-0 md:size-6"
-					/>
+					{#if colorBlind.value}
+						<div
+							class="absolute -z-10 -right-1 top-0 flex justify-end items-center w-5 md:w-9 md:pr-px md:h-6 rounded-full md:-right-3 {bg}"
+						>
+							<Icon icon={iconOf[i]} class="size-3 md:size-5 rotate-12" />
+						</div>
+					{/if}
 				</span>
 			{/if}
 		{/each}

@@ -5,6 +5,7 @@
 	import { browser } from '$app/environment';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import type { Snippet } from 'svelte';
+	import { useRuneContext } from '$lib/state/contextRune.svelte';
 
 	interface Props {
 		children?: Snippet;
@@ -19,6 +20,8 @@
 			},
 		},
 	});
+
+	useRuneContext('colorblind', false);
 </script>
 
 <main class="box-border flex flex-col flex-1 w-full min-h-screen mx-auto">

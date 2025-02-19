@@ -26,6 +26,7 @@
 	import { GamePhase } from '../../../../common/model';
 	import { tick } from 'svelte';
 	import Button from '$lib/base/Button.svelte';
+	import ColorblindToggle from './ColorblindToggle.svelte';
 
 	const qc = useQueryClient();
 	const { updateGameState } = useUpdateGameState(qc);
@@ -206,8 +207,9 @@
 		</div>
 	</details> -->
 	<button onclick={() => $notify.mutate()}>
-		<Icon icon="bell" class="size-8 [stroke-width:1.5]" />
+		<Icon icon="bell" class="size-6 md:size-8 [stroke-width:1.5]" />
 	</button>
+	<ColorblindToggle />
 	{#if gameCache?.phase === GamePhase.FINISHED}
 		<button onclick={() => (hideOverlay = !hideOverlay)}>
 			<Icon icon="trophy" class="size-8 [stroke-width:1.5] {hideOverlay ? 'animate-bounce' : ''}" />
