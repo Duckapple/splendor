@@ -2,6 +2,7 @@ import { getContext, hasContext, setContext } from 'svelte';
 
 interface Runes {
 	colorblind: boolean;
+	websocket: never;
 }
 
 export function useRuneContext<T extends keyof Runes>(key: T, def?: Runes[T]): { value: Runes[T] } {

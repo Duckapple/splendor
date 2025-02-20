@@ -26,7 +26,7 @@ export function cachedWritable<T>(key: string, defaultValue?: T) {
 	return w;
 }
 
-const TOKEN = 'token' as const;
+export const TOKEN = 'token' as const;
 
 export const jwt = cachedWritable<string>(TOKEN);
 

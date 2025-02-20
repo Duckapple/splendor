@@ -1,7 +1,7 @@
 import jwt from '@elysiajs/jwt';
 import Elysia, { type Static, t } from 'elysia';
 
-import { env } from '$env/dynamic/private';
+import { JWT_SECRET } from '$env/static/private';
 
 export const authSchema = t.Object({ id: t.String(), userName: t.String() });
 
@@ -19,7 +19,7 @@ export class FunctionError extends Error {
 export const Auth = new Elysia({ name: 'Service.Auth' })
 	.use(
 		jwt({
-			secret: env.JWT_SECRET!,
+			secret: JWT_SECRET!,
 			name: 'jwt',
 			alg: 'HS512',
 			schema: authSchema,
