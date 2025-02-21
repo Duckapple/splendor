@@ -5,6 +5,7 @@
 // @ts-check
 
 import { build, files, version } from '$service-worker';
+import { title } from 'process';
 import { client } from './lib/main';
 
 const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
@@ -118,11 +119,11 @@ channel.addEventListener('message', async (e) => {
 	}
 });
 
-sw.addEventListener('push', async (e) => {
+sw.addEventListener('push', async (event) => {
 	const canNotify = await sw.navigator.permissions.query({ name: 'notifications' });
 
 	/** @type {{ message?: string, type: string, gameId?: string }} */
-	const { message, ...rest } = e.data?.json() ?? {};
+	const { message, ...rest } = event.data?.json() ?? {};
 
 	if (rest) channel.postMessage(rest);
 
@@ -130,14 +131,30 @@ sw.addEventListener('push', async (e) => {
 		const oldNotis = await sw.registration.getNotifications();
 		oldNotis.forEach((noti) => noti.close());
 
-		sw.registration.showNotification(message ?? 'Updates are available!', {
-			icon: '/favicon.png',
-			badge: '/favicon.png',
-			tag: rest.type + (rest.gameId ?? ''),
-		});
+		event.waitUntil(
+			sw.registration.showNotification(message ?? 'Updates are available!', {
+				icon: '/favicon.png',
+				badge: '/favicon.png',
+				tag: rest.type + (rest.gameId ?? ''),
+				data: rest,
+				actions: [{ action: `game?${rest.gameId}`, title: 'View game' }],
+			})
+		);
 	} else {
 		console.error('Received push when disallowed', message);
 	}
 });
+
+sw.addEventListener(
+	'notificationclick',
+	(event) => {
+		const { gameId } = event.notification.data;
+
+		event.waitUntil(sw.clients.openWindow(`/game?id=${gameId}`));
+
+		event.notification.close();
+	},
+	false
+);
 
 sw.skipWaiting();
