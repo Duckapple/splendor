@@ -49,6 +49,8 @@ export const Push = pgTable(
 	indicesOn('userId')
 );
 
+export type Push = typeof Push.$inferSelect;
+
 export const pushSchema = createInsertSchema(Push, {
 	keys: object({
 		p256dh: string(),

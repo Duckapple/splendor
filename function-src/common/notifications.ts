@@ -1,7 +1,10 @@
 import { type Static, t } from 'elysia';
-import webPush from 'web-push';
+import webPush, { WebPushError } from 'web-push';
 import { Check } from '@sinclair/typebox/value';
 import { env } from '$env/dynamic/private';
+import { Push } from '../../db/schema';
+import { db } from './db';
+import { eq } from 'drizzle-orm';
 
 const validEnv = t.Object({
 	NOTIFICATION_MAIL: t.String(),
@@ -30,7 +33,7 @@ export const subscription = t.Object({
 });
 
 export async function push<T extends Record<'message' | 'type' | (string & {}), any>>(
-	sub: Static<typeof subscription>,
+	{ userId, ...sub }: Push,
 	data: T
 ) {
 	const nonce = crypto.randomUUID();
@@ -38,7 +41,12 @@ export async function push<T extends Record<'message' | 'type' | (string & {}), 
 	try {
 		await webPush.sendNotification(sub, JSON.stringify({ nonce, ...data }));
 	} catch (error) {
-		console.error(new Date(), '[error]', 'Failed to send notification:', error);
+		if (error instanceof WebPushError && error.statusCode === 410) {
+			await db.delete(Push).where(eq(Push.userId, userId));
+			console.error(new Date(), '[error]', 'Subscription is no longer valid:', sub);
+		} else {
+			console.error(new Date(), '[error]', 'Failed to send notification:', error);
+		}
 	}
 
 	return nonce;
