@@ -1,6 +1,6 @@
 import type { AuthUser } from '../common/communication';
 import { FunctionError } from './common/auth';
-import { and, eq, gt } from 'drizzle-orm';
+import { and, eq, gt, not } from 'drizzle-orm';
 import { Push, SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
 import { db } from './common/db';
 import { actionSchema } from '../common/schema/actions';
@@ -82,12 +82,18 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 
 	const nextTurn = res.value.game.turn!;
 
-	const [pushes] = await Promise.all([
+	const [pushes, otherPlayers] = await Promise.all([
 		db
 			.select({ userId: SplendorGamePlayer.userId, Push })
 			.from(SplendorGamePlayer)
-			.leftJoin(Push, eq(Push.userId, SplendorGamePlayer.userId))
+			.innerJoin(Push, eq(Push.userId, SplendorGamePlayer.userId))
 			.where(and(eq(SplendorGamePlayer.gameId, gameId), eq(SplendorGamePlayer.position, nextTurn))),
+		db
+			.select()
+			.from(SplendorGamePlayer)
+			.where(
+				and(eq(SplendorGamePlayer.gameId, gameId), not(eq(SplendorGamePlayer.userId, user.id)))
+			),
 		db.update(SplendorGame).set(res.value.game).where(eq(SplendorGame.id, gameId)),
 		db
 			.update(SplendorGamePlayer)
@@ -106,13 +112,13 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 		action: dbAction as Action,
 	};
 
-	websocketCache[pushes[0].userId]?.({ type: 'game-update', id: gameId, update: data });
+	otherPlayers.forEach(({ userId }) => {
+		websocketCache[userId]?.({ type: 'game-update', id: gameId, update: data });
+	});
 
 	await Promise.all(
 		pushes.map(({ Push }) => {
-			const { userId, ...sub } = Push ?? {};
-			if ('keys' in sub)
-				return push(sub, { message: "It's your turn!", type: 'your-turn', gameId, data });
+			if (Push) return push(Push, { message: "It's your turn!", type: 'your-turn', gameId, data });
 		})
 	);
 
