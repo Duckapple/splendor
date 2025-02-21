@@ -8,7 +8,7 @@ type PartialRes<T> = Omit<Treaty.TreatyResponse<{ 200: T }>, 'headers' | 'respon
 type TreatyGame = PartialRes<GameAndPlayers>;
 
 export function useUpdateGameState(queryClient: QueryClient) {
-	function updateGameState(gameId: string, actionResult: PartialRes<StateUpdate[string]>) {
+	function updateGameState(gameId: string, actionResult: PartialRes<StateUpdate>) {
 		const newData = actionResult.data;
 		if (!newData) return;
 

@@ -1,4 +1,4 @@
-import { Elysia } from 'elysia';
+import { Elysia, t } from 'elysia';
 import cors from '@elysiajs/cors';
 
 import { Auth, FunctionError, loginSchema } from './function-src/common/auth';
@@ -9,6 +9,7 @@ import * as actionRoutes from './function-src/action';
 import * as loginRoutes from './function-src/log-in';
 import * as registerRoutes from './function-src/register';
 import * as notificationsRoutes from './function-src/notifications';
+import { websocketCache } from './wss';
 
 const PORT = process.env.PORT;
 

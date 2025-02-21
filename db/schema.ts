@@ -70,7 +70,7 @@ export type SplendorRoom = typeof SplendorRoom.$inferSelect;
 export const SplendorGamePlayer = pgTable("SplendorGamePlayer", {
   userId: uuid("userId").notNull(),
   gameId: uuid("gameId").notNull(),
-  position: smallint("position").notNull(),
+  position: smallint("position").notNull().$type<0 | 1 | 2 | 3>(),
 	reserved: json("reserved").notNull().default(sql`('[]')`).$type<number[]>(),
   cards: json("cards").notNull().default(sql`('[]')`).$type<number[]>(),
   tokens: json("tokens").notNull().default(sql`('[0,0,0,0,0,0]')`).$type<TokenHold>(),

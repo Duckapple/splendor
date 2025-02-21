@@ -9,6 +9,7 @@ import { GamePhase, type Action, type GameState } from '../common/model';
 import { t } from 'elysia';
 import type { Infer } from './common/type';
 import { push } from './common/notifications';
+import { websocketCache } from '../wss';
 
 get.params = {
 	params: t.Object({ id: t.String() }),
@@ -83,9 +84,9 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 
 	const [pushes] = await Promise.all([
 		db
-			.select({ Push })
+			.select({ userId: SplendorGamePlayer.userId, Push })
 			.from(SplendorGamePlayer)
-			.innerJoin(Push, eq(Push.userId, SplendorGamePlayer.userId))
+			.leftJoin(Push, eq(Push.userId, SplendorGamePlayer.userId))
 			.where(and(eq(SplendorGamePlayer.gameId, gameId), eq(SplendorGamePlayer.position, nextTurn))),
 		db.update(SplendorGame).set(res.value.game).where(eq(SplendorGame.id, gameId)),
 		db
@@ -105,10 +106,14 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 		action: dbAction as Action,
 	};
 
+	websocketCache[pushes[0].userId]?.({ type: 'game-update', id: gameId, update: data });
+
 	await Promise.all(
-		pushes.map(({ Push: { userId, ...sub } }) =>
-			push(sub, { message: "It's your turn!", type: 'your-turn', gameId, data })
-		)
+		pushes.map(({ Push }) => {
+			const { userId, ...sub } = Push ?? {};
+			if ('keys' in sub)
+				return push(sub, { message: "It's your turn!", type: 'your-turn', gameId, data });
+		})
 	);
 
 	return data;

@@ -27,6 +27,7 @@
 	import { tick } from 'svelte';
 	import Button from '$lib/base/Button.svelte';
 	import ColorblindToggle from './ColorblindToggle.svelte';
+	import { getWebSocket } from '$lib/web-socket.svelte';
 
 	const qc = useQueryClient();
 	const { updateGameState } = useUpdateGameState(qc);
@@ -47,6 +48,22 @@
 				console.log('Your turn!', e.data);
 				updateGameState(e.data.gameId, { data: e.data.data, error: null, status: 200 });
 				break;
+		}
+	});
+
+	const ws = getWebSocket();
+	let subbed = $state(false);
+	$effect(() => {
+		if (jwt && ws && !subbed) {
+			ws?.subscribe(({ data }) => {
+				switch (data.type) {
+					case 'game-update':
+						console.log('Your turn!', data);
+						updateGameState(data.id, { data: data.update, error: null, status: 200 });
+						break;
+				}
+			});
+			subbed = true;
 		}
 	});
 

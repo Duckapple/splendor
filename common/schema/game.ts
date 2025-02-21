@@ -2,10 +2,12 @@ import { t, type Static } from 'elysia';
 import { actionSchema } from './actions';
 import { GamePhase } from '../model';
 
-const idDecksSchema = t.Record(
-	t.UnionEnum(['high', 'middle', 'low', 'persons']),
-	t.Array(t.Number())
-);
+const idDecksSchema = t.Object({
+	high: t.Array(t.Number()),
+	middle: t.Array(t.Number()),
+	low: t.Array(t.Number()),
+	persons: t.Array(t.Number()),
+});
 
 // prettier-ignore
 const _tokensTuple = t.Tuple([
@@ -32,16 +34,13 @@ export const playerSchema = t.Object({
 	cards: t.Array(t.Number()),
 });
 
-export const stateUpdateSchema = t.Record(
-	t.String(),
-	t.Object({
-		action: t.Intersect([
-			actionSchema,
-			t.Object({ gameId: t.String(), userId: t.String(), timestamp: t.Date() }),
-		]),
-		game: gameSchema,
-		player: playerSchema,
-	})
-);
+export const stateUpdateSchema = t.Object({
+	action: t.Intersect([
+		actionSchema,
+		t.Object({ gameId: t.String(), userId: t.String(), timestamp: t.Date() }),
+	]),
+	game: gameSchema,
+	player: playerSchema,
+});
 
 export type StateUpdate = Static<typeof stateUpdateSchema>;
