@@ -18,7 +18,7 @@ const cache: Record<string, (data: unknown, compress?: boolean) => ServerWebSock
 
 export const app = new Elysia()
 	.get('/ping', 'Pong!')
-	.use(cors())
+	.use(cors({ origin: ['splendor.simon-green.dev', 'api-splendor.simon-green.dev'] }))
 	.use(Auth)
 	// .post('/forward', async ({ body }) => {}, { auth: true })
 	.ws('/ws', {
