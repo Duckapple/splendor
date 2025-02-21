@@ -52,16 +52,17 @@ export const room = new Elysia({ prefix: '/room' })
 		let message = "You're already in the room!";
 
 		if (players.length < 4 && players.every((player) => player.userId !== user.id)) {
+			const length = players.length as 0 | 1 | 2 | 3;
 			const newPlayer = {
 				gameId: id,
 				userId: user.id,
-				position: players.length,
+				position: length,
 				cards: [],
 			};
 			await db.insert(SplendorGamePlayer).values(newPlayer);
 			players.push({
 				userId: user.id,
-				position: players.length,
+				position: length,
 				userName: user.userName,
 			});
 			message = 'Joined the room!';
