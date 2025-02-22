@@ -9,7 +9,7 @@
 
 	const rooms = createQuery({
 		queryKey: ['rooms'],
-		queryFn: () => client.api.room.index.get(),
+		queryFn: () => client.api.room.index.get({ query: {} }),
 	});
 
 	const createRoom = createMutation({
@@ -31,7 +31,7 @@
 <Background />
 
 <section class="z-50 flex flex-col justify-center items-center flex-[0.6]">
-	<div class="p-2 m-2 rounded-md shadow-md md:p-4 lg:px-8 lg:py-6 bg-slate-50">
+	<div class="p-4 m-2 rounded-md shadow-md md:px-10 md:py-8 bg-slate-50">
 		<h1 class="pb-6 text-7xl md:text-8xl">Splendor</h1>
 		{#if $isLoggedIn && $rooms.isLoading}
 			<div class="p-8 flex justify-center">
@@ -39,14 +39,16 @@
 			</div>
 		{/if}
 		{#if $isLoggedIn && $rooms.isSuccess}
-			<div class="flex flex-col gap-4 pb-2">
+			<div class="flex md:grid grid-cols-2 lg:grid-cols-3 flex-col gap-4 pb-2">
 				{#each $rooms.data?.data ?? [] as room}
 					<a
 						class="relative block p-2 rounded text-slate-600 hover:no-underline border border-slate-300 shadow hover:scale-105 transition-transform"
 						href={`/${room.started ? 'game' : 'new'}?id=${room.id}`}
 					>
-						{#if room.started}
-							<span class="absolute right-2 bottom-2 text-sm">in progress</span>
+						{#if room.started || room.ended}
+							<span class="absolute right-2 bottom-2 text-sm"
+								>{room.ended ? 'game over' : 'in progress'}</span
+							>
 						{/if}
 						<p title="Updated {timeAgo(room.updatedAt)} ({room.updatedAt.toString()})">
 							Created by
@@ -63,7 +65,7 @@
 						</ul>
 					</a>
 				{:else}
-					<p class="text-center">No rooms found</p>
+					<p class="p-8 text-center">No rooms found</p>
 				{/each}
 			</div>
 		{:else if $rooms.isError && $rooms.error.message !== 'Unauthorized'}

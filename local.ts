@@ -9,7 +9,6 @@ import * as actionRoutes from './function-src/action';
 import * as loginRoutes from './function-src/log-in';
 import * as registerRoutes from './function-src/register';
 import * as notificationsRoutes from './function-src/notifications';
-import { websocketCache } from './wss';
 
 const PORT = process.env.PORT;
 
@@ -22,7 +21,13 @@ export const app = new Elysia({ prefix: '/api' })
 	// .use(cors())
 	.use(Auth)
 	.get('/ping', 'Pong!')
-	.error('FunctionError', FunctionError)
+	.error({ FunctionError })
+	.onError(({ code, error, set, headers }) => {
+		if (code === 'FunctionError') {
+			set.headers = { ...headers, 'Content-Type': 'application/json' };
+			return new Response(JSON.stringify(error.json), { status: error.status });
+		}
+	})
 	.onAfterResponse(({ route }) => {
 		console.debug(new Date(), '[debug]', route);
 	})

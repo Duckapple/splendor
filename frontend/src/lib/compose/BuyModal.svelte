@@ -70,6 +70,7 @@
 		if (cardId == null) {
 			values = [0, 0, 0, 0, 0, 0];
 			isFree = false;
+			error = '';
 			return;
 		}
 
@@ -106,18 +107,22 @@
 		}
 	}
 
+	let error = $state('');
+
 	const buyMutation = $derived(
 		createMutation({
 			mutationKey: ['action', 'BUY_CARD', cardId],
 			async mutationFn() {
 				if (!player || !game || cardId == null) {
-					throw { message: 'Invalid initial state. Retry the action, this time slowly' };
+					error = 'Invalid initial state. Retry the action, this time slowly';
+					return;
 				}
 				const position =
 					positionFromCardId(game.shown, cardId) ??
 					reservePositionFromCardId(player.reserved, cardId);
 				if (position == null || position[0] === 'persons') {
-					throw { message: 'Card is somehow not in play?' };
+					error = 'Card is somehow not in play?';
+					return;
 				}
 				const [row, i] = position;
 
@@ -133,6 +138,10 @@
 				} as const;
 
 				const res = await client.api.action({ id: game.id }).post(body);
+				if (res.error) {
+					error = res.error.value.message;
+					return;
+				}
 				if (res.data) {
 					updateGameState(game.id, res);
 				}
@@ -147,11 +156,13 @@
 			mutationKey: ['action', 'RESERVE', cardId],
 			async mutationFn() {
 				if (!player || !game || cardId == null) {
-					throw { message: 'Invalid initial state. Retry the action, this time slowly' };
+					error = 'Invalid initial state. Retry the action, this time slowly';
+					return;
 				}
 				const position = positionFromCardId(game.shown, cardId);
 				if (position == null || position[0] === 'persons') {
-					throw { message: 'Card is somehow not in play?' };
+					error = 'Card is somehow not in play?';
+					return;
 				}
 				const [row, i] = position;
 
@@ -161,6 +172,10 @@
 				} as const;
 
 				const res = await client.api.action({ id: game.id }).post(body);
+				if (res.error) {
+					error = res.error.value.message;
+					return;
+				}
 				if (res.data) {
 					updateGameState(game.id, res);
 				}
@@ -230,12 +245,12 @@
 	{#if isFree}
 		<div>
 			You can buy it for free! <span class="text-red-700"
-				>{$buyMutation.error?.message ?? $reserveMutation.error?.message ?? ''}</span
+				>{$buyMutation.error?.message ?? $reserveMutation.error?.message ?? error}</span
 			>
 		</div>
 	{:else}
 		Want to buy this card? <span class="text-red-700"
-			>{$buyMutation.error?.message ?? $reserveMutation.error?.message ?? ''}</span
+			>{$buyMutation.error?.message ?? $reserveMutation.error?.message ?? error}</span
 		>
 		<div class="flex justify-center gap-2">
 			{#each Object.values(Color).filter(only('number')) as color}

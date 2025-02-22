@@ -1,19 +1,30 @@
-import { eq, SQL } from 'drizzle-orm';
+import { and, eq, SQL } from 'drizzle-orm';
 import { SplendorGamePlayer, SplendorRoom, User } from '../db/schema';
 import { db } from './common/db';
 import { Auth } from './common/auth';
 import { randomUUID } from 'crypto';
 import { alias } from 'drizzle-orm/pg-core';
-import { Elysia } from 'elysia';
+import { Elysia, t } from 'elysia';
 
 const playerAgain = alias(SplendorGamePlayer, 'player2');
 
 export const room = new Elysia({ prefix: '/room' })
 	.use(Auth)
 	.guard({ auth: true })
-	.get('/', async ({ user }) => {
-		return await getGame(eq(playerAgain.userId, user.id), true);
-	})
+	.get(
+		'/',
+		async ({ user, query: { showEnded } = {} }) => {
+			const conditions = [eq(playerAgain.userId, user.id)];
+			if (!showEnded) {
+				conditions.push(eq(SplendorRoom.ended, false));
+			}
+			return await getGame(
+				conditions.length > 1 ? (and(...conditions) as SQL) : conditions[0],
+				true
+			);
+		},
+		{ query: t.Optional(t.Object({ showEnded: t.Optional(t.Boolean()) })) }
+	)
 	.get('/:id', async ({ user, params: { id }, error }) => {
 		const [data] = await getGame(eq(SplendorRoom.id, id) as SQL);
 
