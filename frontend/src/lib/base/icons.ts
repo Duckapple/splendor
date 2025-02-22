@@ -1,5 +1,3 @@
-import { view } from 'drizzle-orm/sqlite-core';
-
 export const iconSvgs = {
 	// https://www.svgrepo.com/collection/gems-and-crystal-line-vectors/
 	'gem-triangle': {

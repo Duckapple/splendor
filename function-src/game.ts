@@ -4,7 +4,7 @@ import { db } from './common/db';
 import { FunctionError } from './common/auth';
 import type { AuthUser, GameAndPlayers } from '../common/communication';
 import { newGameState } from '../common/defaults';
-import { mapValues, omit } from '../common/utils';
+import { mapValues } from '../common/utils';
 
 export async function post(user: AuthUser, id: string) {
 	if (typeof id !== 'string') throw new FunctionError(400, { message: 'Bad room ID' });

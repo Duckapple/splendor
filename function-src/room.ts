@@ -1,4 +1,4 @@
-import { and, eq, SQL } from 'drizzle-orm';
+import { and, eq, type SQL } from 'drizzle-orm';
 import { SplendorGamePlayer, SplendorRoom, User } from '../db/schema';
 import { db } from './common/db';
 import { Auth } from './common/auth';

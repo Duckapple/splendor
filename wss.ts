@@ -1,6 +1,6 @@
 import { Elysia, t, type Static } from 'elysia';
 import { Auth } from './function-src/common/auth';
-import { ServerWebSocketSendStatus } from 'bun';
+import type { ServerWebSocketSendStatus } from 'bun';
 import cors from '@elysiajs/cors';
 import { stateUpdateSchema } from './common/schema/game';
 
