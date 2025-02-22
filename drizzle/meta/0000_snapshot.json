@@ -1,10 +1,8 @@
 {
-  "id": "003c1b5e-e62b-46f8-9907-cd457dfca4e1",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "Push": {
+    "public.Push": {
       "name": "Push",
       "schema": "",
       "columns": {
@@ -29,18 +27,29 @@
       },
       "indexes": {
         "userIdIndex": {
-          "name": "userIdIndex",
           "columns": [
-            "userId"
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "userIdIndex",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "SplendorAction": {
+    "public.SplendorAction": {
       "name": "SplendorAction",
       "schema": "",
       "columns": {
@@ -79,9 +88,12 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "SplendorGame": {
+    "public.SplendorGame": {
       "name": "SplendorGame",
       "schema": "",
       "columns": {
@@ -129,9 +141,12 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "SplendorGamePlayer": {
+    "public.SplendorGamePlayer": {
       "name": "SplendorGamePlayer",
       "schema": "",
       "columns": {
@@ -178,9 +193,12 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "SplendorRoom": {
+    "public.SplendorRoom": {
       "name": "SplendorRoom",
       "schema": "",
       "columns": {
@@ -222,9 +240,12 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "User": {
+    "public.User": {
       "name": "User",
       "schema": "",
       "columns": {
@@ -250,11 +271,19 @@
       },
       "indexes": {
         "idIndex": {
-          "name": "idIndex",
           "columns": [
-            "id"
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "idIndex",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -262,29 +291,39 @@
       "uniqueConstraints": {
         "User_userName_unique": {
           "name": "User_userName_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "userName"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
-      }
+      },
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     }
   },
   "enums": {
-    "SplendorActionType": {
+    "public.SplendorActionType": {
       "name": "SplendorActionType",
-      "values": {
-        "BUY_CARD": "BUY_CARD",
-        "TAKE_PERSON": "TAKE_PERSON",
-        "TAKE_TOKENS": "TAKE_TOKENS",
-        "RESERVE": "RESERVE"
-      }
+      "schema": "public",
+      "values": [
+        "BUY_CARD",
+        "TAKE_PERSON",
+        "TAKE_TOKENS",
+        "RESERVE"
+      ]
     }
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "003c1b5e-e62b-46f8-9907-cd457dfca4e1",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "sequences": {},
+  "policies": {},
+  "views": {},
+  "roles": {}
 }

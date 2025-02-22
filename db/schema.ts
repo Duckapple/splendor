@@ -62,6 +62,7 @@ export const SplendorRoom = pgTable('SplendorRoom', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	ownerId: uuid('ownerId').notNull(),
 	started: boolean('started').default(false),
+	ended: boolean('ended').default(false),
 	createdAt: timestamp('createdAt', { precision: 0 }).notNull().defaultNow(),
 	updatedAt: timestamp('updatedAt', { precision: 0 }).notNull().defaultNow(),
 });
