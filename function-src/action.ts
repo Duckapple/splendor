@@ -1,7 +1,7 @@
 import type { AuthUser } from '../common/communication';
 import { FunctionError } from './common/auth';
 import { and, eq, gt, not } from 'drizzle-orm';
-import { Push, SplendorAction, SplendorGame, SplendorGamePlayer } from '../db/schema';
+import { Push, SplendorAction, SplendorGame, SplendorGamePlayer, SplendorRoom } from '../db/schema';
 import { db } from './common/db';
 import { actionSchema } from '../common/schema/actions';
 import { performAction } from '../common/logic';
@@ -121,6 +121,9 @@ export async function post(user: AuthUser, req: Infer<typeof post.params>) {
 			if (Push) return push(Push, { message: "It's your turn!", type: 'your-turn', gameId, data });
 		})
 	);
+
+	if (data.game.phase === GamePhase.FINISHED)
+		await db.update(SplendorRoom).set({ ended: true }).where(eq(SplendorRoom.id, gameId));
 
 	return data;
 }

@@ -65,7 +65,7 @@
 						</ul>
 					</a>
 				{:else}
-					<p class="p-8 text-center">No rooms found</p>
+					<p class="py-8 text-center">No rooms found</p>
 				{/each}
 			</div>
 		{:else if $rooms.isError && $rooms.error.message !== 'Unauthorized'}

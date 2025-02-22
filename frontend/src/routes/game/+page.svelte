@@ -241,7 +241,7 @@
 	>
 		<div class="text-white flex flex-col items-center gap-y-6 mb-64 sm:mb-0">
 			<h2 class="text-4xl text-center">Game Over</h2>
-			<div class="flex flex-col gap-y-4 gap-x-8 lg:grid grid-cols-2">
+			<div class="flex flex-col gap-y-4 gap-x-8 lg:grid grid-cols-2 text-center lg:text-left">
 				{#each playersWithPoints ?? [] as player, i}
 					{@const delayIndex = (playersWithPoints?.length ?? 0) - i}
 					{#if showWinners}
