@@ -52,6 +52,12 @@
 			return result;
 		},
 	});
+
+	$effect(() => {
+		if ($room.data?.data.started) {
+			window.location.href = `/game?id=${$searchId}`;
+		}
+	});
 </script>
 
 <svelte:head>
