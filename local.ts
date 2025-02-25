@@ -1,7 +1,7 @@
 import { Elysia, t } from 'elysia';
-import cors from '@elysiajs/cors';
 
 import { Auth, FunctionError, loginSchema } from './function-src/common/auth';
+import { RedirectError } from './function-src/common/error';
 
 import { room } from './function-src/room';
 import * as gameRoutes from './function-src/game';
@@ -9,6 +9,7 @@ import * as actionRoutes from './function-src/action';
 import * as loginRoutes from './function-src/log-in';
 import * as registerRoutes from './function-src/register';
 import * as notificationsRoutes from './function-src/notifications';
+import * as joinRoutes from './function-src/join';
 
 const PORT = process.env.PORT;
 
@@ -21,11 +22,14 @@ export const app = new Elysia({ prefix: '/api' })
 	// .use(cors())
 	.use(Auth)
 	.get('/ping', 'Pong!')
-	.error({ FunctionError })
-	.onError(({ code, error, set, headers }) => {
+	.error({ FunctionError, RedirectError })
+	.onError(({ code, error, set, headers, redirect }) => {
 		if (code === 'FunctionError') {
 			set.headers = { ...headers, 'Content-Type': 'application/json' };
 			return new Response(JSON.stringify(error.json), { status: error.status });
+		}
+		if (code === 'RedirectError') {
+			return redirect(error.location, error.status);
 		}
 	})
 	.onAfterResponse(({ route }) => {
@@ -69,6 +73,7 @@ export const app = new Elysia({ prefix: '/api' })
 			({ user, body }) => notificationsRoutes.post(user, { body }),
 			notificationsRoutes.post.params
 		)
-	);
+	)
+	.get('/join', ({ user, query }) => joinRoutes.get(user, { query }), joinRoutes.get.params);
 
 export type App = typeof app;

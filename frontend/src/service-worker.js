@@ -137,8 +137,8 @@ sw.addEventListener('push', async (event) => {
 				actions.push({ action: `/game?id=${rest.gameId}`, title: 'View game' });
 				break;
 			case 'invite':
-				actions.push({ action: `/join?id=${rest.gameId}`, title: 'Accept' });
-				actions.push({ action: `/decline?id=${rest.gameId}`, title: 'Decline' });
+				actions.push({ action: `/api/join?id=${rest.gameId}`, title: 'Accept' });
+				actions.push({ action: '__none__', title: 'Dismiss' });
 				break;
 		}
 
@@ -174,7 +174,9 @@ sw.addEventListener(
 			}
 		}
 
-		event.waitUntil(sw.clients.openWindow(event.action));
+		if (action !== '__none__') {
+			event.waitUntil(sw.clients.openWindow(event.action));
+		}
 	},
 	false
 );

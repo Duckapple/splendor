@@ -52,7 +52,7 @@ export const room = new Elysia({ prefix: '/room' })
 	.put('/:id', async ({ user, params: { id }, error }) => {
 		const roomAndPlayers = await getGame(eq(SplendorRoom.id, id));
 
-		if (roomAndPlayers == null || roomAndPlayers.length === 0) {
+		if (roomAndPlayers.length === 0) {
 			return error(404, { message: 'Not Found' });
 		}
 
