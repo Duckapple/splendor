@@ -131,13 +131,24 @@ sw.addEventListener('push', async (event) => {
 		const oldNotis = await sw.registration.getNotifications();
 		oldNotis.forEach((noti) => noti.close());
 
+		const actions = [];
+		switch (rest.type) {
+			case 'your-turn':
+				actions.push({ action: `/game?id=${rest.gameId}`, title: 'View game' });
+				break;
+			case 'invite':
+				actions.push({ action: `/join?id=${rest.gameId}`, title: 'Accept' });
+				actions.push({ action: `/decline?id=${rest.gameId}`, title: 'Decline' });
+				break;
+		}
+
 		event.waitUntil(
 			sw.registration.showNotification(message ?? 'Updates are available!', {
 				icon: '/favicon.png',
 				badge: '/favicon.png',
 				tag: rest.type + (rest.gameId ?? ''),
 				data: rest,
-				actions: [{ action: `game?${rest.gameId}`, title: 'View game' }],
+				actions,
 			})
 		);
 	} else {
@@ -148,11 +159,22 @@ sw.addEventListener('push', async (event) => {
 sw.addEventListener(
 	'notificationclick',
 	(event) => {
-		const { gameId } = event.notification.data;
-
-		event.waitUntil(sw.clients.openWindow(`/game?id=${gameId}`));
-
 		event.notification.close();
+
+		let action = event.action;
+
+		if (!action) {
+			switch (event.notification.data.type) {
+				case 'your-turn':
+					action = `/game?id=${event.notification.data.gameId}`;
+					break;
+				case 'invite':
+					action = `/new?id=${event.notification.data.gameId}`;
+					break;
+			}
+		}
+
+		event.waitUntil(sw.clients.openWindow(event.action));
 	},
 	false
 );

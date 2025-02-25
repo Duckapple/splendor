@@ -31,8 +31,18 @@ export const app = new Elysia({ prefix: '/api' })
 	.onAfterResponse(({ route }) => {
 		console.debug(new Date(), '[debug]', route);
 	})
-	.post('/register', ({ jwt, body }) => registerRoutes.post(body, jwt.sign), { body: loginSchema })
-	.post('/log-in', async ({ jwt, body }) => loginRoutes.post(body, jwt.sign), { body: loginSchema })
+	.post(
+		'/register',
+		({ jwt, body, cookie: { accessToken } }) =>
+			registerRoutes.post(body, jwt.sign, (value) => accessToken.set({ value, maxAge: 34550000 })),
+		{ body: loginSchema }
+	)
+	.post(
+		'/log-in',
+		async ({ jwt, body, cookie: { accessToken } }) =>
+			loginRoutes.post(body, jwt.sign, (value) => accessToken.set({ value, maxAge: 34550000 })),
+		{ body: loginSchema }
+	)
 	.guard({ auth: true })
 	.use(room)
 	.group('/game', (app) =>

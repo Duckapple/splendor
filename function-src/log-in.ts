@@ -7,7 +7,8 @@ import type { authSchema, loginSchema } from './common/auth';
 
 export async function post(
 	{ userName, password }: Static<typeof loginSchema>,
-	sign: (i: Static<typeof authSchema>) => Promise<string>
+	sign: (i: Static<typeof authSchema>) => Promise<string>,
+	setCookie: (value: string) => void
 ) {
 	const [user] = await db.select().from(User).where(eq(User.userName, userName));
 	if (user == null) {
@@ -18,6 +19,8 @@ export async function post(
 	}
 
 	const newJwt = await sign({ id: user.id, userName: user.userName });
+
+	setCookie(newJwt);
 
 	return { jwt: newJwt };
 }

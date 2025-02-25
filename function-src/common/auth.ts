@@ -25,8 +25,8 @@ export const Auth = new Elysia({ name: 'Service.Auth' })
 			schema: authSchema,
 		})
 	)
-	.derive({ as: 'scoped' }, async ({ headers, jwt }) => {
-		const bearer = headers.authorization?.split(' ')[1];
+	.derive({ as: 'scoped' }, async ({ headers, jwt, cookie }) => {
+		const bearer = cookie.accessToken.value ?? headers.authorization?.split(' ')[1];
 		return {
 			bearer,
 			user: (await jwt.verify(bearer)) as Static<typeof authSchema>,

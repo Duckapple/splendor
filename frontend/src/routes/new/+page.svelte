@@ -38,10 +38,6 @@
 			return result;
 		},
 	});
-
-	run(() => {
-		console.log($room);
-	});
 </script>
 
 <svelte:head>
