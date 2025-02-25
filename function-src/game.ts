@@ -5,27 +5,34 @@ import { FunctionError } from './common/auth';
 import type { AuthUser, GameAndPlayers } from '../common/communication';
 import { newGameState } from '../common/defaults';
 import { mapValues } from '../common/utils';
+import { websocketCache } from '../wss';
 
 export async function post(user: AuthUser, id: string) {
 	if (typeof id !== 'string') throw new FunctionError(400, { message: 'Bad room ID' });
 
-	const [room, ...rest] = await db
+	const roomPlayers = await db
 		.select()
 		.from(Room)
 		.leftJoin(SplendorGamePlayer, eq(Room.id, SplendorGamePlayer.gameId))
 		.where(and(eq(Room.id, id), eq(Room.ownerId, user.id), eq(Room.started, false)));
 
-	if (room == null) throw new FunctionError(400, { message: 'Bad Request' });
+	if (roomPlayers == null) throw new FunctionError(400, { message: 'Bad Request' });
 
-	if (rest.length === 0)
+	if (roomPlayers.length < 2)
 		throw new FunctionError(400, { message: 'Cannot start game with only 1 player' });
 
-	const game = newGameState(id, (rest.length + 1) as 2 | 3 | 4);
+	const game = newGameState(id, roomPlayers.length as 2 | 3 | 4);
 
 	await Promise.all([
 		db.insert(SplendorGame).values(game),
 		db.update(Room).set({ started: true }).where(eq(Room.id, id)),
 	]);
+
+	for (const { SplendorGamePlayer } of roomPlayers.filter(
+		({ SplendorGamePlayer }) => SplendorGamePlayer?.userId !== user.id
+	)) {
+		websocketCache[SplendorGamePlayer!.userId]?.({ type: 'game-started', id });
+	}
 
 	return game;
 }

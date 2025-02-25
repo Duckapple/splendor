@@ -1,16 +1,30 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { timeAgo } from '$lib/timeAgo';
-	import { client, isLoggedIn, user } from '$lib/main';
+	import { client, isLoggedIn, jwt, user } from '$lib/main';
 	import { readable } from 'svelte/store';
 	import Background from '$lib/compose/Background.svelte';
 	import { cardFromId } from '../../../../common/defaults';
 	import Login from '$lib/Login.svelte';
 	import Button from '$lib/base/Button.svelte';
+	import { getWebSocket } from '$lib/web-socket.svelte';
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
+
+	const ws = getWebSocket();
+	let subbed = $state(false);
+	$effect(() => {
+		if (jwt && ws && !subbed) {
+			ws?.subscribe(({ data }) => {
+				switch (data.type) {
+					case 'game-started':
+						window.location.href = `/game?id=${data.id}`;
+						break;
+				}
+			});
+			subbed = true;
+		}
+	});
 
 	const room = createQuery({
 		queryKey: ['room', $searchId],
@@ -59,6 +73,7 @@
 				<Button loading={$joinRoom.isPending} onClick={() => $joinRoom.mutate()}>
 					Join the room
 				</Button>
+				<Button href="/" class="mt-2">Go back</Button>
 			{:else}
 				<span class="text-red-700">{err?.message}</span>
 			{/if}
@@ -82,14 +97,19 @@
 					{/each}
 				</ul>
 				{#if data.ownerId === $user?.id && data.players.length > 1}
-					<Button onClick={() => $startGame.mutate()} loading={$startGame.isPending} class="mt-2">
+					<Button
+						onClick={() => $startGame.mutate()}
+						loading={$startGame.isPending}
+						class="mt-2 bg-green-100"
+					>
 						Start the game
 					</Button>
 				{/if}
+				<Button href="/" class="mt-2">Go back</Button>
 			</div>
 		{:else if $room.isSuccess}
 			Game doesn't exist
-			<Button onClick={() => history.back()} class="mt-2">Go back</Button>
+			<Button href="/" class="mt-2">Go back</Button>
 		{/if}
 	</div>
 </div>

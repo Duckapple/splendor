@@ -22,6 +22,10 @@ const responseSchema = t.Union([
 		id: t.String(),
 		update: t.Any() as unknown as typeof stateUpdateSchema,
 	}),
+	t.Object({
+		type: t.Literal('game-started'),
+		id: t.String(),
+	}),
 ]);
 
 type UserID = string;
