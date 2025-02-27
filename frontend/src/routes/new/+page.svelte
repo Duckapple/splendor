@@ -63,6 +63,7 @@
 <svelte:head>
 	<title>New Splendor room</title>
 	<meta name="description" content="You have been invited to a new room. Click to join the fun!" />
+	<meta name="og:image" content="/new-game.webp" />
 </svelte:head>
 
 <Background card={cardFromId(143)} />
