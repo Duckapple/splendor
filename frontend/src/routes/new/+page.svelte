@@ -64,6 +64,7 @@
 	<title>New Splendor room</title>
 	<meta name="description" content="You have been invited to a new room. Click to join the fun!" />
 	<meta name="og:image" content="/new-game.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
 <Background card={cardFromId(143)} />
