@@ -1,4 +1,4 @@
-import type { Color } from '../../../common/model';
+import type { Color } from '../../common/model';
 import type { iconSvgs } from './base/icons';
 
 export const bgColorOf = [

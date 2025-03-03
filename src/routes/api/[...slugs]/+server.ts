@@ -1,4 +1,4 @@
-import { app } from '../../../../../local';
+import { app } from '../../../../local';
 
 type RequestHandler = (v: { request: Request }) => Response | Promise<Response>;
 

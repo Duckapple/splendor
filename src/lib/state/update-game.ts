@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/svelte-query';
 import type { Treaty } from '@elysiajs/eden';
-import type { GameAndPlayers } from '../../../../common/communication';
-import type { StateUpdate } from '../../../../common/schema/game';
+import type { GameAndPlayers } from '../../../common/communication';
+import type { StateUpdate } from '../../../common/schema/game';
 
 type PartialRes<T> = Omit<Treaty.TreatyResponse<{ 200: T }>, 'headers' | 'response'>;
 
