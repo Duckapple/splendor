@@ -1,10 +1,10 @@
 import { t } from 'elysia';
 import type { AuthUser } from '$common/communication';
-import type { Infer } from './common/type';
-import { RedirectError } from './common/error';
-import { db } from './common/db';
-import { SplendorGamePlayer, SplendorRoom } from '../db/schema';
-import { getGame } from './room';
+import type { Infer } from '../common/type';
+import { RedirectError } from '../common/error';
+import { db } from '../common/db';
+import { SplendorGamePlayer, SplendorRoom } from '../../db/schema';
+import { getGame } from '$backend/routes/room';
 import { eq } from 'drizzle-orm';
 
 get.params = { query: t.Object({ id: t.String() }) };

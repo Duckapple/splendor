@@ -1,8 +1,8 @@
 import type { AuthUser } from '$common/communication';
-import { db } from './common/db';
-import { Push } from '../db/schema';
-import type { Infer } from './common/type';
-import { push, subscription } from './common/notifications';
+import { db } from '../common/db';
+import { Push } from '../../db/schema';
+import type { Infer } from '../common/type';
+import { push, subscription } from '../common/notifications';
 
 post.params = { body: subscription };
 export async function post(user: AuthUser, req: Infer<typeof post.params>) {

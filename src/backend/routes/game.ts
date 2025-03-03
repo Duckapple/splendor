@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
-import { SplendorGame, SplendorGamePlayer, SplendorRoom as Room, User } from '../db/schema';
-import { db } from './common/db';
-import { FunctionError } from './common/auth';
+import { SplendorGame, SplendorGamePlayer, SplendorRoom as Room, User } from '../../db/schema';
+import { db } from '../common/db';
+import { FunctionError } from '../common/auth';
 import type { AuthUser, GameAndPlayers } from '$common/communication';
 import { newGameState } from '$common/defaults';
 import { mapValues } from '$common/utils';

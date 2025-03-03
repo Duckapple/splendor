@@ -1,14 +1,20 @@
 import type { AuthUser } from '$common/communication';
-import { FunctionError } from './common/auth';
+import { FunctionError } from '../common/auth';
 import { and, eq, gt, not } from 'drizzle-orm';
-import { Push, SplendorAction, SplendorGame, SplendorGamePlayer, SplendorRoom } from '../db/schema';
-import { db } from './common/db';
+import {
+	Push,
+	SplendorAction,
+	SplendorGame,
+	SplendorGamePlayer,
+	SplendorRoom,
+} from '../../db/schema';
+import { db } from '../common/db';
 import { actionSchema } from '$common/schema/actions';
 import { performAction } from '$common/logic';
 import { GamePhase, type Action, type GameState } from '$common/model';
 import { t } from 'elysia';
-import type { Infer } from './common/type';
-import { push } from './common/notifications';
+import type { Infer } from '../common/type';
+import { push } from '../common/notifications';
 import { websocketCache } from '$backend/wss';
 
 get.params = {

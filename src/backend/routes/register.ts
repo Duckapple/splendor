@@ -1,8 +1,8 @@
 import Bun from 'bun';
 import type { Static } from 'elysia';
-import { User } from '../db/schema';
-import { db } from './common/db';
-import { loginSchema, authSchema } from './common/auth';
+import { User } from '../../db/schema';
+import { db } from '../common/db';
+import { loginSchema, authSchema } from '../common/auth';
 
 export async function post(
 	{ userName, password }: Static<typeof loginSchema>,

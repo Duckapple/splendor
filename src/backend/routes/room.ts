@@ -1,7 +1,7 @@
 import { and, eq, type SQL } from 'drizzle-orm';
-import { SplendorGamePlayer, SplendorRoom, User } from '../db/schema';
-import { db } from './common/db';
-import { Auth } from './common/auth';
+import { SplendorGamePlayer, SplendorRoom, User } from '../../db/schema';
+import { db } from '../common/db';
+import { Auth } from '../common/auth';
 import { randomUUID } from 'crypto';
 import { alias } from 'drizzle-orm/pg-core';
 import { Elysia, t } from 'elysia';
@@ -96,9 +96,8 @@ export async function getGame(where: ReturnType<typeof eq>, inRoom?: true) {
 		.leftJoin(SplendorGamePlayer, eq(SplendorGamePlayer.gameId, SplendorRoom.id))
 		.leftJoin(User, eq(User.id, SplendorGamePlayer.userId));
 
-	const roomAndPlayers = await (inRoom
-		? partial.leftJoin(playerAgain, eq(playerAgain.gameId, SplendorRoom.id))
-		: partial
+	const roomAndPlayers = await (
+		inRoom ? partial.leftJoin(playerAgain, eq(playerAgain.gameId, SplendorRoom.id)) : partial
 	).where(where);
 
 	if (roomAndPlayers.length === 0) return [];
