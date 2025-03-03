@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Card } from '../../../../common/model';
+	import type { Card } from '$common/model';
 	import { bgColorOf } from '$lib/color';
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
 	interface Props {

@@ -16,14 +16,14 @@
 	import Coin from '$lib/game/Coin.svelte';
 	import Person from '$lib/game/Person.svelte';
 
-	import { cardFromId } from '../../../../common/defaults';
+	import { cardFromId } from '$common/defaults';
 	import Hand from '$lib/compose/Hand.svelte';
-	import { range } from '../../../../common/utils';
+	import { range } from '$common/utils';
 	import { moveTo } from '$lib/move';
-	import type { GameAndPlayers } from '../../../../common/communication';
+	import type { GameAndPlayers } from '$common/communication';
 	import { useUpdateGameState } from '$lib/state/update-game';
 	import Icon from '$lib/base/Icon.svelte';
-	import { GamePhase } from '../../../../common/model';
+	import { GamePhase } from '$common/model';
 	import { tick } from 'svelte';
 	import Button from '$lib/base/Button.svelte';
 	import ColorblindToggle from './ColorblindToggle.svelte';

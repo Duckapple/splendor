@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Coin from '$lib/game/Coin.svelte';
 	import { slide } from 'svelte/transition';
-	import type { Color } from '../../../../common/model';
-	import { range } from '../../../../common/utils';
+	import type { Color } from '$common/model';
+	import { range } from '$common/utils';
 
 	interface Props {
 		initialCoinColor: Color | null;

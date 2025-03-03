@@ -16,7 +16,7 @@ import {
 import { sql } from 'drizzle-orm';
 import { object, string } from 'valibot';
 import { createInsertSchema } from 'drizzle-valibot';
-import type { GamePhase, IdDecks, TokenHold } from '../common/model';
+import type { GamePhase, IdDecks, TokenHold } from '$common/model';
 
 function indicesOn<T extends string>(
 	...keys: T[]

@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import winSnapshotTest from '../common/test/win.snapshot.test';
+import winSnapshotTest from '$common/test/win.snapshot.test';
 import { SplendorGame, SplendorGamePlayer, SplendorRoom } from '../db/schema';
 import { db } from './local-db';
 import { $ } from 'bun';

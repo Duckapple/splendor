@@ -1,15 +1,15 @@
 import { Elysia, t } from 'elysia';
 
-import { Auth, FunctionError, loginSchema } from './backend/common/auth';
-import { RedirectError } from './backend/common/error';
+import { Auth, FunctionError, loginSchema } from '$backend/common/auth';
+import { RedirectError } from '$backend/common/error';
 
-import { room } from './backend/room';
-import * as gameRoutes from './backend/game';
-import * as actionRoutes from './backend/action';
-import * as loginRoutes from './backend/log-in';
-import * as registerRoutes from './backend/register';
-import * as notificationsRoutes from './backend/notifications';
-import * as joinRoutes from './backend/join';
+import { room } from '$backend/room';
+import * as gameRoutes from '$backend/game';
+import * as actionRoutes from '$backend/action';
+import * as loginRoutes from '$backend/log-in';
+import * as registerRoutes from '$backend/register';
+import * as notificationsRoutes from '$backend/notifications';
+import * as joinRoutes from '$backend/join';
 
 const PORT = process.env.PORT;
 

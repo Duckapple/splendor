@@ -4,7 +4,7 @@
 	import { client, isLoggedIn, jwt, user } from '$lib/main';
 	import { readable } from 'svelte/store';
 	import Background from '$lib/compose/Background.svelte';
-	import { cardFromId } from '../../../../common/defaults';
+	import { cardFromId } from '$common/defaults';
 	import Login from '$lib/Login.svelte';
 	import Button from '$lib/base/Button.svelte';
 	import { getWebSocket } from '$lib/web-socket.svelte';

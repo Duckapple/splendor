@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Color, GamePhase, type Card as CardType } from '../../../../common/model';
+	import { Color, GamePhase, type Card as CardType } from '$common/model';
 	import Card from '$lib/game/Card.svelte';
 	import Coin from '$lib/game/Coin.svelte';
 	import { user } from '$lib/main';
-	import { cardFromId } from '../../../../common/defaults';
+	import { cardFromId } from '$common/defaults';
 	import type { SplendorGamePlayer } from '../../../../db/schema';
 	import Person from '$lib/game/Person.svelte';
 

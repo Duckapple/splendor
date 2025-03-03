@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Background from '$lib/compose/Background.svelte';
-	import { cardFromId } from '../../../../common/defaults';
+	import { cardFromId } from '$common/defaults';
 </script>
 
 <Background card={cardFromId(143)} class="opacity-60" />

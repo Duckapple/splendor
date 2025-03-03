@@ -1,6 +1,6 @@
 import { getContext, hasContext, setContext } from 'svelte';
 import { treaty } from '@elysiajs/eden';
-import type { WSApp } from '../../wss';
+import type { WSApp } from '$backend/wss';
 import { PUBLIC_WS_PORT } from '$env/static/public';
 import { browser } from '$app/environment';
 

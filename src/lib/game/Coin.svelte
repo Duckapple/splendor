@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bgColorOf, fadeTextBgColorOf, iconOf, ringColorOf } from '$lib/color';
-	import type { Color } from '../../../../common/model';
+	import type { Color } from '$common/model';
 	import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
 	import Icon from '$lib/base/Icon.svelte';
 

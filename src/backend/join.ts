@@ -1,5 +1,5 @@
 import { t } from 'elysia';
-import type { AuthUser } from '../common/communication';
+import type { AuthUser } from '$common/communication';
 import type { Infer } from './common/type';
 import { RedirectError } from './common/error';
 import { db } from './common/db';

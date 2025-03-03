@@ -7,7 +7,7 @@ import { err, fromThrowable, ok } from 'neverthrow';
 import { object, safeParse as _safeParse, string, BaseSchema } from 'valibot';
 import { randomUUID } from 'crypto';
 
-import { newGameState } from '../common/defaults';
+import { newGameState } from '$common/defaults';
 import { Push, User } from '../db/schema';
 
 import process from '$env/dynamic/private';

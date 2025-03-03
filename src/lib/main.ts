@@ -1,6 +1,6 @@
 import { writable, derived, get, type Writable } from 'svelte/store';
 import { treaty } from '@elysiajs/eden';
-import type { App } from '../../local';
+import type { App } from '$backend/local';
 
 export const BASE_URL = import.meta.env.DEV
 	? 'http://localhost:5173'

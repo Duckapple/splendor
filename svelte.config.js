@@ -11,8 +11,13 @@ const config = {
 		adapter: adapter({
 			fallback: '404.html',
 		}),
+		alias: {
+			$backend: 'src/backend',
+			$common: 'src/common',
+			$db: 'src/db',
+		},
 		files: {
-			serviceWorker: 'src/service-worker.js',
+			serviceWorker: 'src/service-worker',
 		},
 	},
 };

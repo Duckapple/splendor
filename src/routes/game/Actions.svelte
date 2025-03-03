@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { cachedWritable, client, userNames } from '$lib/main';
 	import { createQuery } from '@tanstack/svelte-query';
-	import type { Action } from '../../../../common/model';
+	import type { Action } from '$common/model';
 	import Coin from '$lib/game/Coin.svelte';
 	import Card from '$lib/game/Card.svelte';
-	import { cardFromId } from '../../../../common/defaults';
+	import { cardFromId } from '$common/defaults';
 	import { moveTo } from '$lib/move';
 
 	interface Props {

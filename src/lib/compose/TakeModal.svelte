@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import Modal from '../Modal.svelte';
-	import { Color, type GameState, type Player } from '../../../../common/model';
+	import { Color, type GameState, type Player } from '$common/model';
 	import { client } from '../main';
-	import { range } from '../../../../common/utils';
+	import { range } from '$common/utils';
 	import { useUpdateGameState } from '$lib/state/update-game';
 	import SelectTokens from './SelectTokens.svelte';
 	import { slide } from 'svelte/transition';

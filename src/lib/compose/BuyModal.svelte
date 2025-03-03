@@ -1,17 +1,8 @@
 <script lang="ts">
-	import {
-		Color,
-		type Card as CardType,
-		type Player,
-		type GameState,
-	} from '../../../../common/model';
-	import {
-		cardFromId,
-		positionFromCardId,
-		reservePositionFromCardId,
-	} from '../../../../common/defaults';
-	import { getBonusFromCards, canAfford, getEarnedPeople } from '../../../../common/logic';
-	import { only } from '../../../../common/filter-utils';
+	import { Color, type Card as CardType, type Player, type GameState } from '$common/model';
+	import { cardFromId, positionFromCardId, reservePositionFromCardId } from '$common/defaults';
+	import { getBonusFromCards, canAfford, getEarnedPeople } from '$common/logic';
+	import { only } from '$common/filter-utils';
 
 	import Counter from '../../routes/Counter.svelte';
 	import Modal from '../Modal.svelte';

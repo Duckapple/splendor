@@ -1,4 +1,4 @@
-import type { AuthUser } from '../common/communication';
+import type { AuthUser } from '$common/communication';
 import { db } from './common/db';
 import { Push } from '../db/schema';
 import type { Infer } from './common/type';

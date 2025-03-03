@@ -2,10 +2,10 @@ import { and, eq } from 'drizzle-orm';
 import { SplendorGame, SplendorGamePlayer, SplendorRoom as Room, User } from '../db/schema';
 import { db } from './common/db';
 import { FunctionError } from './common/auth';
-import type { AuthUser, GameAndPlayers } from '../common/communication';
-import { newGameState } from '../common/defaults';
-import { mapValues } from '../common/utils';
-import { websocketCache } from '../wss';
+import type { AuthUser, GameAndPlayers } from '$common/communication';
+import { newGameState } from '$common/defaults';
+import { mapValues } from '$common/utils';
+import { websocketCache } from '$backend/wss';
 
 export async function post(user: AuthUser, id: string) {
 	if (typeof id !== 'string') throw new FunctionError(400, { message: 'Bad room ID' });
@@ -53,7 +53,7 @@ export async function get(user: AuthUser, id: string) {
 	if (!result.some(({ player }) => player?.userId === user.id))
 		throw new FunctionError(403, { message: 'Forbidden' });
 
-	const piles = mapValues(result[0].game.piles, ({ length }) => ({ length } as number[]));
+	const piles = mapValues(result[0].game.piles, ({ length }) => ({ length }) as number[]);
 
 	const game: GameAndPlayers = {
 		...result[0].game,

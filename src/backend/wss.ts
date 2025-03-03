@@ -1,8 +1,8 @@
 import { Elysia, t, type Static } from 'elysia';
-import { Auth } from './backend/common/auth';
+import { Auth } from '$backend/common/auth';
 import type { ServerWebSocketSendStatus } from 'bun';
 import cors from '@elysiajs/cors';
-import { stateUpdateSchema } from './common/schema/game';
+import { stateUpdateSchema } from '$common/schema/game';
 
 const messageSchema = t.Union([
 	t.Object({

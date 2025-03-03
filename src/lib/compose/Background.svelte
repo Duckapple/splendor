@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Card from '$lib/game/Card.svelte';
 	import { onMount } from 'svelte';
-	import { cardFromId } from '../../../../common/defaults';
+	import { cardFromId } from '$common/defaults';
 
 	let { card = cardFromId(75), small = false, class: cn = '' } = $props();
 
