@@ -1,4 +1,5 @@
-import { Elysia, t } from 'elysia';
+import { Elysia } from 'elysia';
+import cors from '@elysiajs/cors';
 
 import { Auth, FunctionError, loginSchema } from '$backend/common/auth';
 import { RedirectError } from '$backend/common/error';
@@ -19,7 +20,7 @@ if (!PORT) {
 }
 
 export const app = new Elysia({ prefix: '/api' })
-	// .use(cors())
+	.use(cors())
 	.use(Auth)
 	.get('/ping', 'Pong!')
 	.error({ FunctionError, RedirectError })
