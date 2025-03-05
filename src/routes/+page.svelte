@@ -42,7 +42,7 @@
 			<div class="flex md:grid grid-cols-2 lg:grid-cols-3 flex-col gap-4 pb-2">
 				{#each $rooms.data?.data ?? [] as room}
 					<a
-						class="relative block p-2 rounded text-slate-600 hover:no-underline border border-slate-300 shadow hover:scale-105 transition-transform"
+						class="relative block p-2 rounded-sm text-slate-600 hover:no-underline border border-slate-300 shadow-sm hover:scale-105 transition-transform"
 						href={`/${room.started ? 'game' : 'new'}?id=${room.id}`}
 					>
 						{#if room.started || room.ended}

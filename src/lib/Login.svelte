@@ -35,7 +35,7 @@
 >
 	<label for="userName">User name</label>
 	<input
-		class="p-1 border rounded border-slate-500"
+		class="p-1 border rounded-sm border-slate-500"
 		type="text"
 		name="userName"
 		id="userName"
@@ -44,7 +44,7 @@
 	/>
 	<label for="password">Password</label>
 	<input
-		class="p-1 border rounded border-slate-500"
+		class="p-1 border rounded-sm border-slate-500"
 		type="password"
 		name={pw}
 		id={pw}
@@ -56,7 +56,7 @@
 	{/if}
 	<div class="flex gap-2">
 		<button
-			class="flex-grow p-1 mt-2 border rounded border-slate-500"
+			class="grow p-1 mt-2 border rounded-sm border-slate-500"
 			onclick={() => (register = true)}
 			type="submit"
 		>
@@ -66,7 +66,7 @@
 			Register
 		</button>
 		<button
-			class="flex-grow p-1 mt-2 border rounded border-slate-500"
+			class="grow p-1 mt-2 border rounded-sm border-slate-500"
 			onclick={() => (register = false)}
 			type="submit"
 		>

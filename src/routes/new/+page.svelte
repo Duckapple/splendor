@@ -70,7 +70,7 @@
 <Background card={cardFromId(143)} />
 
 <div class="z-30 flex flex-col items-center justify-center w-full h-screen">
-	<div class="flex flex-col p-2 m-2 rounded-md shadow md:p-4 bg-slate-50">
+	<div class="flex flex-col p-2 m-2 rounded-md shadow-sm md:p-4 bg-slate-50">
 		{#if !$isLoggedIn}
 			<Login onSuccess={() => {}} />
 		{/if}

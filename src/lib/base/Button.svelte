@@ -31,7 +31,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <svelte:element
 	this={href ? 'a' : 'button'}
-	class="p-1 border border-slate-300 shadow-sm rounded transition-all md:px-2 hover:scale-105 hover:text-slate-600 disabled:grayscale-0 {className}"
+	class="p-1 border border-slate-300 shadow-xs rounded-sm transition-all md:px-2 hover:scale-105 hover:text-slate-600 disabled:grayscale-0 {className}"
 	{onclick}
 	{href}
 >

@@ -70,7 +70,7 @@
 
 <button
 	bind:this={ref}
-	class="flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-[transform,opacity] rounded-lg border border-black select-none {cardStyle} shadow-lg aspect-square bg-gradient-to-bl outline-offset-4 focus:outline outline-blue-500 {gradientOf[
+	class="flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-[transform,opacity] rounded-lg border border-black select-none {cardStyle} shadow-lg aspect-square bg-linear-to-bl outline-offset-4 focus:outline outline-blue-500 {gradientOf[
 		card.c
 	]}"
 	class:md:-mt-32={stacked && !small}
@@ -106,7 +106,7 @@
 	>
 		{#each card.cost as co, i}
 			{#if filteredLength === 3 && secondPos === i}
-				<div class:md:hidden={!small}></div>
+				<div class={[!small && 'md:hidden md:-order-1']}></div>
 			{/if}
 			{#if !hideCost && co}
 				{@const bg = bgColorOf[i]}

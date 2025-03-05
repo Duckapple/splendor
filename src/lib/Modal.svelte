@@ -69,7 +69,7 @@
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		class={['p-4 md:p-6 bg-white rounded-lg md:rounded-2xl shadow', cn]}
+		class={['p-4 md:p-6 bg-white rounded-lg md:rounded-2xl shadow-sm', cn]}
 		onclick={(e) => {
 			e.stopPropagation();
 			onclick?.(e);

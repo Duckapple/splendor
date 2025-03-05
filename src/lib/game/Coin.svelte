@@ -43,7 +43,7 @@
 		{@const top = !hideNumber && i + 1 === stackSize}
 		<div
 			class="{!small &&
-				coinMd} relative h-10 w-10 select-none transition-transform flex justify-center items-center last:mb-0 -mb-11 last:group-hover:-translate-y-2 rounded-full aspect-square ring-2 {bgColorOf[
+				coinMd} relative h-10 w-10 select-none transition-transform flex justify-center items-center last:mb-0 -mb-11 group-hover:last:-translate-y-2 rounded-full aspect-square ring-2 {bgColorOf[
 				color
 			]} {ringColorOf[color]}"
 		>
