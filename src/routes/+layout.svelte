@@ -1,28 +1,24 @@
 <script lang="ts">
-	import './styles.css';
 	import '../app.css';
 	import '$lib/main';
-	import { browser } from '$app/environment';
-	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+
+	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import type { Snippet } from 'svelte';
+	import { browser } from '$app/environment';
+
 	import { useRuneContext } from '$lib/state/context-rune.svelte';
 	import { useLocalStoreRune } from '$lib/state/local-store-rune.svelte';
 	import { TOKEN } from '$lib/main';
 	import { getWebSocket } from '$lib/web-socket.svelte';
 
+	import type { LayoutData } from './$types';
+
 	interface Props {
+		data: LayoutData;
 		children?: Snippet;
 	}
 
-	let { children }: Props = $props();
-
-	const queryClient = new QueryClient({
-		defaultOptions: {
-			queries: {
-				enabled: browser,
-			},
-		},
-	});
+	let { children, data }: Props = $props();
 
 	const colorblind = useRuneContext(
 		'colorblind',
@@ -45,7 +41,7 @@
 </script>
 
 <main class="box-border flex flex-col flex-1 w-full min-h-screen mx-auto">
-	<QueryClientProvider client={queryClient}>
+	<QueryClientProvider client={data.queryClient}>
 		{@render children?.()}
 	</QueryClientProvider>
 </main>
