@@ -6,11 +6,16 @@ export const BASE_URL = import.meta.env.DEV
 	? 'http://localhost:5173'
 	: 'https://splendor.simon-green.dev';
 
-export const client = treaty<App>(BASE_URL, {
-	headers() {
-		return { Authorization: `Bearer ${get(jwt)}` };
-	},
-});
+export function getClient(fetcher: typeof globalThis.fetch) {
+	return treaty<App>(BASE_URL, {
+		fetcher,
+		headers() {
+			return { Authorization: `Bearer ${get(jwt)}` };
+		},
+	});
+}
+
+export const client = getClient(fetch);
 
 const BASE_HEADERS = {
 	Accept: 'application/json',

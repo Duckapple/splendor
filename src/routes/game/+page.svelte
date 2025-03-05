@@ -28,6 +28,7 @@
 	import Button from '$lib/base/Button.svelte';
 	import ColorblindToggle from './ColorblindToggle.svelte';
 	import { getWebSocket } from '$lib/web-socket.svelte';
+	import { gameQuery } from './_queries';
 
 	const qc = useQueryClient();
 	const { updateGameState } = useUpdateGameState(qc);
@@ -101,25 +102,13 @@
 
 	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
 
-	// let gameCache = $state<GameAndPlayers>();
+	const game = $derived(createQuery(gameQuery(fetch, $searchId)));
 
-	const gameQueryOptions = $derived(
-		queryOptions({
-			queryKey: ['game', $searchId],
-			async queryFn() {
-				if ($searchId == null) throw { message: 'ID undefined' };
-				const params = { id: $searchId };
-				const result = await client.api.game(params).get();
-				for (const { userName, userId } of result.data?.players ?? []) {
-					$userNames[userId] = userName;
-				}
-				// gameCache = result.data;
-				return result;
-			},
-		})
-	);
-
-	const game = $derived(createQuery(gameQueryOptions));
+	$effect(() => {
+		for (const { userName, userId } of $game.data?.data?.players ?? []) {
+			$userNames[userId] = userName;
+		}
+	});
 
 	const gameCache = $derived($game.data?.data as GameAndPlayers | undefined);
 

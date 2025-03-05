@@ -63,7 +63,7 @@
 <div
 	onclick={(e) => e.target === element && closeModal()}
 	onkeypress={(e) => e.target === element && e.key === 'Escape' && closeModal()}
-	class="fixed top-0 bottom-0 left-0 right-0 z-10 flex items-center justify-center bg-slate-600 bg-opacity-40"
+	class="fixed top-0 bottom-0 left-0 right-0 z-10 flex items-center justify-center bg-slate-600/40"
 	class:hidden={!open}
 	bind:this={element}
 >

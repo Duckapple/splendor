@@ -70,15 +70,17 @@
 
 <button
 	bind:this={ref}
-	class="flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-[transform,opacity] rounded-lg border border-black select-none {cardStyle} shadow-lg aspect-square bg-linear-to-bl outline-offset-4 focus:outline outline-blue-500 {gradientOf[
-		card.c
-	]}"
-	class:md:-mt-32={stacked && !small}
-	class:-mt-16={stacked}
-	class:cursor-default={stacked}
-	class:hover:scale-110={!stacked}
-	class:hover:z-10={!stacked}
-	class:-rotate-90={rotated}
+	class={[
+		'flex flex-col justify-between w-14 h-[5.5rem] first:mt-0 transition-[transform,scale,opacity] rounded-lg border border-black select-none shadow-lg aspect-square bg-linear-to-bl outline-offset-4 focus:outline outline-blue-500',
+		cardStyle,
+		gradientOf[card.c],
+		{
+			'md:-mt-32': stacked && !small,
+			'-mt-16 cursor-default': stacked,
+			'hover:scale-110 hover:z-10': !stacked,
+			'-rotate-90': rotated,
+		},
+	]}
 	disabled={stacked}
 	data-card-id={card.id}
 	{onclick}
