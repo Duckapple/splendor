@@ -6,11 +6,9 @@
 	import Background from '$lib/compose/Background.svelte';
 	import Login from '$lib/Login.svelte';
 	import Button from '$lib/base/Button.svelte';
+	import { roomsQuery } from './_queries';
 
-	const rooms = createQuery({
-		queryKey: ['rooms'],
-		queryFn: () => client.api.room.index.get({ query: {} }),
-	});
+	const rooms = createQuery(roomsQuery(fetch));
 
 	const createRoom = createMutation({
 		mutationKey: ['rooms'],
