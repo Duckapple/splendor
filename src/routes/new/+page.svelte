@@ -2,14 +2,17 @@
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { timeAgo } from '$lib/timeAgo';
 	import { client, isLoggedIn, jwt, user } from '$lib/main';
-	import { readable } from 'svelte/store';
 	import Background from '$lib/compose/Background.svelte';
 	import { cardFromId } from '$common/defaults';
 	import Login from '$lib/Login.svelte';
 	import Button from '$lib/base/Button.svelte';
 	import { getWebSocket } from '$lib/web-socket.svelte';
+	import { page } from '$app/state';
+	import { roomQuery } from './_queries';
 
-	const searchId = readable(new URLSearchParams(globalThis.location?.search).get('id'));
+	const queryClient = useQueryClient();
+
+	const searchId = page.url.searchParams.get('id');
 
 	const ws = getWebSocket();
 	let subbed = $state(false);
@@ -26,28 +29,21 @@
 		}
 	});
 
-	const room = createQuery({
-		queryKey: ['room', $searchId],
-		queryFn: async () => {
-			if ($searchId == null) throw { message: 'ID undefined' };
-			const res = await client.api.room({ id: $searchId }).get();
-			return res;
-		},
-	});
+	const room = $derived(createQuery(roomQuery(fetch, searchId)));
 
 	const joinRoom = createMutation({
 		mutationFn: async () => {
-			if ($searchId == null) throw { message: 'ID undefined' };
-			const result = await client.api.room({ id: $searchId }).put();
-			useQueryClient().setQueryData(['room', $searchId], result);
+			if (searchId == null) throw { message: 'ID undefined' };
+			const result = await client.api.room({ id: searchId }).put();
+			queryClient.setQueryData(['room', searchId], result);
 			return result;
 		},
 	});
 
 	const startGame = createMutation({
 		mutationFn: async () => {
-			if ($searchId == null) throw { message: 'ID undefined' };
-			const result = await client.api.game({ id: $searchId }).post();
+			if (searchId == null) throw { message: 'ID undefined' };
+			const result = await client.api.game({ id: searchId }).post();
 			window.location.href = `/game?id=${result.data?.id}`;
 			return result;
 		},
@@ -55,7 +51,7 @@
 
 	$effect(() => {
 		if ($room.data?.data.started) {
-			window.location.href = `/game?id=${$searchId}`;
+			window.location.href = `/game?id=${searchId}`;
 		}
 	});
 </script>
