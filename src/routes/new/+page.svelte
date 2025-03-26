@@ -9,6 +9,7 @@
 	import { getWebSocket } from '$lib/web-socket.svelte';
 	import { page } from '$app/state';
 	import { roomQuery } from './_queries';
+	import { goto } from '$app/navigation';
 
 	const queryClient = useQueryClient();
 
@@ -21,7 +22,7 @@
 			ws?.subscribe(({ data }) => {
 				switch (data.type) {
 					case 'game-started':
-						window.location.href = `/game?id=${data.id}`;
+						goto(`/game?id=${data.id}`);
 						break;
 				}
 			});
@@ -44,7 +45,7 @@
 		mutationFn: async () => {
 			if (searchId == null) throw { message: 'ID undefined' };
 			const result = await client.api.game({ id: searchId }).post();
-			window.location.href = `/game?id=${result.data?.id}`;
+			if (result.data?.id) goto(`/game?id=${result.data.id}`);
 			return result;
 		},
 	});
