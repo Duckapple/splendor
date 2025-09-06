@@ -1,5 +1,9 @@
 # splendor
 
+> [!WARNING]
+> This repository has been archived. It lives on in [my monorepo, Monnerepo](https://github.com/Duckapple/monnerepo/tree/main/app/splendor).
+> Any PRs, issues, etc should be submitted there.
+
 This is a port of Splendor into an asynchronous web-based board game.
 
 Frontend is made with SvelteKit, backend is Google Cloud functions interacting with Neon DB using Drizzle ORM. Everything is written in TypeScript, using Bun as package manager and bundler for the cloud functions.
